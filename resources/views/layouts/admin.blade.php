@@ -9,7 +9,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="shortcut icon" href="{{asset('images/logo_sm.png')}}">
 
     <!-- Bootstrap core CSS -->
 {{Html::Style('css/bootstrap.min.css')}}
@@ -81,7 +81,7 @@
         <div class="topbar-left">
             <div class="">
                 <a href="index.html" class="logo">
-                    <img src="{{url('images/logo.png')}}" alt="logo" class="logo-lg"/>
+                    <img src="{{url('images/logo.png')}}" alt="logo" class="logo-lg" style="height: 40px"/>
                     <img src="{{url('images/logo_sm.png')}}" alt="logo" class="logo-sm hidden"/>
                 </a>
             </div>
