@@ -10,7 +10,7 @@ Luego de tener clonado el repositorio, es necesario ejecutar los siguientes pasa
 
 <h4>Generar el archivo de configuracion .env</h4>
 
-<pre>copy .env.example .env</prev>
+<pre>copy .env.example .env</pre>
 
 <h4>Generar la key de laravel </h4>
 
