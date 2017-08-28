@@ -50,7 +50,7 @@
 
                             <div class="row m-t-30">
                                 <div class="col-xs-12">
-                                    <a href="index.html" class="btn btn-lg btn-custom btn-block" type="submit">Volver al Inicio</a>
+                                    <a href="{{route('login')}}" class="btn btn-lg btn-custom btn-block" type="submit">Volver al Inicio</a>
                                 </div>
                             </div>
 
