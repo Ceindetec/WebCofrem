@@ -275,8 +275,12 @@ class HomeController extends Controller
             $rol->slug = $request->slug;
             $rol->description = $request->descripcion;
             if ($rol->save()) {
-                $rol->syncPermissions($request->permisos);
-                $rol->save();
+                if(count($request->permisos)>0){
+                    foreach ($request->permisos as $permiso){
+                        $rol->syncPermissions($permiso);
+                        $rol->save();
+                    }
+                }
                 $result["estado"] = true;
                 $result["mensaje"] = "Rol agregado satisfactoriamente";
             } else {
@@ -285,7 +289,7 @@ class HomeController extends Controller
             }
             DB::commit();
             return $result;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $result["estado"] = false;
             $result["mensaje"] = "No fue posible agregar el Rol " . $e->getMessage();
             DB::rollBack();
