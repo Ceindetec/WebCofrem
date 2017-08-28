@@ -1,6 +1,6 @@
 <?php
 
-namespace prueba23\Notifications;
+namespace creditocofrem\Notifications;
 
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Bus\Queueable;

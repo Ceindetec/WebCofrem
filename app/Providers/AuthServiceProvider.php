@@ -1,6 +1,6 @@
 <?php
 
-namespace prueba23\Providers;
+namespace creditocofrem\Providers;
 
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -13,7 +13,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        'prueba23\Model' => 'prueba23\Policies\ModelPolicy',
+        'creditocofrem\Model' => 'creditocofrem\Policies\ModelPolicy',
     ];
 
     /**

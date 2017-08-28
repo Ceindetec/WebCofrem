@@ -1,6 +1,6 @@
 <?php
 
-namespace prueba23;
+namespace creditocofrem;
 
 use Illuminate\Database\Eloquent\Model;
 

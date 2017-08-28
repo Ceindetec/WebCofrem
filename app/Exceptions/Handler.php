@@ -1,6 +1,6 @@
 <?php
 
-namespace prueba23\Exceptions;
+namespace creditocofrem\Exceptions;
 
 use Exception;
 use Illuminate\Auth\AuthenticationException;

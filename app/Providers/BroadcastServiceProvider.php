@@ -1,6 +1,6 @@
 <?php
 
-namespace prueba23\Providers;
+namespace creditocofrem\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Broadcast;

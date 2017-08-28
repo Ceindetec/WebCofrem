@@ -171,11 +171,11 @@ return [
         /*
          * Application Service Providers...
          */
-        prueba23\Providers\AppServiceProvider::class,
-        prueba23\Providers\AuthServiceProvider::class,
-        // prueba23\Providers\BroadcastServiceProvider::class,
-        prueba23\Providers\EventServiceProvider::class,
-        prueba23\Providers\RouteServiceProvider::class,
+        creditocofrem\Providers\AppServiceProvider::class,
+        creditocofrem\Providers\AuthServiceProvider::class,
+        // creditocofrem\Providers\BroadcastServiceProvider::class,
+        creditocofrem\Providers\EventServiceProvider::class,
+        creditocofrem\Providers\RouteServiceProvider::class,
 
 
         Yajra\Datatables\DatatablesServiceProvider::class,

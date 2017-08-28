@@ -1,6 +1,6 @@
 <?php
 
-namespace prueba23\Console;
+namespace creditocofrem\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;

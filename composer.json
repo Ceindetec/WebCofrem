@@ -23,7 +23,7 @@
             "database"
         ],
         "psr-4": {
-            "prueba23\\": "app/"
+            "creditocofrem\\": "app/"
         }
     },
     "autoload-dev": {

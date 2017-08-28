@@ -1,11 +1,11 @@
 <?php
 
-namespace prueba23;
+namespace creditocofrem;
 
 use Caffeinated\Shinobi\Traits\ShinobiTrait;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use prueba23\Notifications\MyResetPassword;
+use creditocofrem\Notifications\MyResetPassword;
 
 
 class User extends Authenticatable

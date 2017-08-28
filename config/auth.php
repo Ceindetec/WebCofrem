@@ -67,7 +67,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => prueba23\User::class,
+            'model' => creditocofrem\User::class,
         ],
 
         // 'users' => [
