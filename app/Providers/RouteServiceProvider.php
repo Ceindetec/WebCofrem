@@ -1,6 +1,6 @@
 <?php
 
-namespace prueba23\Providers;
+namespace creditocofrem\Providers;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
@@ -14,7 +14,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    protected $namespace = 'prueba23\Http\Controllers';
+    protected $namespace = 'creditocofrem\Http\Controllers';
 
     /**
      * Define your route model bindings, pattern filters, etc.
@@ -59,7 +59,6 @@ class RouteServiceProvider extends ServiceProvider
              ->namespace($this->namespace)
              ->group(base_path('routes/web.php'));
     }
-
 
     /**
      * Define the "web" routes for the application.

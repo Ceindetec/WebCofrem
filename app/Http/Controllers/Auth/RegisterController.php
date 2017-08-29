@@ -1,9 +1,9 @@
 <?php
 
-namespace prueba23\Http\Controllers\Auth;
+namespace creditocofrem\Http\Controllers\Auth;
 
-use prueba23\User;
-use prueba23\Http\Controllers\Controller;
+use creditocofrem\User;
+use creditocofrem\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 

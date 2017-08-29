@@ -1,6 +1,6 @@
 <?php
 
-namespace prueba23\Http\Middleware;
+namespace creditocofrem\Http\Middleware;
 
 use Illuminate\Cookie\Middleware\EncryptCookies as BaseEncrypter;
 

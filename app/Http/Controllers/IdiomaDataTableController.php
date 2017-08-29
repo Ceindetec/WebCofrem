@@ -1,6 +1,6 @@
 <?php
 
-namespace prueba23\Http\Controllers;
+namespace creditocofrem\Http\Controllers;
 
 use Illuminate\Http\Request;
 

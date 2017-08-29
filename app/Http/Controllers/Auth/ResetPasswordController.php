@@ -1,8 +1,8 @@
 <?php
 
-namespace prueba23\Http\Controllers\Auth;
+namespace creditocofrem\Http\Controllers\Auth;
 
-use prueba23\Http\Controllers\Controller;
+use creditocofrem\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ResetsPasswords;
 
 class ResetPasswordController extends Controller
