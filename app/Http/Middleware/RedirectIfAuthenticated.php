@@ -1,6 +1,6 @@
 <?php
 
-namespace prueba23\Http\Middleware;
+namespace creditocofrem\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;

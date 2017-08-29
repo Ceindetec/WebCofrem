@@ -4,12 +4,12 @@
  *
  */
 
-namespace prueba23\Http\Controllers;
+namespace creditocofrem\Http\Controllers;
 
 use Illuminate\Http\Request;
 
 use Mockery\Exception;
-use prueba23\User;
+use creditocofrem\User;
 use Yajra\Datatables\Datatables;
 use Caffeinated\Shinobi\Models\Role;
 use Caffeinated\Shinobi\Models\Permission;

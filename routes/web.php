@@ -86,6 +86,10 @@ Route::group(['middleware' => 'auth'], function () {
 
         /*TERMINA ADMINISTRACION DE PERMISO*/
 
+        /*INICIO ESTABLECIMIENTOS*/
+        route::get('establecimientos','EstablecimientosController@index')->name('establecimientos');
+        /*FINALIZA ESTABLECIMIENTOS*/
+
     });
 
 

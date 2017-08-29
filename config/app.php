@@ -171,19 +171,15 @@ return [
         /*
          * Application Service Providers...
          */
-        prueba23\Providers\AppServiceProvider::class,
-        prueba23\Providers\AuthServiceProvider::class,
-        // prueba23\Providers\BroadcastServiceProvider::class,
-        prueba23\Providers\EventServiceProvider::class,
-        prueba23\Providers\RouteServiceProvider::class,
-
-
-        Yajra\Datatables\DatatablesServiceProvider::class,
+        creditocofrem\Providers\AppServiceProvider::class,
+        creditocofrem\Providers\AuthServiceProvider::class,
+        // creditocofrem\Providers\BroadcastServiceProvider::class,
+        creditocofrem\Providers\EventServiceProvider::class,
+        creditocofrem\Providers\RouteServiceProvider::class,
 
         Collective\Html\HtmlServiceProvider::class,
-
+        Yajra\Datatables\DatatablesServiceProvider::class,
         Caffeinated\Shinobi\ShinobiServiceProvider::class,
-
         Yajra\Oci8\Oci8ServiceProvider::class,
 
     ],
@@ -239,8 +235,6 @@ return [
         'Html' => Collective\Html\HtmlFacade::class,
 
         'Shinobi' => Caffeinated\Shinobi\Facades\Shinobi::class,
-
-
 
     ],
 

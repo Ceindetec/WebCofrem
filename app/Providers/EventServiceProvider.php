@@ -1,6 +1,6 @@
 <?php
 
-namespace prueba23\Providers;
+namespace creditocofrem\Providers;
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -13,8 +13,8 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-        'prueba23\Events\Event' => [
-            'prueba23\Listeners\EventListener',
+        'creditocofrem\Events\Event' => [
+            'creditocofrem\Listeners\EventListener',
         ],
     ];
 
