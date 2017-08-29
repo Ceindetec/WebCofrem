@@ -4,6 +4,14 @@ Author: CoderThemes
 Email: coderthemes@gmail.com
 File: Main file css
 */
+
+
+/*ajustes personaliados*/
+.parsley-errors-list.filled, .parsley-errors-list{
+  display: block !important;
+}
+
+/*fin ajustes*/
 @import url("https://fonts.googleapis.com/css?family=Hind:400,500,700|Noto+Sans:400,700");
 /*=====================
          Menu
