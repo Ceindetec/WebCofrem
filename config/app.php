@@ -177,13 +177,9 @@ return [
         creditocofrem\Providers\EventServiceProvider::class,
         creditocofrem\Providers\RouteServiceProvider::class,
 
-
-        Yajra\Datatables\DatatablesServiceProvider::class,
-
         Collective\Html\HtmlServiceProvider::class,
-
+        Yajra\Datatables\DatatablesServiceProvider::class,
         Caffeinated\Shinobi\ShinobiServiceProvider::class,
-
         Yajra\Oci8\Oci8ServiceProvider::class,
 
     ],
@@ -239,8 +235,6 @@ return [
         'Html' => Collective\Html\HtmlFacade::class,
 
         'Shinobi' => Caffeinated\Shinobi\Facades\Shinobi::class,
-
-
 
     ],
 

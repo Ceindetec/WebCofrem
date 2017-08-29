@@ -60,7 +60,6 @@ class RouteServiceProvider extends ServiceProvider
              ->group(base_path('routes/web.php'));
     }
 
-
     /**
      * Define the "web" routes for the application.
      *
