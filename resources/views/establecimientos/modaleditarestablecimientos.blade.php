@@ -1,5 +1,6 @@
-<div id="modalcrearestablecimientos">
-    {{Form::open(['route'=>['establecimiento.crearp'], 'class'=>'form-horizontal', 'id'=>'crearestablecimientos'])}}
+<div id="modaleditarestablecimiento">
+
+    {{Form::model($establecimiento,['route'=>['establecimiento.editarp',$establecimiento->id], 'class'=>'form-horizontal', 'id'=>'editarestablecimientos'])}}
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h4 class="modal-title">Agregar establecimiento comercial</h4>
@@ -52,8 +53,8 @@
 
 <script>
     $(function () {
-        $("#crearestablecimientos").parsley();
-        $("#crearestablecimientos").submit(function (e) {
+        $("#editarestablecimientos").parsley();
+        $("#editarestablecimientos").submit(function (e) {
             e.preventDefault();
             var form = $(this);
             $.ajax({
