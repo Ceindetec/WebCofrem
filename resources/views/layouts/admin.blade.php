@@ -16,10 +16,11 @@
 <!-- MetisMenu CSS -->
 {{Html::Style('css/metisMenu.min.css')}}
 <!-- Icons CSS -->
-{{Html::Style('css/icons.css')}}
+    {{Html::Style('css/icons.css')}}
 
     <link href="{{asset('plugins/bootstrap-sweetalert/sweetalert.css')}}" rel="stylesheet" type="text/css">
     <link href="{{asset('plugins/select2/css/select2.min.css')}}" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="{{asset('plugins/switchery/switchery.min.css')}}">
 
 <!-- Custom styles for this template -->
     {{Html::Style('css/style.css')}}
@@ -283,11 +284,11 @@
             @yield('contenido')
 
             <div class="footer">
-                <div class="pull-right hidden-xs">
+                <!--<div class="pull-right hidden-xs">
                     Project Completed <strong class="text-custom">39%</strong>.
-                </div>
+                </div>-->
                 <div>
-                    <strong>Simple Admin</strong> - Copyright &copy; 2017
+                    <strong>Ceindetec Llanos</strong> - Copyright &copy; 2017
                 </div>
             </div> <!-- end footer -->
 
@@ -326,6 +327,11 @@
 
 <script src="{{asset('plugins/select2/js/select2.min.js')}}" type="text/javascript"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/i18n/es.js"></script>
+
+<script src="{{asset('plugins/parsleyjs/parsley.min.js')}}"></script>
+<script src="{{asset('plugins/parsleyjs/idioma/es.js')}}"></script>
+
+<script src="{{asset('plugins/switchery/switchery.min.js')}}"></script>
 <!-- App Js -->
 {{Html::Script("js/jquery.app.js")}}
 
