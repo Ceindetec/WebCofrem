@@ -97,6 +97,15 @@ Route::group(['middleware' => 'auth'], function () {
 
         /*FINALIZA ESTABLECIMIENTOS*/
 
+        /*INICIA SUCURSALES ESTABLECIMIENTOS*/
+
+        Route::get('listsucursales/{id}','SucursalesController@index')->name('listsucursales');
+        Route::get('gridsuscursales','SucursalesController@gridSuscursales')->name('gridsuscursales');
+        Route::get('sucursal/crear','SucursalesController@viewCrearSucursal')->name('sucursal.crear');
+        Route::post('sucursal/crear','SucursalesController@crearSucursal')->name('sucursal.crearp');
+
+        /*FINALIZA SUCURSALES ESTABLECIMIENTOS*/
+
     });
 
 
@@ -108,6 +117,11 @@ Route::group(['middleware' => 'auth'], function () {
 
 
 });
+
+Route::get('municipios', function (\Illuminate\Http\Request $request){
+    return \DB::table('municipios')->where('departamento_codigo',$request->data)->get();
+})->name('municipios');
+
 
 Route::get('datatable_es', 'IdiomaDataTableController@espanol')->name('datatable_es');
 

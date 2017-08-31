@@ -15,9 +15,44 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-12">
-                <h4 class="header-title m-t-0 m-b-20">Gestionar establecimientos comerciales </h4>
+                <h4 class="header-title m-t-0 m-b-20">Sucursales de {{$establecimiento->razon_social}}
+                    <span class="pull-right"><a href="{{route('establecimientos')}}" class="btn btn-custom" style="position: relative; top: -7px"><i class="ti-arrow-left"></i> Volver</a> </span></h4></h4>
             </div>
         </div> <!-- end row -->
+
+        <div class="card-box">
+            <h4>Informacion del establecimiento</h4>
+            <p>&nbsp;</p>
+            <div class="row">
+                <div class="col-sm-12">
+                    <label class="col-sm-2">Nit:</label>
+                    <div class="col-sm-10">
+                        {{$establecimiento->nit}}
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <label class="col-sm-2">Rozon social:</label>
+                    <div class="col-sm-10">
+                        {{$establecimiento->razon_social}}
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <label class="col-sm-2">Estado</label>
+                    <div class="col-sm-10">
+                        Activo
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-box">
+                <h4>Sucursales activas</h4>
+                <p>&nbsp;</p>
+            <div class="row">
+                <div id="map" style="width: 100%;height: 250px"></div>
+            </div>
+
+        </div>
 
         <div class="row">
             <div class="col-sm-12">
@@ -26,7 +61,9 @@
                     <div class="row">
                         <div class="col-lg-3 col-sm-6">
                             <div class="widget-inline-box">
-                                <a href="{{route('establecimiento.crear')}}" data-modal class="btn btn-custom waves-effect waves-light" data-toggle="modal" data-target="#modalrol">Agregar Establecimiento</a>
+                                <a href="{{route('sucursal.crear',['id'=>$establecimiento->id])}}" data-modal="modal-lg"
+                                   class="btn btn-custom waves-effect waves-light" data-toggle="modal"
+                                   data-target="#modalrol">Agregar sucursal</a>
                             </div>
                         </div>
                     </div>
@@ -40,8 +77,9 @@
                     <table id="datatable" class="table table-striped table-bordered" width="100%">
                         <thead>
                         <tr>
-                            <th>Nit</th>
-                            <th>Razon social</th>
+                            <th>Nombre</th>
+                            <th>Ciudad</th>
+                            <th>Direccion</th>
                             <th>Acciones</th>
                         </tr>
                         </thead>
@@ -71,9 +109,13 @@
     <script src="{{asset('plugins/datatables/dataTables.colVis.js')}}"></script>
     <script src="{{asset('plugins/datatables/dataTables.fixedColumns.min.js')}}"></script>
 
+    <script src="http://maps.google.com/maps/api/js?key=AIzaSyB1hUpbneHQgqsTgVZMvWc0jqUBKdQUobM&sensor=true"></script>
+    <script src="{{asset('plugins/gmaps/gmaps.min.js')}}"></script>
+
     <script>
         var table;
         $(function () {
+            //iniciamos el data table
             table = $('#datatable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -81,16 +123,31 @@
                     "url": "{!!route('datatable_es')!!}"
                 },
                 ajax: {
-                    url: "{!!route('gridestablecimientos')!!}",
+                    url: "{!!route('gridsuscursales',['id'=>$establecimiento->id])!!}",
                     "type": "get"
                 },
                 columns: [
-                    {data: 'nit', name: 'nit'},
-                    {data: 'razon_social', name: 'razon_social'},
+                    {data: 'nombre', name: 'nombre'},
+                    {data: 'get_municipio.descripcion', name: 'ciudad'},
+                    {data: 'direccion', name: 'direccion'},
                     {data: 'action', name: 'action', orderable: false, searchable: false}
                 ],
                 order: [[1, 'asc']]
             });
-        })
+
+            initMap();//inicializa el mapa
+        });
+
+        var map;//variable que contendra el mapa de google
+        function initMap() {
+            setTimeout(function () {
+                map = new GMaps({
+                    div: '#map',
+                    lat: -12.043333,
+                    lng: -77.028333
+                });
+            },200);
+        };
+
     </script>
 @endsection
