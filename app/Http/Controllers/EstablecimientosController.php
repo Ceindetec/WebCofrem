@@ -24,8 +24,10 @@ class EstablecimientosController extends Controller
         $establecimientos = Establecimientos::all();
         return Datatables::of($establecimientos)
             ->addColumn('action', function ($establecimientos) {
-                $acciones = '<a href="' . route("establecimiento.editar", ["id" => $establecimientos->id]) . '" data-modal="modal-lg" class="btn btn-xs btn-custom" ><i class="glyphicon glyphicon-edit"></i> Edit</a>';
-                $acciones = $acciones . ' ' . '<button class="btn btn-xs btn-danger" onclick="eliminar(' . $establecimientos->id . ')"><i class="glyphicon glyphicon-remove"></i> Eliminar</button>';
+                $acciones = '<div class="btn-group">';
+                $acciones = $acciones.'<a href="' . route("establecimiento.editar", ["id" => $establecimientos->id]) . '" class="btn btn-xs btn-custom" ><i class="ti-pencil-alt"></i> Edit</a>';
+                $acciones = $acciones.'<a class="btn btn-xs btn-primary" href="'.route("listsucursales", [$establecimientos->id]).'"><i class="ti-layers-alt"></i> Sucursales</a>';
+                $acciones = $acciones.'</div>';
                 return $acciones;
             })
             ->make(true);
@@ -62,13 +64,16 @@ class EstablecimientosController extends Controller
     }
 
     /**
-     * trae la vista para el modal que tendra el formulario de editar establecimiento
+     * trae la vista para editar establecimiento asi como agregar contractos y editarlos
      * @param Request $request trae la id del establecimiento a editar
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function viewEditarEstablecimiento(Request $request){
         $establecimiento = Establecimientos::find($request->id);
-        return view('establecimientos.modaleditarestablecimientos', compact('establecimiento'));
+        if($establecimiento == null){
+            return redirect()->back();
+        }
+        return view('establecimientos.editarestablecimiento', compact('establecimiento'));
     }
 
     public function  editarEstablecimiento(Request $request){
