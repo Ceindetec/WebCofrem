@@ -47,19 +47,26 @@ class EstablecimientosController extends Controller
      * @return mixed returna una respuesta positiva o negativa dependiendo de la transaccion
      */
     public function crearEstablecimiento(Request $request){
-        $validator = \Validator::make($request->all(), [
-            'nit' => 'required|unique:establecimientos|max:11',
-            'email' => 'required|unique:establecimientos',
-        ]);
+        $result = [];
+        try{
+            $validator = \Validator::make($request->all(), [
+                'nit' => 'required|unique:establecimientos|max:11',
+                'email' => 'required|unique:establecimientos',
+            ]);
 
-        if ($validator->fails()) {
-            return $validator->errors()->all();
+            if ($validator->fails()) {
+                return $validator->errors()->all();
+            }
+
+            $establecimiento = new Establecimientos($request->all());
+            $establecimiento->razon_social = strtoupper($establecimiento->razon_social);
+            $establecimiento->save();
+            $result['estado'] = true;
+            $result['mensaje'] = 'El establecimiento ha sido creado satisfactoriamente';
+        }catch (\Exception $exception){
+            $result['estado'] = false;
+            $result['mensaje'] = 'No fue posible crear el establicimiento '.$exception->getMessage();
         }
-
-        $establecimiento = new Establecimientos();
-        $establecimiento->create($request->all());
-        $result['estado'] = true;
-        $result['mensaje'] = 'El establecimiento ha sido creado satisfactoriamente';
         return $result;
     }
 
@@ -105,8 +112,9 @@ class EstablecimientosController extends Controller
                 return $validator->errors()->all();
             }
         }
-
         $establecimiento->update($request->all());
+        $establecimiento->razon_social = strtoupper($establecimiento->razon_social);
+        $establecimiento->save();
         $result['estado'] = true;
         $result['mensaje'] = 'El establecimiento actualizado satisfactorimante.';
         return $result;

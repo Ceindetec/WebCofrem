@@ -103,6 +103,9 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('gridsuscursales','SucursalesController@gridSuscursales')->name('gridsuscursales');
         Route::get('sucursal/crear','SucursalesController@viewCrearSucursal')->name('sucursal.crear');
         Route::post('sucursal/crear','SucursalesController@crearSucursal')->name('sucursal.crearp');
+        Route::get('marketsucursales','SucursalesController@getMarketSucursales')->name('marketsucursales');
+        Route::get('sucursal/editar','SucursalesController@viewEditarSucursal')->name('sucursal.editar');
+        Route::post('sucursal/editar','SucursalesController@editarSucursal')->name('sucursal.editarp');
 
         /*FINALIZA SUCURSALES ESTABLECIMIENTOS*/
 
