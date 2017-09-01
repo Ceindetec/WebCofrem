@@ -10,4 +10,20 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+Auth::routes();
 
+Route::group(['middleware' => 'auth'], function () {
+
+    Route::group(['middleware' => 'roleshinobi:admin'], function (){
+
+        /*INICIO TARJETAS*/
+
+        route::get('tarjetas','TarjetasController@index')->name('tarjetas');
+        route::get('tarjetas/gridtarjetas','TarjetasController@gridTarjetas')->name('gridtarjetas');
+        route::get('tarjetas/crear','TarjetasController@viewCrearTarjeta')->name('tarjetas.crear');
+        route::post('tarjetas/crear','TarjetasController@crearTarjeta')->name('tarjetas.crearp');
+
+        /*FINALIZA TARJETAS*/
+
+    });
+    });

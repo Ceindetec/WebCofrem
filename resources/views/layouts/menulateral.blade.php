@@ -9,6 +9,8 @@
             <li><a href="{{route('usuarios')}}">Usuarios</a></li>
             <li><a href="{{route('roles')}}">Roles</a></li>
             <li><a href="{{route('permisos')}}">Permisos</a></li>
+
+            <li><a href="{{route('tarjetas')}}">Tarjetas</a></li>
         </ul>
     </li>
 @endrole
