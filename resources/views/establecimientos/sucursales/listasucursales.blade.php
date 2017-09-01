@@ -62,8 +62,7 @@
                         <div class="col-lg-3 col-sm-6">
                             <div class="widget-inline-box">
                                 <a href="{{route('sucursal.crear',['id'=>$establecimiento->id])}}" data-modal="modal-lg"
-                                   class="btn btn-custom waves-effect waves-light" data-toggle="modal"
-                                   data-target="#modalrol">Agregar sucursal</a>
+                                   class="btn btn-custom waves-effect waves-light" data-toggle="modal">Agregar sucursal</a>
                             </div>
                         </div>
                     </div>
@@ -80,6 +79,7 @@
                             <th>Nombre</th>
                             <th>Ciudad</th>
                             <th>Direccion</th>
+                            <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                         </thead>
@@ -130,12 +130,24 @@
                     {data: 'nombre', name: 'nombre'},
                     {data: 'get_municipio.descripcion', name: 'ciudad'},
                     {data: 'direccion', name: 'direccion'},
+                    {
+                        data: 'estado',
+                        name: 'estado',
+                        render: function (data) {
+                            if(data=='A'){
+                                return 'Activa'
+                            }else{
+                                return 'Inactiva'
+                            }
+                        }
+                    },
                     {data: 'action', name: 'action', orderable: false, searchable: false}
                 ],
                 order: [[1, 'asc']]
             });
 
             initMap();//inicializa el mapa
+            setTimeout(getMarket,500);
         });
 
         var map;//variable que contendra el mapa de google
@@ -148,6 +160,22 @@
                 });
             },200);
         };
+
+        function getMarket() {
+            $.get("{{route('marketsucursales',['id'=>$establecimiento->id])}}",{},function (data) {
+                for(i=0;i<data.length;i++){
+                    map.setCenter(data[0].latitud, data[0].longitud);
+                    map.addMarker({
+                        lat: data[i].latitud,
+                        lng: data[i].longitud,
+                        title: data[i].nombre,
+                        infoWindow: {
+                            content: '<p>'+data[i].nombre+'</p>'
+                        }
+                    });
+                }
+            })
+        }
 
     </script>
 @endsection
