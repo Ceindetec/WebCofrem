@@ -85,7 +85,7 @@
         <div class="form-group">
             <label class="col-md-2 control-label">Contraseña</label>
             <div class="col-md-10">
-                {{Form::password('password', ['class'=>'form-control', "required", "data-parsley-type"=>"number", "tabindex"=>"9","maxlength"=>"10"])}}
+                {{Form::password('password', ['class'=>'form-control', "required", "data-parsley-type"=>"number", "tabindex"=>"9","maxlength"=>"4"])}}
             </div>
         </div>
 
