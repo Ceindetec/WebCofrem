@@ -1,8 +1,8 @@
-<div id="modalcrearsucursal">
-    {{Form::open(['route'=>['sucursal.crearp', $establecimiento_id], 'class'=>'form-horizontal', 'id'=>'crearsucursal'])}}
+<div id="modaleditarsucursal">
+    {{Form::model($sucursal,['route'=>['sucursal.editarp', $sucursal->id], 'class'=>'form-horizontal', 'id'=>'editarsucursal'])}}
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h4 class="modal-title">Agregar sucursal</h4>
+        <h4 class="modal-title">Editar sucursal</h4>
     </div>
     <div class="modal-body">
 
@@ -77,7 +77,7 @@
             <label class="col-md-2 control-label">Complemento</label>
             <div class="col-md-10">
                 <input type="text" id="complemento" name="complemento" tabindex="8" class="form-control obtener"
-                data-parsley-pattern="^[a-zA-Z0-9]+(\s*[a-zA-Z0-9]*)*[a-zA-Z0-9]+$"  maxlength="60">
+                       data-parsley-pattern="^[a-zA-Z0-9]+(\s*[a-zA-Z0-9]*)*[a-zA-Z0-9]+$"  maxlength="60">
             </div>
         </div>
 
@@ -85,7 +85,14 @@
         <div class="form-group">
             <label class="col-md-2 control-label">Contraseña</label>
             <div class="col-md-10">
-                {{Form::password('password', ['class'=>'form-control', "required", "data-parsley-type"=>"number", "tabindex"=>"9","maxlength"=>"10"])}}
+                {{Form::password('password', ['class'=>'form-control', "data-parsley-type"=>"number", "tabindex"=>"9","maxlength"=>"10"])}}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-2 control-label">Estado</label>
+            <div class="col-md-10">
+                {{Form::select("estado",["A"=>"Activa","I"=>"Inactiva"],null,['class'=>'form-control', "tabindex"=>"2",'id'=>'departamento'])}}
             </div>
         </div>
 
@@ -99,12 +106,15 @@
 </div>
 
 <script>
+    var direccion = '{{$sucursal->direccion}}';
+    var valdep = '{{$depar->codigo}}';
+    var valmuni = '{{$sucursal->municipio_codigo}}';
     $(function () {
         setTimeout(function () {
             $('#nombre').focus();
         },1000);
-        $("#crearsucursal").parsley();
-        $("#crearsucursal").submit(function (e) {
+        $("#editarsucursal").parsley();
+        $("#editarsucursal").submit(function (e) {
             e.preventDefault();
             var form = $(this);
             $.ajax({
@@ -171,6 +181,27 @@
             geolocalizarDireccion();
         });
 
+        $('#departamento > option[value='+valdep+']').attr('selected', 'selected');
+
+        var arraydire = direccion.split(' ');
+
+        var complemento = arraydire[2].split('-');
+
+        $('#viaprincipal > option[value='+arraydire[0]+']').attr('selected', 'selected');
+
+        $('#numerovia').val(arraydire[1]);
+        $('#numero2').val(complemento[1]);
+        $('#numero1').val(complemento[0].substring(1,complemento[0].length));
+
+        if(arraydire.length>3){
+            var findire="";
+            findire +=arraydire[3];
+            for(i=4;i<arraydire.length;i++){
+                findire +=" "+arraydire[i];
+            }
+            $('#complemento').val(findire);
+        }
+
 
 
     });
@@ -235,6 +266,8 @@
             $.each(result, function (i, value) {
                 $('#municipio').append($('<option>').text(value.descripcion).attr('value', value.codigo));
             });
+            $('#municipio > option[value='+valmuni+']').attr('selected', 'selected');
+            geolocalizarDireccion();
         })
     }
 
