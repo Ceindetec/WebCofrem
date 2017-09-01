@@ -236,6 +236,8 @@ return [
 
         'Shinobi' => Caffeinated\Shinobi\Facades\Shinobi::class,
 
+        'Encript' => Facades\creditocofrem\Encript::class,
+
     ],
 
 ];
