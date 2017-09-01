@@ -19,6 +19,9 @@ class SucursalesController extends Controller
      */
     public function index($id){
         $establecimiento = Establecimientos::find($id);
+        if($establecimiento==null){
+            return redirect()->back();
+        }
         return view('establecimientos.sucursales.listasucursales', compact('establecimiento'));
     }
 
@@ -36,7 +39,7 @@ class SucursalesController extends Controller
             ->addColumn('action', function ($sucursales) {
                 $acciones = '<div class="btn-group">';
                 $acciones = $acciones.'<a href="' . route("sucursal.editar", ["id" => $sucursales->id]) . '" data-modal="modal-lg" class="btn btn-xs btn-custom" ><i class="ti-pencil-alt"></i> Edit</a>';
-                $acciones = $acciones.'<a class="btn btn-xs btn-primary" href="'.route("listsucursales", [$sucursales->id]).'"><i class="ti-layers-alt"></i> Terminales</a>';
+                $acciones = $acciones.'<a class="btn btn-xs btn-primary" href="'.route("listterminales", [$sucursales->id]).'"><i class="ti-layers-alt"></i> Terminales</a>';
                 $acciones = $acciones.'</div>';
                 return $acciones;
             })

@@ -14,4 +14,9 @@ class Sucursales extends Model
     {
         return $this->belongsTo('creditocofrem\Municipios', 'municipio_codigo','codigo');
     }
+
+    public function getEstablecimiento()
+    {
+        return $this->belongsTo('creditocofrem\Establecimientos', 'establecimiento_id','id');
+    }
 }

@@ -16,7 +16,7 @@
         <div class="row">
             <div class="col-sm-12">
                 <h4 class="header-title m-t-0 m-b-20">Sucursales de {{$establecimiento->razon_social}}
-                    <span class="pull-right"><a href="{{route('establecimientos')}}" class="btn btn-custom" style="position: relative; top: -7px"><i class="ti-arrow-left"></i> Volver</a> </span></h4></h4>
+                    <span class="pull-right"><a href="{{route('establecimientos')}}" class="btn btn-custom" style="position: relative; top: -7px"><i class="ti-arrow-left"></i> Volver</a> </span></h4>
             </div>
         </div> <!-- end row -->
 

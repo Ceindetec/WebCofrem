@@ -109,6 +109,18 @@ Route::group(['middleware' => 'auth'], function () {
 
         /*FINALIZA SUCURSALES ESTABLECIMIENTOS*/
 
+        /*INICIA TERMINALES*/
+
+        Route::get('listterminales/{id}','TerminalesController@index')->name('listterminales');
+        Route::get('gridterminales','TerminalesController@gridTerminales')->name('gridterminales');
+        Route::get('terminal/crear','TerminalesController@viewCrearTerminal')->name('terminal.crear');
+        Route::post('terminal/crear','TerminalesController@crearTerminal')->name('terminal.crearp');
+        Route::get('terminal/editar','TerminalesController@viewEditarTerminal')->name('terminal.editar');
+        Route::post('terminal/editar','TerminalesController@editarTerminal')->name('terminal.editarp');
+        Route::post('terminal/cambiarestado','TerminalesController@cambiarEstadoTerminal')->name('terminal.cambiarestado');
+
+        /*FINALIZA TERMINALES*/
+
     });
 
 
