@@ -1,39 +1,17 @@
-<div id="modalcrearestablecimientos">
-    {{Form::open(['route'=>['establecimiento.crearp'], 'class'=>'form-horizontal', 'id'=>'crearestablecimientos'])}}
+<div id="modaleditarterminal">
+    {{Form::model($terminal,['route'=>['terminal.editarp',$terminal->id], 'class'=>'form-horizontal', 'id'=>'editarterminal'])}}
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h4 class="modal-title">Agregar establecimiento comercial</h4>
+        <h4 class="modal-title">Agregar terminal</h4>
     </div>
     <div class="modal-body">
         <div class="row">
             <div class="form-group">
-                <label class="col-md-2 control-label">Nit</label>
+                <label class="col-md-2 control-label">Numero activo</label>
                 <div class="col-md-10">
-                    {{Form::text('nit', null ,['class'=>'form-control', "required", "maxlength"=>"10", "data-parsley-type"=>"number"])}}
+                    {{Form::text('numero_activo', null ,['class'=>'form-control', "required", "maxlength"=>"10", "data-parsley-type"=>"number"])}}
                 </div>
             </div>
-
-            <div class="form-group">
-                <label class="col-md-2 control-label">Razon social</label>
-                <div class="col-md-10">
-                    {{Form::text('razon_social', null ,['class'=>'form-control', "required", "maxlength"=>"40", "data-parsley-pattern"=>"^[a-zA-Z0-9]+(\s*[a-zA-Z0-9]*)*[a-zA-Z0-9]+$"])}}
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="col-md-2 control-label">E-mail</label>
-                <div class="col-md-10">
-                    {{Form::email('email', null ,['class'=>'form-control', "required"])}}
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="col-md-2 control-label">Telefono</label>
-                <div class="col-md-10">
-                    {{Form::text('telefono', null ,['class'=>'form-control', "required", "data-parsley-type"=>"number", "maxlength"=>"10"])}}
-                </div>
-            </div>
-
             <div class="form-group">
                 <label class="col-md-2 control-label">Celular</label>
                 <div class="col-md-10">
@@ -41,6 +19,18 @@
                 </div>
             </div>
 
+            <div class="form-group">
+                <label class="col-md-2 control-label">Contraseña</label>
+                <div class="col-md-10">
+                    {{Form::password('password', ['class'=>'form-control',  "maxlength"=>"4", "id"=>"password"])}}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">Confirmar</label>
+                <div class="col-md-10">
+                    {{Form::password('password_confirmation', ['class'=>'form-control', "maxlength"=>"4", "data-parsley-equalto"=>"#password"])}}
+                </div>
+            </div>
         </div>
     </div>
     <div class="modal-footer">
@@ -52,8 +42,8 @@
 
 <script>
     $(function () {
-        $("#crearestablecimientos").parsley();
-        $("#crearestablecimientos").submit(function (e) {
+        $("#editarterminal").parsley();
+        $("#editarterminal").submit(function (e) {
             e.preventDefault();
             var form = $(this);
             $.ajax({
@@ -108,6 +98,7 @@
                 }
             });
         })
+
 
 
     })

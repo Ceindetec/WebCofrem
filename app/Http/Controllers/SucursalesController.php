@@ -8,6 +8,7 @@ use creditocofrem\Municipios;
 use creditocofrem\Sucursales;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
+use Facades\creditocofrem\Encript;
 
 class SucursalesController extends Controller
 {
@@ -18,6 +19,9 @@ class SucursalesController extends Controller
      */
     public function index($id){
         $establecimiento = Establecimientos::find($id);
+        if($establecimiento==null){
+            return redirect()->back();
+        }
         return view('establecimientos.sucursales.listasucursales', compact('establecimiento'));
     }
 
@@ -35,7 +39,7 @@ class SucursalesController extends Controller
             ->addColumn('action', function ($sucursales) {
                 $acciones = '<div class="btn-group">';
                 $acciones = $acciones.'<a href="' . route("sucursal.editar", ["id" => $sucursales->id]) . '" data-modal="modal-lg" class="btn btn-xs btn-custom" ><i class="ti-pencil-alt"></i> Edit</a>';
-                $acciones = $acciones.'<a class="btn btn-xs btn-primary" href="'.route("listsucursales", [$sucursales->id]).'"><i class="ti-layers-alt"></i> Terminales</a>';
+                $acciones = $acciones.'<a class="btn btn-xs btn-primary" href="'.route("listterminales", [$sucursales->id]).'"><i class="ti-layers-alt"></i> Terminales</a>';
                 $acciones = $acciones.'</div>';
                 return $acciones;
             })
@@ -66,7 +70,7 @@ class SucursalesController extends Controller
             $sucursal->establecimiento_id = $request->getQueryString();
             $sucursal->direccion = trim($request->vp).' '.trim($request->nv).' #'.trim($request->n1).'-'.trim($request->n2).' '.trim($request->complemento);
             $sucursal->estado = 'A';
-            $sucursal->password = $request->password;
+            $sucursal->password = Encript::encryption($request->password);
             if($sucursal->save()){
                 $result['estado']= true;
                 $result['mensaje'] = 'sucursal creada satisfactoriamente';
@@ -103,6 +107,11 @@ class SucursalesController extends Controller
        return view('establecimientos.sucursales.modaleditarsucursal', compact(['sucursal','departamentos','depar']));
     }
 
+    /**
+     * metodo que permite editar una socursal determinada
+     * @param Request $request tar los parametros que se quieren editar de la sucursal, incluyendo su id para identificarla
+     * @return array
+     */
     public function editarSucursal(Request $request){
         $result=[];
         try{
@@ -111,7 +120,7 @@ class SucursalesController extends Controller
             $sucursal->direccion = trim($request->vp).' '.trim($request->nv).' #'.trim($request->n1).'-'.trim($request->n2).' '.trim($request->complemento);
             $sucursal->estado = $request->estado; /*tener presente que cuando se creen terminales si esta pasa a inactiva se debe inactivar sus terminales*/
             if($request->password !=""){
-                $sucursal->password = $request->password;
+                $sucursal->password = Encript::encryption($request->password);
             }
             if($sucursal->save()){
                 $result['estado']= true;
