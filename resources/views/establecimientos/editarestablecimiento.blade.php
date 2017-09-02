@@ -60,6 +60,13 @@
                 </div>
             </div>
             <div class="form-group">
+                <label class="col-md-2 control-label">Estado</label>
+                <div class="col-md-10">
+                    {{Form::select("estado",['A'=>'Activo','I'=>'Inactivo'],null,['class'=>'form-control', "tabindex"=>"2",'id'=>'departamento', "disabled"])}}
+                </div>
+            </div>
+
+            <div class="form-group">
                 <label class="col-md-2 control-label">&nbsp;</label>
                 <div class="col-md-10">
                     <input type="submit" class="btn btn-custom waves-effect waves-light" value="Guardar" disabled>
@@ -191,9 +198,9 @@
             
             $('#editarcheck').change(function () {
                 if($(this).is(':checked')){
-                    $('#editarestablecimientos input').attr('disabled',false)
+                    $('#editarestablecimientos input, #editarestablecimientos select').attr('disabled',false)
                 }else{
-                    $('#editarestablecimientos input').attr('disabled',true)
+                    $('#editarestablecimientos input, #editarestablecimientos select').attr('disabled',true)
                 }
             })
         });

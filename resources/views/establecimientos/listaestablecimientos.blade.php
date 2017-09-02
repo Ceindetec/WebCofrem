@@ -42,6 +42,7 @@
                         <tr>
                             <th>Nit</th>
                             <th>Razon social</th>
+                            <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                         </thead>
@@ -87,6 +88,17 @@
                 columns: [
                     {data: 'nit', name: 'nit'},
                     {data: 'razon_social', name: 'razon_social'},
+                    {
+                        data: 'estado',
+                        name: 'estado',
+                        render: function (data) {
+                            if(data=='A')
+                                return 'Activo';
+                            else
+                                return 'Inactivo';
+
+                        }
+                    },
                     {data: 'action', name: 'action', orderable: false, searchable: false}
                 ],
                 order: [[1, 'asc']]

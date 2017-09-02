@@ -11,6 +11,7 @@
         "laravel/framework": "5.4.*",
         "laravel/tinker": "~1.0",
         "laravelcollective/html": "^5.4.0",
+        "owen-it/laravel-auditing": "^4.1",
         "yajra/laravel-datatables-oracle": "7.5",
         "yajra/laravel-oci8": "5.4.*"
     },

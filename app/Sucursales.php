@@ -3,9 +3,13 @@
 namespace creditocofrem;
 
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
-class Sucursales extends Model
+class Sucursales extends Model implements AuditableContract
 {
+    use Auditable;
+
     protected $fillable = [
         'nombre', 'latitud', 'longitud','municipio_codigo'
     ];
