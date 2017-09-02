@@ -6,11 +6,12 @@ use Caffeinated\Shinobi\Traits\ShinobiTrait;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use creditocofrem\Notifications\MyResetPassword;
+use OwenIt\Auditing\Auditable;
 
 
 class User extends Authenticatable
 {
-    use Notifiable, ShinobiTrait;
+    use Notifiable, ShinobiTrait, Auditable;
 
     /**
      * The attributes that are mass assignable.

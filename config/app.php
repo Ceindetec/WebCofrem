@@ -181,6 +181,7 @@ return [
         Yajra\Datatables\DatatablesServiceProvider::class,
         Caffeinated\Shinobi\ShinobiServiceProvider::class,
         Yajra\Oci8\Oci8ServiceProvider::class,
+        OwenIt\Auditing\AuditingServiceProvider::class,
 
     ],
 
