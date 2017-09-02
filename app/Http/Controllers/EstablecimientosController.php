@@ -57,9 +57,9 @@ class EstablecimientosController extends Controller
             if ($validator->fails()) {
                 return $validator->errors()->all();
             }
-
             $establecimiento = new Establecimientos($request->all());
             $establecimiento->razon_social = strtoupper($establecimiento->razon_social);
+            $establecimiento->estado = 'I';
             $establecimiento->save();
             $result['estado'] = true;
             $result['mensaje'] = 'El establecimiento ha sido creado satisfactoriamente';
@@ -75,8 +75,8 @@ class EstablecimientosController extends Controller
      * @param Request $request trae la id del establecimiento a editar
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function viewEditarEstablecimiento(Request $request){
-        $establecimiento = Establecimientos::find($request->id);
+    public function viewEditarEstablecimiento($id){
+        $establecimiento = Establecimientos::find($id);
         if($establecimiento == null){
             return redirect()->back();
         }
@@ -110,6 +110,12 @@ class EstablecimientosController extends Controller
             ]);
             if ($validator->fails()) {
                 return $validator->errors()->all();
+            }
+        }
+        if($request->estado=='A'){
+            $convenios = $establecimiento->convenios;
+            if(count($convenios)==0){
+                $establecimiento->estado = 'I';
             }
         }
         $establecimiento->update($request->all());

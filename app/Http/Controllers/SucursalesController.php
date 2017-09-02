@@ -116,7 +116,7 @@ class SucursalesController extends Controller
         $result=[];
         try{
             $sucursal = Sucursales::find($request->getQueryString());
-            $sucursal->nombre = strtoupper($sucursal->nombre);
+            $sucursal->nombre = strtoupper($request->nombre);
             $sucursal->direccion = trim($request->vp).' '.trim($request->nv).' #'.trim($request->n1).'-'.trim($request->n2).' '.trim($request->complemento);
             $sucursal->estado = $request->estado; /*tener presente que cuando se creen terminales si esta pasa a inactiva se debe inactivar sus terminales*/
             if($request->password !=""){
