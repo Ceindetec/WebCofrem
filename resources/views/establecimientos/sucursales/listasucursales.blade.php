@@ -39,7 +39,7 @@
                 <div class="col-sm-12">
                     <label class="col-sm-2">Estado</label>
                     <div class="col-sm-10">
-                        Activo
+                        {{$establecimiento->estado=='A'?'Activo':'Inactivo'}}
                     </div>
                 </div>
             </div>
