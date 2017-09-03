@@ -14,7 +14,7 @@ class CreateContratosEmprsTable extends Migration
     public function up()
     {
         Schema::create('contratos_emprs', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->bigIncrements('id')->nocache();
             $table->string('n_contrato')->unique();
             $table->double('valor_contrato',5,2);
             $table->integer('valor_impuesto');

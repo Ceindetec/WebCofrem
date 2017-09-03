@@ -14,7 +14,7 @@ class CreateHContratosTable extends Migration
     public function up()
     {
         Schema::create('h_contratos', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->bigIncrements('id')->nocache();
             $table->bigInteger('contrato_id')->unsigned();
             $table->foreign('contrato_id')->references('id')->on('contratos_emprs')->onDelete('cascade');
             $table->date('fecha');

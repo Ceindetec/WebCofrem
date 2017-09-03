@@ -14,7 +14,7 @@ class CreateCempresaTpagosTable extends Migration
     public function up()
     {
         Schema::create('cempresa_tpagos', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->bigIncrements('id')->nocache();
             $table->Integer('tiempo_pagos_id')->unsigned();
             $table->foreign('tiempo_pagos_id')->references('id')->on('tiempo_pagos')->onDelete('cascade');
             $table->bigInteger('contrato_empresas_id')->unsigned();
