@@ -14,7 +14,7 @@ class CreateTarjetasRegalosTable extends Migration
     public function up()
     {
         Schema::create('tarjetas_regalos', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->bigIncrements('id')->nocache();
             $table->primary('id');
             $table->string('numero_tarjeta')-> index();
             $table->foreign('numero_tarjeta')->references('numero_tarjeta')->on('tarjetas')->onDelete('cascade');

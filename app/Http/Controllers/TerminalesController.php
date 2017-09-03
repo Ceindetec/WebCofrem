@@ -92,6 +92,9 @@ class TerminalesController extends Controller
             $terminal->celular = $request->celular;
             $terminal->password = Encript::encryption($request->password);
             $terminal->sucursal_id = $request->getQueryString();
+            $sucursal = Sucursales::find($request->getQueryString());
+            if($sucursal->estado == 'I')
+                $terminal->estado = 'I';
             $terminal->save();
             $result['estado'] = true;
             $result['mensaje'] = 'Terminal creada satisfactoriamente';
@@ -157,11 +160,20 @@ class TerminalesController extends Controller
         try {
             $terminal = Terminales::find($request->id);
 
-            if ($terminal->estado == 'A')
+            if ($terminal->estado == 'A'){
                 $terminal->estado = 'I';
-            else
-                $terminal->estado = 'A';
+            }
+            else{
+                $sucursal = Sucursales::find($terminal->sucursal_id);
+                if($sucursal->estado == 'A'){
+                    $terminal->estado = 'A';
+                }else{
+                    $result['estado'] = false;
+                    $result['mensaje'] = 'No se puede activar una terminal de una sucursal inactiva';
+                    return $result;
+                }
 
+            }
             $terminal->save();
             $result['estado'] = true;
             $result['mensaje'] = 'Se cambio de estado satisfactoriamente';

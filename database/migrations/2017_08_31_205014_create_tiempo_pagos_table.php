@@ -14,7 +14,7 @@ class CreateTiempoPagosTable extends Migration
     public function up()
     {
         Schema::create('tiempo_pagos', function (Blueprint $table) {
-            $table->increments('id');
+            $table->increments('id')->nocache();
             $table->string('descripcion');
             $table->integer('meses');
             $table->enum('estado',['A','I']);// activo e inactivo
