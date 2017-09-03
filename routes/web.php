@@ -125,6 +125,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('gridconveniosestablecimiento','ConveniosEstablecimientosController@gridConveniosEstablecimiento')->name('gridconveniosestablecimiento');
         Route::get('convenio/crear/{id}','ConveniosEstablecimientosController@viewCrearConvenio')->name('convenio.crear');
         Route::post('convenio/crear/{id}','ConveniosEstablecimientosController@crearConvenio')->name('convenio.crearp');
+        
         /*FINALIZA CONVENIOS ESTABLECIMIENTOS*/
     });
 
