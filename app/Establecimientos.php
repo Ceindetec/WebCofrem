@@ -13,9 +13,6 @@ class Establecimientos extends Model implements AuditableContract
         'nit', 'razon_social', 'email', 'telefono','celular',
     ];
 
-    public function ultimoComvenio(){
-
-    }
 
     public function convenios()
     {
