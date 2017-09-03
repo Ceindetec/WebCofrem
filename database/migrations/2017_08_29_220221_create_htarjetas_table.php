@@ -14,7 +14,7 @@ class CreateHtarjetasTable extends Migration
     public function up()
     {
         Schema::create('htarjetas', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->bigIncrements('id')->nocache();
             $table->primary('id');
             $table->string('motivo');
             $table->enum('estado',['A','I','P','C']);//activo, inactivo, pendiente, creado

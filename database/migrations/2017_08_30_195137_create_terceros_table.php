@@ -14,7 +14,7 @@ class CreateTercerosTable extends Migration
     public function up()
     {
         Schema::create('terceros', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->bigIncrements('id')->nocache();
             $table->primary('id');
             $table->string('identificacion')-> unique();
             $table->string('nombres');

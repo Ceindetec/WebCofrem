@@ -28,7 +28,7 @@ class CreateAuditsTable extends Migration
     {
         Schema::connection(Config::get('audit.drivers.database.connection'))
             ->create(Config::get('audit.drivers.database.table'), function (Blueprint $table) {
-                $table->increments('id');
+                $table->increments('id')->nocache();
                 $table->unsignedInteger(Config::get('audit.user.foreign_key', 'user_id'))->nullable();
                 $table->string('event');
                 $table->morphs('auditable');

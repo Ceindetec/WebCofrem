@@ -83,6 +83,11 @@ class EstablecimientosController extends Controller
         return view('establecimientos.editarestablecimiento', compact('establecimiento'));
     }
 
+    /**
+     * metodo que permite editar un establecimiento comercial
+     * @param Request $request campos del establecimiento a editar
+     * @return mixed
+     */
     public function  editarEstablecimiento(Request $request){
         $establecimiento = Establecimientos::find($request->getQueryString());
         if($establecimiento->nit != $request->nit){
@@ -115,7 +120,9 @@ class EstablecimientosController extends Controller
         if($request->estado=='A'){
             $convenios = $establecimiento->convenios;
             if(count($convenios)==0){
-                $establecimiento->estado = 'I';
+                $result['estado'] = false;
+                $result['mensaje'] = 'No es posible cambiar el estado de un establecimiento sin un convenio activo.';
+                return $result;
             }
         }
         $establecimiento->update($request->all());
