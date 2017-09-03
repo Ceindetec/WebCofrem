@@ -8,6 +8,7 @@
     <link href="{{asset('plugins/datatables/dataTables.colVis.css')}}" rel="stylesheet" type="text/css"/>
     <link href="{{asset('plugins/datatables/dataTables.bootstrap.min.css')}}" rel="stylesheet" type="text/css"/>
     <link href="{{asset('plugins/datatables/fixedColumns.dataTables.min.css')}}" rel="stylesheet" type="text/css"/>
+    <link href="{{asset('plugins/bootstrap-datepicker/css/bootstrap-datepicker.min.css')}}" rel="stylesheet">
 
 @endsection
 
@@ -76,6 +77,21 @@
             {{Form::close()}}
         </div>
 
+        <div class="row">
+            <div class="col-sm-12">
+                <h5>Acciones</h5>
+                <div class="card-box widget-inline">
+                    <div class="row">
+                        <div class="col-lg-3 col-sm-6">
+                            <div class="widget-inline-box">
+                                <a href="{{route('convenio.crear',[$establecimiento->id])}}" data-modal class="btn btn-custom waves-effect waves-light" data-toggle="modal" data-target="#modalrol">Agregar convenio</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="card-box">
             <h4 class="m-t-0">Lista de convenios</h4>
 
@@ -83,8 +99,10 @@
                 <table id="datatable" class="table table-striped table-bordered" width="100%">
                     <thead>
                     <tr>
-                        <th>Nit</th>
-                        <th>Razon social</th>
+                        <th>Numero de convenio</th>
+                        <th>Fecha de inicio</th>
+                        <th>Fecha de finalización</th>
+                        <th>estado</th>
                         <th>Acciones</th>
                     </tr>
                     </thead>
@@ -114,6 +132,9 @@
     <script src="{{asset('plugins/datatables/dataTables.scroller.min.js')}}"></script>
     <script src="{{asset('plugins/datatables/dataTables.colVis.js')}}"></script>
     <script src="{{asset('plugins/datatables/dataTables.fixedColumns.min.js')}}"></script>
+    <script src="{{asset('plugins/moment/moment.js')}}"></script>
+    <script src="{{asset('plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js')}}"></script>
+    <script src="{{asset('plugins/bootstrap-datepicker/locale/bootstrap-datepicker.es.min.js')}}" charset="UTF-8"></script>
 
 
 
@@ -127,12 +148,35 @@
                     "url": "{!!route('datatable_es')!!}"
                 },
                 ajax: {
-                    url: "{!!route('gridestablecimientos')!!}",
+                    url: "{!!route('gridconveniosestablecimiento',['id'=>$establecimiento->id])!!}",
                     "type": "get"
                 },
                 columns: [
-                    {data: 'nit', name: 'nit'},
-                    {data: 'razon_social', name: 'razon_social'},
+                    {data: 'numero_convenio', name: 'numero_convenio'},
+                    {
+                        data: 'fecha_inicio',
+                        name: 'fecha_inicio',
+                        render:function (data) {
+                            return moment(data).format('DD/MM/YYYY');
+                        }
+                    },
+                    {
+                        data: 'fecha_fin',
+                        name: 'fecha_fin',
+                        render:function (data) {
+                            return moment(data).format('DD/MM/YYYY');
+                        }
+                    },
+                    {
+                        data: 'estado',
+                        name: 'estado',
+                        render:function (data) {
+                            if(data=='A')
+                                return 'Activo';
+                            else
+                                return 'Inactivo';
+                        }
+                    },
                     {data: 'action', name: 'action', orderable: false, searchable: false}
                 ],
                 order: [[1, 'asc']]
