@@ -10,7 +10,7 @@ class Establecimientos extends Model implements AuditableContract
 {
     use Auditable;
     protected $fillable = [
-        'nit', 'razon_social', 'email', 'telefono','celular',
+        'nit', 'razon_social', 'email', 'telefono','celular','estado',
     ];
 
 

@@ -18,52 +18,59 @@
         <div class="row">
             <div class="col-sm-12">
                 <h4 class="header-title m-t-0 m-b-20">Editar establecimiento
-                <span class="pull-right"><a href="{{route('establecimientos')}}" class="btn btn-custom" style="position: relative; top: -7px"><i class="ti-arrow-left"></i> Volver</a> </span></h4>
+                    <span class="pull-right"><a href="{{route('establecimientos')}}" class="btn btn-custom"
+                                                style="position: relative; top: -7px"><i class="ti-arrow-left"></i> Volver</a> </span>
+                </h4>
             </div>
         </div> <!-- end row -->
 
         <div class="card-box">
-            <h4 class="m-t-0">Informacion establecimiento  <span class="pull-right">Editar <input type="checkbox" id="editarcheck"  data-plugin="switchery" data-color="#1bb99a" data-size="small"/></span></h4>
+            <h4 class="m-t-0">Informacion establecimiento <span class="pull-right">Editar <input type="checkbox"
+                                                                                                 id="editarcheck"
+                                                                                                 data-plugin="switchery"
+                                                                                                 data-color="#1bb99a"
+                                                                                                 data-size="small"/></span>
+            </h4>
             {{Form::model($establecimiento,['route'=>['establecimiento.editarp',$establecimiento->id], 'class'=>'form-horizontal', 'id'=>'editarestablecimientos'])}}
 
             <div class="form-group">
                 <label class="col-md-2 control-label">Nit</label>
                 <div class="col-md-10">
-                    {{Form::text('nit', null ,['class'=>'form-control', "required", "maxlength"=>"10", "data-parsley-type"=>"number", "disabled"])}}
+                    {{Form::text('nit', null ,['class'=>'form-control', "id"=>"nit", "required", "maxlength"=>"10", "data-parsley-type"=>"number", "disabled"])}}
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="col-md-2 control-label">Razon social</label>
                 <div class="col-md-10">
-                    {{Form::text('razon_social', null ,['class'=>'form-control', "required", "maxlength"=>"40","data-parsley-pattern"=>"^[a-zA-Z0-9]+(\s*[a-zA-Z0-9]*)*[a-zA-Z0-9]+$","disabled" ])}}
+                    {{Form::text('razon_social', null ,['class'=>'form-control', "id"=>"razon_social", "required", "maxlength"=>"40","data-parsley-pattern"=>"^[a-zA-Z0-9]+(\s*[a-zA-Z0-9]*)*[a-zA-Z0-9]+$","disabled" ])}}
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="col-md-2 control-label">E-mail</label>
                 <div class="col-md-10">
-                    {{Form::email('email', null ,['class'=>'form-control', "required", "disabled"])}}
+                    {{Form::email('email', null ,['class'=>'form-control', "id"=>"email", "required", "disabled"])}}
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="col-md-2 control-label">Telefono</label>
                 <div class="col-md-10">
-                    {{Form::text('telefono', null ,['class'=>'form-control', "required", "data-parsley-type"=>"number", "maxlength"=>"10", "disabled"])}}
+                    {{Form::text('telefono', null ,['class'=>'form-control',"id"=>"telefono", "required", "data-parsley-type"=>"number", "maxlength"=>"10", "disabled"])}}
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="col-md-2 control-label">Celular</label>
                 <div class="col-md-10">
-                    {{Form::text('celular', null ,['class'=>'form-control', "required", "data-parsley-type"=>"number", "maxlength"=>"10", "disabled"])}}
+                    {{Form::text('celular', null ,['class'=>'form-control',"id"=>"celular", "required", "data-parsley-type"=>"number", "maxlength"=>"10", "disabled"])}}
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-md-2 control-label">Estado</label>
                 <div class="col-md-10">
-                    {{Form::select("estado",['A'=>'Activo','I'=>'Inactivo'],null,['class'=>'form-control', "tabindex"=>"2",'id'=>'departamento', "disabled"])}}
+                    {{Form::select("estado",['A'=>'Activo','I'=>'Inactivo'],null,['class'=>'form-control', "tabindex"=>"2",'id'=>'estado', "disabled"])}}
                 </div>
             </div>
 
@@ -84,7 +91,9 @@
                     <div class="row">
                         <div class="col-lg-3 col-sm-6">
                             <div class="widget-inline-box">
-                                <a href="{{route('convenio.crear',[$establecimiento->id])}}" data-modal class="btn btn-custom waves-effect waves-light" data-toggle="modal" data-target="#modalrol">Agregar convenio</a>
+                                <a href="{{route('convenio.crear',[$establecimiento->id])}}" data-modal
+                                   class="btn btn-custom waves-effect waves-light" data-toggle="modal"
+                                   data-target="#modalrol">Agregar convenio</a>
                             </div>
                         </div>
                     </div>
@@ -134,7 +143,8 @@
     <script src="{{asset('plugins/datatables/dataTables.fixedColumns.min.js')}}"></script>
     <script src="{{asset('plugins/moment/moment.js')}}"></script>
     <script src="{{asset('plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js')}}"></script>
-    <script src="{{asset('plugins/bootstrap-datepicker/locale/bootstrap-datepicker.es.min.js')}}" charset="UTF-8"></script>
+    <script src="{{asset('plugins/bootstrap-datepicker/locale/bootstrap-datepicker.es.min.js')}}"
+            charset="UTF-8"></script>
 
 
 
@@ -156,25 +166,27 @@
                     {
                         data: 'fecha_inicio',
                         name: 'fecha_inicio',
-                        render:function (data) {
+                        render: function (data) {
                             return moment(data).format('DD/MM/YYYY');
                         }
                     },
                     {
                         data: 'fecha_fin',
                         name: 'fecha_fin',
-                        render:function (data) {
+                        render: function (data) {
                             return moment(data).format('DD/MM/YYYY');
                         }
                     },
                     {
                         data: 'estado',
                         name: 'estado',
-                        render:function (data) {
-                            if(data=='A')
+                        render: function (data) {
+                            if (data == 'A')
                                 return 'Activo';
-                            else
+                            else if(data=='I')
                                 return 'Inactivo';
+                            else
+                                return 'Pendiente';
                         }
                     },
                     {data: 'action', name: 'action', orderable: false, searchable: false}
@@ -187,15 +199,15 @@
                 e.preventDefault();
                 var form = $(this);
                 $.ajax({
-                    url : form.attr('action'),
-                    data : form.serialize(),
-                    type : 'POST',
-                    dataType : 'json',
+                    url: form.attr('action'),
+                    data: form.serialize(),
+                    type: 'POST',
+                    dataType: 'json',
                     beforeSend: function () {
                         cargando();
                     },
-                    success : function(result) {
-                        if(result.estado){
+                    success: function (result) {
+                        if (result.estado) {
                             swal(
                                 {
                                     title: 'Bien!!',
@@ -204,18 +216,19 @@
                                     confirmButtonColor: '#4fa7f3'
                                 }
                             );
-                            $('#editarestablecimientos input').attr('disabled',true);
-                            $('#editarcheck').trigger('click');
-                        }else if(result.estado == false){
+                            resetInfo(result.data);
+                        } else if (result.estado == false) {
                             swal(
                                 'Error!!',
                                 result.mensaje,
                                 'error'
-                            )
-                        }else{
-                            html='';
-                            for(i=0; i<result.length;i++){
-                                html+=result[i]+'\n\r';
+                            );
+                            resetInfo(result.data);
+
+                        } else {
+                            html = '';
+                            for (i = 0; i < result.length; i++) {
+                                html += result[i] + '\n\r';
                             }
                             swal(
                                 'Error!!',
@@ -225,7 +238,7 @@
                         }
                         table.ajax.reload();
                     },
-                    error : function(xhr, status) {
+                    error: function (xhr, status) {
                         var message = "Error de ejecución: " + xhr.status + " " + xhr.statusText;
                         swal(
                             'Error!!',
@@ -234,19 +247,36 @@
                         )
                     },
                     // código a ejecutar sin importar si la petición falló o no
-                    complete : function(xhr, status) {
+                    complete: function (xhr, status) {
                         fincarga();
                     }
                 });
             });
-            
+
             $('#editarcheck').change(function () {
-                if($(this).is(':checked')){
-                    $('#editarestablecimientos input, #editarestablecimientos select').attr('disabled',false)
-                }else{
-                    $('#editarestablecimientos input, #editarestablecimientos select').attr('disabled',true)
+                if ($(this).is(':checked')) {
+                    $('#editarestablecimientos input, #editarestablecimientos select').attr('disabled', false)
+                } else {
+                    $('#editarestablecimientos input, #editarestablecimientos select').attr('disabled', true)
                 }
             })
         });
+
+        function resetInfo(data) {
+            $('#nit').val(data.nit);
+            $('#razon_social').val(data.razon_social);
+            $('#email').val(data.email);
+            $('#telefono').val(data.telefono);
+            $('#celular').val(data.celular);
+            $('#celular').val(data.celular);
+            $('#estado').val(data.estado);
+            setTimeout(function () {
+                if ($('#editarcheck').is(':checked')) {
+                    $('#editarcheck').trigger('click');
+                }
+            }, 200);
+
+        }
+
     </script>
 @endsection
