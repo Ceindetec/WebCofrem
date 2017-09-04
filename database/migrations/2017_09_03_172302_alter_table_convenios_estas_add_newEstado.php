@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AlterTableConveniosEstaAddFechaFin extends Migration
+class AlterTableConveniosEstasAddNewEstado extends Migration
 {
     /**
      * Run the migrations.
@@ -14,8 +14,7 @@ class AlterTableConveniosEstaAddFechaFin extends Migration
     public function up()
     {
         Schema::table('convenios_estas', function(Blueprint $table) {
-            $table->renameColumn('fecha', 'fecha_inicio');
-            $table->date('fecha_fin')->default(\Carbon\Carbon::now());
+            $table->enum('estado',['A','I','P'])->default('A');
         });
     }
 
@@ -27,8 +26,7 @@ class AlterTableConveniosEstaAddFechaFin extends Migration
     public function down()
     {
         Schema::table('convenios_estas', function(Blueprint $table) {
-            $table->renameColumn('fecha_inicio', 'fecha');
-            $table->dropColumn('fecha_fin');
+            $table->dropColumn('estado')->default('A');
         });
     }
 }

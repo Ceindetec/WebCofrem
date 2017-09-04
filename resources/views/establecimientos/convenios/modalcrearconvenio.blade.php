@@ -105,7 +105,8 @@
                                 type: 'success',
                                 confirmButtonColor: '#4fa7f3'
                             }
-                        )
+                        );
+                        resetInfo(result.data);
                         modalBs.modal('hide');
                     } else if (result.estado == false) {
                         swal(
