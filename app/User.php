@@ -7,9 +7,10 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use creditocofrem\Notifications\MyResetPassword;
 use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 
-class User extends Authenticatable
+class User extends Authenticatable implements AuditableContract
 {
     use Notifiable, ShinobiTrait, Auditable;
 
@@ -21,6 +22,13 @@ class User extends Authenticatable
     protected $fillable = [
         'name', 'email', 'password',
     ];
+
+    protected $auditInclude = [
+        'name',
+        'email',
+        'password',
+    ];
+
 
     /**
      * The attributes that should be hidden for arrays.
