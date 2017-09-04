@@ -92,9 +92,42 @@ Route::group(['middleware' => 'auth'], function () {
         route::get('establecimientos/gridestablecimientos','EstablecimientosController@gridEstablecimientos')->name('gridestablecimientos');
         route::get('establecimientos/crear','EstablecimientosController@viewCrearEstablecimiento')->name('establecimiento.crear');
         route::post('establecimientos/crear','EstablecimientosController@crearEstablecimiento')->name('establecimiento.crearp');
+        route::get('establecimientos/editar/{id}','EstablecimientosController@viewEditarEstablecimiento')->name('establecimiento.editar');
+        route::post('establecimientos/editar','EstablecimientosController@editarEstablecimiento')->name('establecimiento.editarp');
 
         /*FINALIZA ESTABLECIMIENTOS*/
 
+        /*INICIA SUCURSALES ESTABLECIMIENTOS*/
+
+        Route::get('listsucursales/{id}','SucursalesController@index')->name('listsucursales');
+        Route::get('gridsuscursales','SucursalesController@gridSuscursales')->name('gridsuscursales');
+        Route::get('sucursal/crear','SucursalesController@viewCrearSucursal')->name('sucursal.crear');
+        Route::post('sucursal/crear','SucursalesController@crearSucursal')->name('sucursal.crearp');
+        Route::get('marketsucursales','SucursalesController@getMarketSucursales')->name('marketsucursales');
+        Route::get('sucursal/editar','SucursalesController@viewEditarSucursal')->name('sucursal.editar');
+        Route::post('sucursal/editar','SucursalesController@editarSucursal')->name('sucursal.editarp');
+
+        /*FINALIZA SUCURSALES ESTABLECIMIENTOS*/
+
+        /*INICIA TERMINALES*/
+
+        Route::get('listterminales/{id}','TerminalesController@index')->name('listterminales');
+        Route::get('gridterminales','TerminalesController@gridTerminales')->name('gridterminales');
+        Route::get('terminal/crear','TerminalesController@viewCrearTerminal')->name('terminal.crear');
+        Route::post('terminal/crear','TerminalesController@crearTerminal')->name('terminal.crearp');
+        Route::get('terminal/editar','TerminalesController@viewEditarTerminal')->name('terminal.editar');
+        Route::post('terminal/editar','TerminalesController@editarTerminal')->name('terminal.editarp');
+        Route::post('terminal/cambiarestado','TerminalesController@cambiarEstadoTerminal')->name('terminal.cambiarestado');
+
+        /*FINALIZA TERMINALES*/
+
+        /*ICIA CONVENIOS ESTABLECIMIENTOS*/
+        Route::get('gridconveniosestablecimiento','ConveniosEstablecimientosController@gridConveniosEstablecimiento')->name('gridconveniosestablecimiento');
+        Route::get('convenio/crear/{id}','ConveniosEstablecimientosController@viewCrearConvenio')->name('convenio.crear');
+        Route::post('convenio/crear/{id}','ConveniosEstablecimientosController@crearConvenio')->name('convenio.crearp');
+        Route::get('coveniosesta/reglas/{id}','ConveniosEstablecimientosController@viewReglasConvenioEstablecimiento')->name('coveniosesta.reglas');
+
+        /*FINALIZA CONVENIOS ESTABLECIMIENTOS*/
     });
 
 
@@ -106,6 +139,11 @@ Route::group(['middleware' => 'auth'], function () {
 
 
 });
+
+Route::get('municipios', function (\Illuminate\Http\Request $request){
+    return \DB::table('municipios')->where('departamento_codigo',$request->data)->get();
+})->name('municipios');
+
 
 Route::get('datatable_es', 'IdiomaDataTableController@espanol')->name('datatable_es');
 

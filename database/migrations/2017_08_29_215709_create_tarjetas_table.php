@@ -14,7 +14,7 @@ class CreateTarjetasTable extends Migration
     public function up()
     {
         Schema::create('tarjetas', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->bigIncrements('id')->nocache();
             $table->primary('id');
             $table->string('numero_tarjeta')->unique();
             $table->enum('tipo',['A','R','B']);

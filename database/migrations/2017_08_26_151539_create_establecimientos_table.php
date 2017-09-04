@@ -14,7 +14,7 @@ class CreateEstablecimientosTable extends Migration
     public function up()
     {
         Schema::create('establecimientos', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->bigIncrements('id')->nocache();
             $table->string('nit')->unique();
             $table->string('razon_social');
             $table->timestamps();

@@ -14,13 +14,8 @@ class AlterTarjetasRegalo extends Migration
     public function up()
     {
         //
-        Schema::table('tarjetas_regalos', function($table) {
-            $table->dropColumn('monto_inicial');
-            $table->dropColumn('monto_restante');
-        });
-        Schema::table('tarjetas_regalos', function($table) {
-            $table->double('monto_inicial',15,2)->nullable();
-            $table->double('monto_restante',15,2)->nullable();
+        Schema::table('tarjetas_regalos', function(Blueprint $table) {
+            $table->dropColumn(['monto_inicial','monto_restante']);
         });
     }
 
@@ -32,9 +27,9 @@ class AlterTarjetasRegalo extends Migration
     public function down()
     {
         //
-        Schema::table('tarjetas_regalos', function($table) {
-            $table->dropColumn('monto_inicial');
-            $table->dropColumn('monto_restante');
+        Schema::table('tarjetas_regalos', function(Blueprint $table) {
+            $table->double('monto_inicial',15,2)->nullable();
+            $table->double('monto_restante',15,2)->nullable();
         });
     }
 }

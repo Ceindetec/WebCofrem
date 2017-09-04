@@ -16,7 +16,7 @@
             <div class="form-group">
                 <label class="col-md-2 control-label">Razon social</label>
                 <div class="col-md-10">
-                    {{Form::text('razon_social', null ,['class'=>'form-control', "required", "maxlength"=>"40"])}}
+                    {{Form::text('razon_social', null ,['class'=>'form-control', "required", "maxlength"=>"40", "data-parsley-pattern"=>"^[a-zA-Z0-9]+(\s*[a-zA-Z0-9]*)*[a-zA-Z0-9]+$"])}}
                 </div>
             </div>
 
@@ -75,10 +75,20 @@
                             }
                         )
                         modalBs.modal('hide');
-                    }else{
+                    }else if(result.estado == false){
                         swal(
                             'Error!!',
                             result.mensaje,
+                            'error'
+                        )
+                    }else{
+                        html='';
+                        for(i=0; i<result.length;i++){
+                            html+=result[i]+'\n\r';
+                        }
+                        swal(
+                            'Error!!',
+                            html,
                             'error'
                         )
                     }
@@ -99,34 +109,6 @@
             });
         })
 
-
-        $("#selectroles").select2({
-            placeholder: "Seleccione...",
-            minimumInputLength: 1,
-            ajax: {
-                url: "{{route('selectroles')}}",
-                dataType: 'json',
-                type: "GET",
-                quietMillis: 50,
-                data: function (params) {
-                    return {
-                        term: params.term
-                    };
-                },
-                processResults: function (data, params) {
-                    return {
-                        results: $.map(data, function (item) {
-                            return {
-                                text: item.name,
-                                id: item.id
-                            }
-                        })
-                    };
-                },
-            },
-            language: "es",
-            cache: true
-        });
 
     })
 

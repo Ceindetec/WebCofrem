@@ -14,7 +14,7 @@ class CreateConveniosEstasTable extends Migration
     public function up()
     {
         Schema::create('convenios_estas', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->bigIncrements('id')->nocache();
             $table->string('numero_convenio');
             $table->date('fecha');
             $table->bigInteger('establecimiento_id')->unsigned();

@@ -64,7 +64,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'America/Bogota',
 
     /*
     |--------------------------------------------------------------------------
@@ -77,7 +77,7 @@ return [
     |
     */
 
-    'locale' => 'en',
+    'locale' => 'es',
 
     /*
     |--------------------------------------------------------------------------
@@ -181,6 +181,7 @@ return [
         Yajra\Datatables\DatatablesServiceProvider::class,
         Caffeinated\Shinobi\ShinobiServiceProvider::class,
         Yajra\Oci8\Oci8ServiceProvider::class,
+        OwenIt\Auditing\AuditingServiceProvider::class,
 
     ],
 
@@ -235,6 +236,8 @@ return [
         'Html' => Collective\Html\HtmlFacade::class,
 
         'Shinobi' => Caffeinated\Shinobi\Facades\Shinobi::class,
+
+        'Encript' => Facades\creditocofrem\Encript::class,
 
     ],
 

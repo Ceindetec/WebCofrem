@@ -13,6 +13,7 @@
             <li><a href="{{route('tarjetas')}}">Tarjetas</a></li>
         </ul>
     </li>
+    <li><a href="{{route('establecimientos')}}"><i class="ti-layout"></i> Establecimientos </a></li>
 @endrole
 
 <!--<li><a href="index.html"><i class="ti-home"></i> Dashboard </a></li>

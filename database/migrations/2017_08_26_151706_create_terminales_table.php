@@ -14,7 +14,7 @@ class CreateTerminalesTable extends Migration
     public function up()
     {
         Schema::create('terminales', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->bigIncrements('id')->nocache();
             $table->string('codigo');
             $table->string('uid')->nullable();
             $table->string('mac')->nullable();

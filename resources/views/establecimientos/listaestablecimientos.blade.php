@@ -42,6 +42,7 @@
                         <tr>
                             <th>Nit</th>
                             <th>Razon social</th>
+                            <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                         </thead>
@@ -70,8 +71,6 @@
     <script src="{{asset('plugins/datatables/dataTables.scroller.min.js')}}"></script>
     <script src="{{asset('plugins/datatables/dataTables.colVis.js')}}"></script>
     <script src="{{asset('plugins/datatables/dataTables.fixedColumns.min.js')}}"></script>
-    <script src="{{asset('plugins/parsleyjs/parsley.min.js')}}"></script>
-    <script src="{{asset('plugins/parsleyjs/idioma/es.js')}}"></script>
 
     <script>
         var table;
@@ -89,6 +88,17 @@
                 columns: [
                     {data: 'nit', name: 'nit'},
                     {data: 'razon_social', name: 'razon_social'},
+                    {
+                        data: 'estado',
+                        name: 'estado',
+                        render: function (data) {
+                            if(data=='A')
+                                return 'Activo';
+                            else
+                                return 'Inactivo';
+
+                        }
+                    },
                     {data: 'action', name: 'action', orderable: false, searchable: false}
                 ],
                 order: [[1, 'asc']]
