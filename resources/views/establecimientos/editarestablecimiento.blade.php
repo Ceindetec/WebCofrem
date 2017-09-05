@@ -10,6 +10,12 @@
     <link href="{{asset('plugins/datatables/fixedColumns.dataTables.min.css')}}" rel="stylesheet" type="text/css"/>
     <link href="{{asset('plugins/bootstrap-datepicker/css/bootstrap-datepicker.min.css')}}" rel="stylesheet">
 
+    <style>
+        .dt-right{
+            text-align: right;
+        }
+    </style>
+
 @endsection
 
 @section('contenido')
