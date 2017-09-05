@@ -12,4 +12,9 @@ class ConveniosEsta extends Model implements AuditableContract
     protected $fillable = [
         'numero_convenio', 'fecha_inicio', 'fecha_fin'
     ];
+
+    public function getEstablecimiento()
+    {
+        return $this->belongsTo('creditocofrem\Establecimientos','establecimiento_id','id');
+    }
 }

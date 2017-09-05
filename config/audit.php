@@ -38,7 +38,7 @@ return [
     'user' => [
         'primary_key' => 'id',
         'foreign_key' => 'user_id',
-        'model'       => App\User::class,
+        'model'       => creditocofrem\User::class,
         'resolver'    => function () {
             return Auth::check() ? Auth::user()->getAuthIdentifier() : null;
         },

@@ -3,6 +3,7 @@
 namespace creditocofrem\Http\Controllers;
 
 use Carbon\Carbon;
+use creditocofrem\Auditoria;
 use creditocofrem\ConveniosEsta;
 use creditocofrem\Establecimientos;
 use creditocofrem\FerecuenciaConvEs;
@@ -11,6 +12,8 @@ use creditocofrem\RangoConvEs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Yajra\Datatables\Datatables;
+
+
 
 class ConveniosEstablecimientosController extends Controller
 {
@@ -26,7 +29,7 @@ class ConveniosEstablecimientosController extends Controller
             ->addColumn('action', function ($convenios) {
                 $acciones = '<div class="btn-group">';
                 $acciones = $acciones . '<a href="' . route("coveniosesta.reglas", ["id" => $convenios->id]) . '" data-modal="modal-lg" class="btn btn-xs btn-custom" ><i class="ti-pencil-alt"></i> Reglas</a>';
-                $acciones = $acciones . '<a class="btn btn-xs btn-primary" href="' . route("listsucursales", [$convenios->id]) . '"><i class="ti-layers-alt"></i> Sucursales</a>';
+                $acciones = $acciones . '<a class="btn btn-xs btn-primary" href="' . route("convenios.historial", [$convenios->id]) . '" ><i class="ti-layers-alt"></i> Historial</a>';
                 $acciones = $acciones . '</div>';
                 return $acciones;
             })
@@ -109,14 +112,17 @@ class ConveniosEstablecimientosController extends Controller
      */
     public function gridRangosConvenio($id)
     {
-        $rangos = RangoConvEs::where('convenios_esta_id', $id)->get();
+        $rangos = RangoConvEs::where('convenios_esta_id', $id)->where('estado','A')->get();
         return Datatables::of($rangos)
             ->addColumn('action', function ($rangos) {
-                $acciones = '<div class="btn-group">';
-                $acciones = $acciones . '<a href="' . route("sucursal.editar", ["id" => $rangos->id]) . '" data-modal="modal-lg" class="btn btn-xs btn-custom" ><i class="ti-pencil-alt"></i> Edit</a>';
-                $acciones = $acciones . '<a class="btn btn-xs btn-primary" href="' . route("listterminales", [$rangos->id]) . '"><i class="ti-layers-alt"></i> Terminales</a>';
-                $acciones = $acciones . '</div>';
-                return $acciones;
+                $maxId = RangoConvEs::where('convenios_esta_id',$rangos->convenios_esta_id)->where('dias',$rangos->dias)->select([\DB::raw('MAX(id) as id')])->first();
+                if($rangos->id == $maxId->id){
+                    $acciones = '<div class="btn-group">';
+                    $acciones = $acciones . '<button class="btn btn-xs btn-danger" onclick="eliminarRango('.$rangos->id.')" ><i class="fa fa-trash"></i> Eliminar</button>';
+                    $acciones = $acciones . '</div>';
+                    return $acciones;
+                }
+
             })
             ->make(true);
     }
@@ -176,17 +182,100 @@ class ConveniosEstablecimientosController extends Controller
         return $result;
     }
 
+    /**
+     * metodo encargado de agregar un nuevo rango de administracion a un convenio
+     * @param Request $request datos de los rangos a ingresar
+     * @param $id id correspondiente al convenio
+     * @return array
+     */
     public function nuevoRongoConvenio(Request $request, $id){
-        //dd($request->all());
-        $rango = new RangoConvEs();
-        $rango->valor_min =  str_replace(",",".",str_replace(".","",$request->valor_min));
-        $rango->valor_max =  str_replace(",",".",str_replace(".","",$request->valor_max));
-        $rango->dias = $request->dias;
-        $rango->porcentaje = $request->porcentaje;
-        $rango->convenios_esta_id = $id;
-        $rango->save();
-        $result['estado'] = true;
-        $result['mensaje'] = 'rango agregado correctamente';
+        $result = [];
+        try{
+            $rangos = RangoConvEs::where('convenios_esta_id',$id)->where('estado','A')->get();
+
+            if(count($rangos)>0){
+                foreach ($rangos as $rango1){
+                    if($rango1->dias == $request->dias){
+                        if($rango1->valor_max >= str_replace(",",".",str_replace(".","",$request->valor_min))){
+                            $result['estado'] = false;
+                            $result['mensaje'] = 'Para este plazo de la factura, exite un rango de precios que se cruza con el que trata de agregar';
+                            return $result;
+                        }
+                    }
+                }
+            }
+            $rango = new RangoConvEs();
+            $rango->valor_min =  str_replace(",",".",str_replace(".","",$request->valor_min));
+            $rango->valor_max =  str_replace(",",".",str_replace(".","",$request->valor_max));
+            $rango->dias = $request->dias;
+            $rango->porcentaje = $request->porcentaje;
+            $rango->convenios_esta_id = $id;
+            $rango->save();
+            $result['estado'] = true;
+            $result['mensaje'] = 'rango agregado correctamente';
+        }catch (\Exception $exception){
+            $result['estado'] = false;
+            $result['mensaje'] = 'No fue posible agregar el nuevo rango';
+        }
+
         return $result;
     }
+
+    /**
+     * metodo que elimina un rago de administracion para un convenio
+     * @param Request $request trae la id corrrespodiente al rango a eliminar
+     * @return array
+     */
+    public function eliminarRangoConvenio(Request $request){
+        $result = [];
+        try{
+            $rango = RangoConvEs::find($request->id);
+            $rango->estado='I';
+            $rango->save();
+            $result['estado'] = true;
+            $result['mensaje'] = 'Rango eliminado satisfactoriamente.';
+        }catch (\Exception $exception){
+            $result['estado'] = false;
+            $result['mensaje'] = 'No fue posible elimnar el rango.';
+        }
+        return $result;
+    }
+
+    public function historialConvenioEstablecimiento($id){
+        $convenio = ConveniosEsta::find($id);
+        return view('establecimientos.convenios.historicoconvenio', compact('convenio'));
+    }
+
+    public function gridHitorialRangos($id){
+        $rangos = RangoConvEs::where('convenios_esta_id',$id)->distinct()->select('id')->pluck('id');
+        $auditoria = Auditoria::where('auditable_type','creditocofrem\RangoConvEs')
+            ->join('users','users.id','audits.user_id')
+            ->whereIn('auditable_id',$rangos->all())
+            ->select(['audits.*','users.name'])
+            ->get();
+        return Datatables::of($auditoria)->make(true);
+    }
+
+    public function gridFrecuencia($id){
+        $rangos = FerecuenciaConvEs::where('convenios_esta_id',$id)->distinct()->select('id')->pluck('id');
+        $auditoria = Auditoria::where('auditable_type','creditocofrem\FerecuenciaConvEs')
+            ->join('users','users.id','audits.user_id')
+            ->whereIn('auditable_id',$rangos->all())
+            ->select(['audits.*','users.name'])
+        ->get();
+        return Datatables::of($auditoria)->make(true);
+    }
+
+    public function gridPlazos($id){
+        $rangos = PlazoConvEs::where('convenios_esta_id',$id)->distinct()->select('id')->pluck('id');
+        $auditoria = Auditoria::where('auditable_type','creditocofrem\PlazoConvEs')
+            ->join('users','users.id','audits.user_id')
+            ->whereIn('auditable_id',$rangos->all())
+            ->select(['audits.*','users.name'])
+        ->get();
+        return Datatables::of($auditoria)->make(true);
+    }
+
+
+
 }

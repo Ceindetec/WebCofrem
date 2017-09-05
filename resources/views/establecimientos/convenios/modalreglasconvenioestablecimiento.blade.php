@@ -1,7 +1,7 @@
 <div id="modalreglasconvenio">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h4 class="modal-title">Parametros convenio</h4>
+        <h4 class="modal-title">Parametros convenio No {{$convenio->numero_convenio}}</h4>
     </div>
     <div class="modal-body">
         <div class="row">
@@ -40,7 +40,7 @@
                     <div class="col-md-10">
                         <div class="input-group m-t-10">
                             <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                            <input type="text" id="valor_min" name="valor_min" class="form-control dinero" placeholder="" required>
+                            <input type="text" id="valor_min" name="valor_min" class="form-control dinero" maxlength="20" placeholder="" required>
                         </div>
                     </div>
                 </div>
@@ -50,7 +50,7 @@
                     <div class="col-md-10">
                         <div class="input-group m-t-10">
                             <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                            <input type="text" id="valor_max" name="valor_max" class="form-control dinero" placeholder="" required>
+                            <input type="text" id="valor_max" name="valor_max" data-parsley-valorminimo="" maxlength="20" class="form-control dinero" placeholder="" required>
                         </div>
                     </div>
                 </div>
@@ -105,10 +105,30 @@
 
 <script>
     var table2;
-    var valfrecuencia = '{{$frecuencia==null?'':$frecuencia->frecuencia_corte}}';
+    var valfrecuencia = '{{$frecuencia==null?'y':$frecuencia->frecuencia_corte}}';
+
+    window.Parsley.addValidator('valorminimo', {
+        validateString: function(value) {
+            var valor_max = value;
+            var valor_min = $('#valor_min').val();
+            while(valor_max.indexOf('.')!=-1){
+                valor_max = valor_max.replace('.','');
+            }
+            while(valor_min.indexOf('.')!=-1){
+                valor_min = valor_min.replace('.','');
+            }
+            valor_max = parseFloat(valor_max.replace(',','.'),2);
+            valor_min = parseFloat(valor_min.replace(',','.'),2);
+            return valor_max>valor_min;
+        },
+        messages: {
+            es: 'El valor maximo debe ser superior al valor minimo',
+        }
+    });
+
     $(function () {
 
-        $('.dinero').mask('000.000.000.000.000,00', {reverse: true});
+        $('.dinero').mask('000.000.000.000,00', {reverse: true});
 
         table2 = $('#datatablerangos').DataTable({
             processing: true,
@@ -121,11 +141,26 @@
                 "type": "get"
             },
             columns: [
-                {data: 'valor_min', name: 'valor_min'},
-                {data: 'valor_max', name: 'valor_max'},
+                {
+                    data: 'valor_min',
+                    name: 'valor_min',
+                    render: function (data) {
+                        return "$ "+enmascarar(data);
+                    }
+                },
+                {
+                    data: 'valor_max',
+                    name: 'valor_max',
+                    render: function (data) {
+                        return "$ "+enmascarar(data);
+                    }
+                },
                 {data: 'dias', name: 'dias'},
                 {data: 'porcentaje', name: 'porcentaje'},
                 {data: 'action', name: 'action', orderable: false, searchable: false}
+            ],
+            "columnDefs": [
+                { className: "dt-right", "targets": [0,1,2,3] },
             ],
             order: [[1, 'asc']]
         });
@@ -297,9 +332,66 @@
             });
         });
 
-        $('.frecuencia_corte > option[value=' + valfrecuencia + ']').attr('selected', 'selected');
+        if(valfrecuencia!='y')
+            $('.frecuencia_corte > option[value=' + valfrecuencia + ']').attr('selected', 'selected');
 
     })
 
+function eliminarRango(id) {
+    swal({
+            title: '¿Estas seguro?',
+            text: "¡Desea eliminar este rango!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Si',
+            cancelButtonText: 'No',
+            confirmButtonClass: 'btn btn-success',
+            cancelButtonClass: 'btn btn-danger m-l-10',
+            buttonsStyling: false
+        },
+        function () {
+            $.ajax({
+                url: "{{route('convenio.ramgo.eliminar')}}",
+                data: {'id': id},
+                type: 'POST',
+                dataType: 'json',
+                beforeSend: function () {
+                    cargando();
+                },
+                success: function (result) {
+                    setTimeout(function () {
+                        if (result.estado) {
+                            swal({
+                                title: 'Bien!!',
+                                text: result.mensaje,
+                                type: 'success',
+                                confirmButtonColor: '#4fa7f3'
+                            });
+                            table2.ajax.reload();
+                        } else {
+                            swal(
+                                'Error!!',
+                                result.mensaje,
+                                'error'
+                            )
+                        }
+
+                    }, 200);
+                },
+                error: function (xhr, status) {
+                    var message = "Error de ejecución: " + xhr.status + " " + xhr.statusText;
+                    swal(
+                        'Error!!',
+                        message,
+                        'error'
+                    )
+                },
+                // código a ejecutar sin importar si la petición falló o no
+                complete: function (xhr, status) {
+                    fincarga();
+                }
+            });
+        });
+}
 
 </script>
