@@ -126,6 +126,10 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('convenio/crear/{id}','ConveniosEstablecimientosController@viewCrearConvenio')->name('convenio.crear');
         Route::post('convenio/crear/{id}','ConveniosEstablecimientosController@crearConvenio')->name('convenio.crearp');
         Route::get('coveniosesta/reglas/{id}','ConveniosEstablecimientosController@viewReglasConvenioEstablecimiento')->name('coveniosesta.reglas');
+        Route::get('gridrangosconvenio/{id}','ConveniosEstablecimientosController@gridRangosConvenio')->name('gridrangosconvenio');
+        Route::post('actualizar/plazo/{id}','ConveniosEstablecimientosController@actualizarPlazoPagoConvenio')->name('actualizar.plazo');
+        Route::post('actualizar/frecuencia/{id}','ConveniosEstablecimientosController@actualizarFrecuenciaCorteConvenio')->name('actualizar.frecuencia');
+        Route::post('conveni/.nuevorango/{id}','ConveniosEstablecimientosController@nuevoRongoConvenio')->name('convenio.nuevorango');
 
         /*FINALIZA CONVENIOS ESTABLECIMIENTOS*/
     });
