@@ -8,6 +8,7 @@ use creditocofrem\Tarjetas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Yajra\Datatables\Datatables;
+use Facades\creditocofrem\Encript;
 
 class TarjetasController extends Controller
 {
@@ -43,8 +44,21 @@ class TarjetasController extends Controller
             $tarjetas = new Tarjetas($request->all());
             //dd($tarjetas);
             // $tarjetas->create($request->all());
+            $codigo=$tarjetas->numero_tarjeta;
+            while( strlen($codigo) < 6)
+            {
+                $codigo = "0" . $codigo;
+            }
+            $tarjetas->numero_tarjeta=$codigo;
+            $validator = \Validator::make(['numero_tarjeta'=>$codigo], [
+                'numero_tarjeta' => 'required|unique:tarjetas'
+            ]);
+            if ($validator->fails()) {
+                return $validator->errors()->all();
+            }
             $ultimos = substr($tarjetas->numero_tarjeta, -4);
-            $tarjetas->password = bcrypt($ultimos);
+            //$tarjetas->password = bcrypt($ultimos);
+            $tarjetas->password =Encript::encryption($ultimos);
             $tarjetas->save();
             $result['estado'] = true;
             $result['mensaje'] = 'La tarjeta ha sido creada satisfactoriamente';
@@ -134,6 +148,7 @@ class TarjetasController extends Controller
         $result = [];
         \DB::beginTransaction();
         try {
+
             //dd($request->all());
             //dd($tarjetas);
             // $tarjetas->create($request->all());
@@ -143,18 +158,29 @@ class TarjetasController extends Controller
             for($i=$primer_num;$i<($primer_num+$total);$i++)
             {
                 $tarjetas = new Tarjetas();
+                $codigo=$i;
+                while( strlen($codigo) < 6)
+                {
+                    $codigo = "0" . $codigo;
+                }
+                $validator = \Validator::make(['numero_tarjeta'=>$codigo], [
+                    'numero_tarjeta' => 'required|unique:tarjetas'
+                ]);
+                if ($validator->fails()) {
+                    return $validator->errors()->all();
+                }
                 $tarjetas->tipo=$request->tipo;
-                $tarjetas->numero_tarjeta =$i;
-                $ultimos = substr($i, -4);
-                $tarjetas->password = bcrypt($ultimos);
+                $tarjetas->numero_tarjeta =$codigo;
+                $ultimos = substr($codigo, -4);
+                //$tarjetas->password = bcrypt($ultimos);
+                $tarjetas->password =Encript::encryption($ultimos);
                 $tarjetas->save();
                 $cont++;
                 //$paso = 1;
                 //crearHtarjeta($tarjetas);//insertar la historia
                 $result['estado'] = true;
-                $result['mensaje'] = 'la tarjeta'.$i.' ha sido creada satisfactoriamente';
+                $result['mensaje'] = 'la tarjeta'.$codigo.' ha sido creada satisfactoriamente';
                 $this->crearHtarjeta($tarjetas,'C');
-                \DB::commit();
             }
             if($cont==$total)
             {

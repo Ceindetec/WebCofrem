@@ -12,11 +12,10 @@
                     {{Form::text('numero_tarjeta', null ,['class'=>'form-control', "required", "maxlength"=>"7", "data-parsley-type"=>"number"])}} <!-- "data-parsley-type"=>"number"] -->
                 </div>
             </div>
-
             <div class="form-group">
                 <label class="col-md-2 control-label">Tipo</label>
                 <div class="col-md-10">
-                    {{Form::select('tipo', ['A' => 'Afiliado', 'R' => 'Regalo', 'B' => 'Bono'],"required")}}
+                    {{Form::select('tipo', ['A' => 'Afiliado', 'R' => 'Regalo', 'B' => 'Bono'],null, ['class'=>'form-control',"id"=>"tipo", "required"])}}
                 </div>
             </div>
 
@@ -43,8 +42,8 @@
                 beforeSend: function () {
                     cargando();
                 },
-                success : function(result) {
-                    if(result.estado){
+                success: function (result) {
+                    if (result.estado) {
                         swal(
                             {
                                 title: 'Bien!!',
@@ -52,12 +51,21 @@
                                 type: 'success',
                                 confirmButtonColor: '#4fa7f3'
                             }
-                        )
-                        modalBs.modal('hide');
-                    }else{
+                        );
+                    } else if (result.estado == false) {
                         swal(
                             'Error!!',
                             result.mensaje,
+                            'error'
+                        );
+                    } else {
+                        html = '';
+                        for (i = 0; i < result.length; i++) {
+                            html += result[i] + '\n\r';
+                        }
+                        swal(
+                            'Error!!',
+                            html,
                             'error'
                         )
                     }
