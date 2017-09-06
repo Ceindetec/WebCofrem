@@ -81,7 +81,7 @@
         <!-- LOGO -->
         <div class="topbar-left">
             <div class="">
-                <a href="index.html" class="logo">
+                <a href="{{route('login')}}" class="logo">
                     <img src="{{url('images/logo.png')}}" alt="logo" class="logo-lg" style="height: 40px"/>
                     <img src="{{url('images/logo_sm.png')}}" alt="logo" class="logo-sm hidden"/>
                 </a>
