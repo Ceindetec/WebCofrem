@@ -44,4 +44,11 @@ class User extends Authenticatable implements AuditableContract
     {
         $this->notify(new MyResetPassword($token));
     }
+
+    public function getRoles()
+    {
+        $roles = \DB::table('roles')->join('role_user','roles.id','role_user.role_id')->join('users','users.id','role_user.user_id')->where('users.id',$this->id)->select(['roles.*'])->get();
+        return $roles;
+
+    }
 }

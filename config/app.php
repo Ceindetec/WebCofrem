@@ -182,6 +182,7 @@ return [
         Caffeinated\Shinobi\ShinobiServiceProvider::class,
         Yajra\Oci8\Oci8ServiceProvider::class,
         OwenIt\Auditing\AuditingServiceProvider::class,
+        Barryvdh\DomPDF\ServiceProvider::class,
 
     ],
 
@@ -238,6 +239,8 @@ return [
         'Shinobi' => Caffeinated\Shinobi\Facades\Shinobi::class,
 
         'Encript' => Facades\creditocofrem\Encript::class,
+
+        'PDF' => Barryvdh\DomPDF\Facade::class,
 
     ],
 
