@@ -224,7 +224,7 @@
 
                         <li class="dropdown top-menu-item-xs">
                             <a href="" class="dropdown-toggle menu-right-item profile" data-toggle="dropdown"
-                               aria-expanded="true"><img src="{{url('images/users/avatar-1.jpg')}}" alt="user-img"
+                               aria-expanded="true"><img src="{{url('images/avatar2.png')}}" alt="user-img"
                                                          class="img-circle"> </a>
                             <ul class="dropdown-menu">
                                 <!--<li><a href="javascript:void(0)"><i class="ti-user m-r-10"></i> Profile</a></li>
@@ -260,11 +260,11 @@
                     <!-- User Detail box -->
                     <div class="user-details">
                         <div class="pull-left">
-                            <img src="{{url('images/users/avatar-1.jpg')}}" alt="" class="thumb-md img-circle">
+                            <img src="{{url('images/avatar2.png')}}" alt="" class="thumb-md img-circle">
                         </div>
                         <div class="user-info">
-                            <a href="#">Stanley Jones</a>
-                            <p class="text-muted m-0">Administrator</p>
+                            <a href="#">{{Auth::User()->name}}</a>
+                            <p class="text-muted m-0">{{Auth::User()->getRoles()[0]->name}}</p>
                         </div>
                     </div>
                     <!--- End User Detail box -->
