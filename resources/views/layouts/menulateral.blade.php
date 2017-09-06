@@ -12,6 +12,8 @@
         </ul>
     </li>
     <li><a href="{{route('establecimientos')}}"><i class="ti-layout"></i> Establecimientos </a></li>
+    <li><a href="{{route('tarjetas')}}"><i class="ti-layout"></i> Tarjetas </a></li>
+   <!-- <li><a href="{ {route('tarjetasregalo')}}"><i class="ti-layout"></i> Tarjetas Regalo</a></li> -->
 @endrole
 
 <!--<li><a href="index.html"><i class="ti-home"></i> Dashboard </a></li>
