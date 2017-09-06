@@ -128,6 +128,26 @@ function touchHandler(event)
     // event.preventDefault();
 }
 
+function enmascarar(data) {
+    valor = data.split('.');
+    num = valor[0];
+    if(valor[0].length>3){
+        num = valor[0].split('').reverse().join('').replace(/(?=\d*\.?)(\d{3})/g,'$1.');
+        num = num.split('').reverse().join('');
+        pos = num.indexOf('.');
+        if(pos==0){
+            num = num.substring(1, num.length);
+        }
+    }
+    if(valor[1]!= undefined){
+        num = num+','+valor[1];
+    }else{
+        num = num+',00';
+    }
+
+    return num;
+}
+
 function envttohs()
 {
     document.addEventListener("touchstart", touchHandler, true);

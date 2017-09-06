@@ -126,6 +126,15 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('convenio/crear/{id}','ConveniosEstablecimientosController@viewCrearConvenio')->name('convenio.crear');
         Route::post('convenio/crear/{id}','ConveniosEstablecimientosController@crearConvenio')->name('convenio.crearp');
         Route::get('coveniosesta/reglas/{id}','ConveniosEstablecimientosController@viewReglasConvenioEstablecimiento')->name('coveniosesta.reglas');
+        Route::get('gridrangosconvenio/{id}','ConveniosEstablecimientosController@gridRangosConvenio')->name('gridrangosconvenio');
+        Route::post('actualizar/plazo/{id}','ConveniosEstablecimientosController@actualizarPlazoPagoConvenio')->name('actualizar.plazo');
+        Route::post('actualizar/frecuencia/{id}','ConveniosEstablecimientosController@actualizarFrecuenciaCorteConvenio')->name('actualizar.frecuencia');
+        Route::post('conveni/.nuevorango/{id}','ConveniosEstablecimientosController@nuevoRongoConvenio')->name('convenio.nuevorango');
+        Route::post('convenio/ramgo/eliminar','ConveniosEstablecimientosController@eliminarRangoConvenio')->name('convenio.ramgo.eliminar');
+        Route::get('convenios/historial/{id}','ConveniosEstablecimientosController@historialConvenioEstablecimiento')->name('convenios.historial');
+        Route::get('gridhitorialrangos/{id}','ConveniosEstablecimientosController@gridHitorialRangos')->name('gridHitorialrangos');
+        Route::get('gridfrecuencia/{id}','ConveniosEstablecimientosController@gridFrecuencia')->name('gridFrecuencia');
+        Route::get('gridplazos/{id}','ConveniosEstablecimientosController@gridPlazos')->name('gridPlazos');
 
         /*FINALIZA CONVENIOS ESTABLECIMIENTOS*/
     });
