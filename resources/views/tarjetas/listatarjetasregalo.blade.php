@@ -102,7 +102,7 @@
                                 return 'Bono';
                             else
                                 return 'Afiliado';
-                            }
+                        }
                     },
                     {data: 'cambioclave', name: 'cambioclave',
                         render: function(data){
