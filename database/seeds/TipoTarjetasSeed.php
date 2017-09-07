@@ -11,10 +11,11 @@ class TipoTarjetasSeed extends Seeder
      */
     public function run()
     {
-        DB::table('tipo_tarjetas')->insert(
-            ["codigo"=>'A', "descripcion"=>'AFILIADO'],
-            ["codigo"=>'R', "descripcion"=>'REGALO'],
-            ["codigo"=>'B', "descripcion"=>'BONO EMPRESARIAL']
+        DB::table('tipo_tarjetas')->insert([
+            ["id" => "1", "codigo" => 'A', "descripcion" => 'AFILIADO'],
+            ["id" => "2", "codigo" => 'R', "descripcion" => 'REGALO'],
+            ["id" => "3", "codigo" => 'B', "descripcion" => 'BONO EMPRESARIAL']
+            ]
         );
     }
 }

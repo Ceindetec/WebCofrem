@@ -137,6 +137,14 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('gridplazos/{id}','ConveniosEstablecimientosController@gridPlazos')->name('gridPlazos');
 
         /*FINALIZA CONVENIOS ESTABLECIMIENTOS*/
+
+        /*INICIA PARAMETRIZACION TARJETAS*/
+        Route::get('tarjetas/parametrizacion','ParametrizacionTarjetasController@viewParametrosTarjetas')->name('tarjetas.parametros');
+        Route::post('tarjeta/parametrovalor/crear','ParametrizacionTarjetasController@tarjetaCrearParametroValor')->name('tarjeta.parametro.valor');
+        Route::post('tarjeta/parametroadministracion/crear','ParametrizacionTarjetasController@tarjetaCrearParametroAdministracion')->name('tarjeta.parametro.administracion');
+        Route::get('gridadministraciontarjetas','ParametrizacionTarjetasController@gridAdministracionTarjetas')->name('gridadministraciontarjetas');
+
+        /*FINALIZA PARAMETRIZACION TARJETAS*/
     });
 
 
