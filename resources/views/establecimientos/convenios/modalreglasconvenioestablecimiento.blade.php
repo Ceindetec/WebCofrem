@@ -55,7 +55,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-md-2 control-label">Plazo de pago</label>
+                        <label class="col-md-2 control-label">Plazo de pago</label>
                     <div class="col-md-10">
                         <input type="number" name="dias" class="form-control" required maxlength="2" data-parsley-type="number"
                                data-parsley-max="10" data-parsley-min="5">

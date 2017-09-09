@@ -62,12 +62,9 @@
                 <table id="datatableadministracion" class="table table-striped table-bordered" width="100%">
                     <thead>
                     <tr>
-                        <th>id</th>
-                        <th>Evento</th>
-                        <th>Antrior valor</th>
-                        <th>Nuevo valor</th>
-                        <th>Fecha</th>
-                        <th>Usuario</th>
+                        <th>Tarjeta</th>
+                        <th>Administracion %</th>
+                        <th>accion</th>
                     </tr>
                     </thead>
                 </table>
@@ -145,19 +142,8 @@
                     "type": "get"
                 },
                 columns: [
-                    {data: 'nit', name: 'nit'},
-                    {data: 'razon_social', name: 'razon_social'},
-                    {
-                        data: 'estado',
-                        name: 'estado',
-                        render: function (data) {
-                            if (data == 'A')
-                                return 'Activo';
-                            else
-                                return 'Inactivo';
-
-                        }
-                    },
+                    {data: 'get_tipo_tarjeta.descripcion', name: 'tarjeta'},
+                    {data: 'porcentaje', name: 'porcentaje'},
                     {data: 'action', name: 'action', orderable: false, searchable: false}
                 ],
                 order: [[1, 'asc']]
@@ -279,9 +265,66 @@
                         fincarga();
                     }
                 });
-            })
+            });
 
 
         });
+        
+        function eliminarAdministracion(id) {
+            swal({
+                    title: '¿Estas seguro?',
+                    text: "¡Desea eliminar este valor de administracion!",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Si',
+                    cancelButtonText: 'No',
+                    confirmButtonClass: 'btn btn-success',
+                    cancelButtonClass: 'btn btn-danger m-l-10',
+                    buttonsStyling: false
+                },
+                function () {
+                    $.ajax({
+                        url: "{{route('tarjeta.parametro.administracion.eliminar')}}",
+                        data: {'id': id},
+                        type: 'POST',
+                        dataType: 'json',
+                        beforeSend: function () {
+                            cargando();
+                        },
+                        success: function (result) {
+                            setTimeout(function () {
+                                if (result.estado) {
+                                    swal({
+                                        title: 'Bien!!',
+                                        text: result.mensaje,
+                                        type: 'success',
+                                        confirmButtonColor: '#4fa7f3'
+                                    });
+                                    table.ajax.reload();
+                                } else {
+                                    swal(
+                                        'Error!!',
+                                        result.mensaje,
+                                        'error'
+                                    )
+                                }
+
+                            }, 200);
+                        },
+                        error: function (xhr, status) {
+                            var message = "Error de ejecución: " + xhr.status + " " + xhr.statusText;
+                            swal(
+                                'Error!!',
+                                message,
+                                'error'
+                            )
+                        },
+                        // código a ejecutar sin importar si la petición falló o no
+                        complete: function (xhr, status) {
+                            fincarga();
+                        }
+                    });
+                });
+        }
     </script>
 @endsection
