@@ -143,6 +143,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('tarjeta/parametrovalor/crear','ParametrizacionTarjetasController@tarjetaCrearParametroValor')->name('tarjeta.parametro.valor');
         Route::post('tarjeta/parametroadministracion/crear','ParametrizacionTarjetasController@tarjetaCrearParametroAdministracion')->name('tarjeta.parametro.administracion');
         Route::get('gridadministraciontarjetas','ParametrizacionTarjetasController@gridAdministracionTarjetas')->name('gridadministraciontarjetas');
+        Route::post('tarjeta/parametro/administracion/eliminar','ParametrizacionTarjetasController@tarjetaEliminarParametroAdministracion')->name('tarjeta.parametro.administracion.eliminar');
 
         /*FINALIZA PARAMETRIZACION TARJETAS*/
     });

@@ -18,6 +18,11 @@ class ParametrizacionTarjetasController extends Controller
     public function viewParametrosTarjetas(){
         $tipotarjetas = TipoTarjetas::all()->pluck('descripcion','codigo');
         $valorTarjeta = ValorTarjeta::where('estado','A')->first();
+        if($valorTarjeta != null){
+            if(!strrpos($valorTarjeta->valor,'.')){
+                $valorTarjeta->valor= $valorTarjeta->valor.',00';
+            }
+        }
         return view('tarjetas.parametrizacion.parametrizacion', compact(['tipotarjetas','valorTarjeta']));
     }
 
@@ -28,6 +33,7 @@ class ParametrizacionTarjetasController extends Controller
      */
     public function tarjetaCrearParametroValor(Request $request){
         $result = [];
+        \DB::beginTransaction();
         try{
             $existe = ValorTarjeta::all();
             $newvalor = new ValorTarjeta();
@@ -42,9 +48,11 @@ class ParametrizacionTarjetasController extends Controller
                 $newvalor->estado = 'A';
             }
             $newvalor->save();
+            \DB::commit();
             $result['estado'] = true;
             $result['mensaje'] = 'Valor ingresado satisfactoriamente';
         }catch (\Exception $exception){
+            \DB::rollback();
             $result['estado'] = false;
             $result['mensaje'] = 'No fue posible ingresar el valor '.$exception->getMessage();
         }
@@ -81,13 +89,42 @@ class ParametrizacionTarjetasController extends Controller
         return $result;
     }
 
+    /**
+     * metodo encargado de llenar la grid con las configuraciones de administracion existentes para una tarjeta
+     * @return mixed
+     */
     public function gridAdministracionTarjetas(){
         $administraciones = AdminisTarjetas::where('estado','A')->get();
         foreach ($administraciones as $administracione){
             $administracione->getTipoTarjeta;
         }
 
-        return Datatables::of($administraciones)->make(true);
+        return Datatables::of($administraciones)
+            ->addColumn('action', function ($rangos) {
+                    $acciones = '<div class="btn-group">';
+                    $acciones = $acciones . '<button class="btn btn-xs btn-danger" onclick="eliminarAdministracion('.$rangos->id.')" ><i class="fa fa-trash"></i> Eliminar</button>';
+                    $acciones = $acciones . '</div>';
+                    return $acciones;
+            })->make(true);
 
+    }
+
+    /**
+     * metodo que permite eliminar(cambiar de estado) una parametricacion de porcentaje de administracion
+     * @param Request $request
+     */
+    public function tarjetaEliminarParametroAdministracion(Request $request){
+        $result = [];
+        try{
+            $administracion = AdminisTarjetas::find($request->id);
+            $administracion->estado = 'I';
+            $administracion->save();
+            $result['estado'] = true;
+            $result['mensaje'] = 'Eliminado parametro de administracion satisfactoriamente';
+        }catch (\Exception $exception){
+            $result['estado'] = false;
+            $result['mensaje'] = 'Eliminado parametro de administracion satisfactoriamente';
+        }
+        return $result;
     }
 }
