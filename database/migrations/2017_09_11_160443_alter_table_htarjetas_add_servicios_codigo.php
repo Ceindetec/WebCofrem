@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTarjetaServiciosTable extends Migration
+class AlterTableHtarjetasAddServiciosCodigo extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,11 @@ class CreateTarjetaServiciosTable extends Migration
      */
     public function up()
     {
-        Schema::create('tarjeta_servicios', function (Blueprint $table) {
-            $table->increments('id')->nocache();
-            $table->string('numero_tarjeta')->index();
-            $table->foreign('numero_tarjeta')->references('numero_tarjeta')->on('tarjetas')->onDelete('cascade');
+        Schema::table('htarjetas', function (Blueprint $table) {
             $table->string('servicio_codigo')->index();
             $table->foreign('servicio_codigo')->references('codigo')->on('servicios')->onDelete('cascade');
-            $table->timestamps();
+            $table->string('nota')->nullable();
+            $table->dropColumn('hora');
         });
     }
 
@@ -30,6 +28,10 @@ class CreateTarjetaServiciosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tarjeta_servicios');
+        Schema::table('htarjetas', function (Blueprint $table) {
+            $table->dropColumn('servicio_codigo');
+            $table->dropColumn('nota');
+            $table->date('hora');
+        });
     }
 }

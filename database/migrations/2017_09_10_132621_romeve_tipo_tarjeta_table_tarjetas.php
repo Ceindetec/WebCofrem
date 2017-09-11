@@ -27,7 +27,7 @@ class RomeveTipoTarjetaTableTarjetas extends Migration
     {
         Schema::table('tarjetas', function (Blueprint $table) {
             $table->string('tarjeta_codigo')->index();
-            $table->foreign('tarjeta_codigo')->references('codigo')->on('tipo_tarjetas')->onDelete('cascade');
+            $table->foreign('tarjeta_codigo')->references('codigo')->on('servicios')->onDelete('cascade');
         });
     }
 }
