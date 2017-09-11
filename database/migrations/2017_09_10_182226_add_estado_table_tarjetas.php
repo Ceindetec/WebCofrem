@@ -14,7 +14,7 @@ class AddEstadoTableTarjetas extends Migration
     public function up()
     {
         Schema::table('tarjetas', function (Blueprint $table) {
-            $table->enum('estado',['A','I','C']);
+            $table->enum('estado',['A','I','C'])->default('I');
         });
     }
 
