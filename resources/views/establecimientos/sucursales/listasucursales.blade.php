@@ -79,6 +79,8 @@
                             <th>Nombre</th>
                             <th>Ciudad</th>
                             <th>Direccion</th>
+                            <th>Email</th>
+                            <th>Telefono</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
@@ -130,6 +132,8 @@
                     {data: 'nombre', name: 'nombre'},
                     {data: 'get_municipio.descripcion', name: 'ciudad'},
                     {data: 'direccion', name: 'direccion'},
+                    {data: 'email', name: 'email'},
+                    {data: 'telefono', name: 'telefono'},
                     {
                         data: 'estado',
                         name: 'estado',

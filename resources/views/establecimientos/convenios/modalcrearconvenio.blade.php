@@ -32,6 +32,16 @@
                 </div>
             </div>
 
+            <div class="form-group">
+                <label class="col-md-2 control-label">Prorrogable</label>
+                <div class="col-md-10">
+                    <div class="checkbox checkbox-custom">
+                        {{Form::checkbox('prorrogable', '1',true)}}
+                        <label>&nbsp;</label>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
     <div class="modal-footer">
