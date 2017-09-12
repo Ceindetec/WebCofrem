@@ -15,26 +15,37 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-12">
-                <h4 class="header-title m-t-0 m-b-20">Parametrizar </h4>
+                <h4 class="header-title m-t-0 m-b-20">Parametrizar servicios </h4>
             </div>
         </div> <!-- end row -->
 
 
         <div class="card-box">
-            <h4 class="m-t-0">Valor tarjeta</h4>
+            <h4 class="m-t-0">Valor del plastico</h4>
             <br>
             {{Form::open(['route'=>['tarjeta.parametro.valor'], 'class'=>'form-inline', 'id'=>'parametrovalor'])}}
-                <div class="form-group">
-                    <label for="valor">Valor: </label>
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                        <input type="text" class="form-control dinero" name="valor" value="{{$valorTarjeta==null?'':$valorTarjeta->valor}}" id="valor">
-                    </div>
+            <div class="form-group">
+                <label for="valor">Valor: </label>
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                    <input type="text" class="form-control dinero" name="valor"
+                           value="{{$valorTarjeta==null?'':$valorTarjeta->valor}}" id="valor">
                 </div>
+            </div>
 
-                <button type="submit" class="btn btn-custom">Guardar</button>
+            <button type="submit" class="btn btn-custom">Guardar</button>
             {{Form::close()}}
         </div>
+
+
+        <div class="row">
+            <div class="col-sm-12">
+                <h4 class="header-title m-t-0 m-b-20 col-md-6" style="display: inline">Parametrizar servicio </h4>
+                <div class="col-md-6">
+                    {{Form::select("tarjeta_codigo",$tipotarjetas,null,['class'=>'form-control', "tabindex"=>"2",'id'=>'departamento'])}}
+                </div>
+            </div>
+        </div> <!-- end row -->
 
         <div class="card-box">
             <h4 class="m-t-0">Procentaje de administracion</h4>
@@ -47,7 +58,8 @@
             <div class="form-group">
                 <label for="valor">Administracion: </label>
                 <div class="input-group">
-                    <input type="number" name="porcentaje" class="form-control" required maxlength="2" data-parsley-type="number"
+                    <input type="number" name="porcentaje" class="form-control" required maxlength="2"
+                           data-parsley-type="number"
                            data-parsley-max="100" data-parsley-min="0">
                     <span class="input-group-addon"><i class="fa fa-percent" aria-hidden="true"></i></span>
                 </div>
@@ -269,7 +281,7 @@
 
 
         });
-        
+
         function eliminarAdministracion(id) {
             swal({
                     title: '¿Estas seguro?',

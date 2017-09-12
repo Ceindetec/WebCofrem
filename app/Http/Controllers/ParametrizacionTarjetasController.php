@@ -3,7 +3,7 @@
 namespace creditocofrem\Http\Controllers;
 
 use creditocofrem\AdminisTarjetas;
-use creditocofrem\TipoTarjetas;
+use creditocofrem\Servicios;
 use creditocofrem\ValorTarjeta;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
@@ -16,7 +16,7 @@ class ParametrizacionTarjetasController extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function viewParametrosTarjetas(){
-        $tipotarjetas = TipoTarjetas::all()->pluck('descripcion','codigo');
+        $tipotarjetas = Servicios::all()->pluck('descripcion','codigo');
         $valorTarjeta = ValorTarjeta::where('estado','A')->first();
         if($valorTarjeta != null){
             if(!strrpos($valorTarjeta->valor,'.')){
