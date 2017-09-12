@@ -94,15 +94,8 @@
                 },
                 columns: [
                     {data: 'numero_tarjeta', name: 'numero_tarjeta'},
-                    {data: 'tipo', name: 'tipo',
-                        render: function(data){
-                            if(data=='R')
-                                return 'Regalo';
-                            else if(data=='B')
-                                return 'Bono';
-                            else
-                                return 'Afiliado';
-                            }
+                    {data: 'tarjeta_codigo', name: 'tipo',
+
                     },
                     {data: 'cambioclave', name: 'cambioclave',
                         render: function(data){

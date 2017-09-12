@@ -5,6 +5,7 @@ namespace creditocofrem\Http\Controllers;
 use Carbon\Carbon;
 use creditocofrem\Htarjetas;
 use creditocofrem\Tarjetas;
+use creditocofrem\TipoTarjetas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Yajra\Datatables\Datatables;
@@ -31,7 +32,8 @@ class TarjetasController extends Controller
     }
     //vista modal para crear tarjetas
     public function viewCrearTarjeta(){
-        return view('tarjetas.modalcreartarjetas');
+        $tipo_tarjetas = TipoTarjetas::pluck('descripcion', 'codigo');
+        return view('tarjetas.modalcreartarjetas', compact(['tipo_tarjetas']));
     }
 
     //metodo para agregar nueva tarjeta: insertar en bd
@@ -139,8 +141,10 @@ class TarjetasController extends Controller
     //metodo para llamar a la vista modal para crear tarjetas en bloque - masivo
     public function viewCrearTarjetaBloque(Request $request)
     {
-        $tarjeta = Tarjetas::find($request->id);
-        return view('tarjetas.modalcreartarjetabloque', compact('tarjeta'));
+        //$tarjeta = Tarjetas::find($request->id);
+        //return view('tarjetas.modalcreartarjetabloque', compact('tarjeta'));
+        $tipo_tarjetas = TipoTarjetas::pluck('descripcion', 'codigo');
+        return view('tarjetas.modalcreartarjetabloque', compact(['tipo_tarjetas']));
     }
     //metodo para agregar  tarjetas en bloque: insertar en bd de forma masiva
     public function crearTarjetaBloque(Request $request)
@@ -169,7 +173,7 @@ class TarjetasController extends Controller
                 if ($validator->fails()) {
                     return $validator->errors()->all();
                 }
-                $tarjetas->tipo=$request->tipo;
+                $tarjetas->tarjeta_codigo=$request->tarjeta_codigo;
                 $tarjetas->numero_tarjeta =$codigo;
                 $ultimos = substr($codigo, -4);
                 //$tarjetas->password = bcrypt($ultimos);

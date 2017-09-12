@@ -8,6 +8,6 @@ class Tarjetas extends Model
 {
     //
     protected $fillable = [
-        'numero_tarjeta', 'tipo', 'cambioclave', 'password',
+        'numero_tarjeta', 'tarjeta_codigo', 'cambioclave', 'password',
     ];
 }
