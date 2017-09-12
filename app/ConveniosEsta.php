@@ -10,7 +10,7 @@ class ConveniosEsta extends Model implements AuditableContract
 {
     use Auditable;
     protected $fillable = [
-        'numero_convenio', 'fecha_inicio', 'fecha_fin'
+        'numero_convenio', 'fecha_inicio', 'fecha_fin','prorrogable'
     ];
 
     public function getEstablecimiento()

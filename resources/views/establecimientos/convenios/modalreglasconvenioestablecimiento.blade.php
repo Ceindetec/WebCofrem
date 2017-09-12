@@ -5,7 +5,7 @@
     </div>
     <div class="modal-body">
         <div class="row">
-            {{Form::open(['route'=>['actualizar.plazo',$convenio->id], 'class'=>'form-horizontal', 'id'=>'actualizarplazo'])}}
+           {{-- {{Form::open(['route'=>['actualizar.plazo',$convenio->id], 'class'=>'form-horizontal', 'id'=>'actualizarplazo'])}}
             <div class="form-group">
                 <label class="col-md-2 control-label">Plazo de pago</label>
                 <div class="col-md-8">
@@ -16,7 +16,7 @@
                     <button type="submit" class="btn btn-custom waves-effect waves-light">Guardar</button>
                 </div>
             </div>
-            {{Form::close()}}
+            {{Form::close()}} --}}
 
             {{Form::open(['route'=>['actualizar.frecuencia',$convenio->id], 'class'=>'form-horizontal', 'id'=>'actualizarfrecuencia'])}}
             <div class="form-group">

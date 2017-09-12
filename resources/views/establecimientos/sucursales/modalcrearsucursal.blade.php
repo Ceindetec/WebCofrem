@@ -81,6 +81,21 @@
             </div>
         </div>
 
+        <div class="form-group">
+            <label class="col-md-2 control-label">Email</label>
+            <div class="col-md-10">
+                {{Form::text('email', null ,['class'=>'form-control', "id"=>"nombre", "required", "tabindex"=>"1","maxlength"=>"60", "data-parsley-type"=>"email"])}}
+
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-2 control-label">Telefono</label>
+            <div class="col-md-10">
+                {{Form::text('telefono', null ,['class'=>'form-control', "id"=>"nombre", "required", "tabindex"=>"1","maxlength"=>"10", "data-parsley-type"=>"number"])}}
+
+            </div>
+        </div>
 
         <div class="form-group">
             <label class="col-md-2 control-label">Contraseña</label>
