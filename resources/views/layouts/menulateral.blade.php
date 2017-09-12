@@ -25,7 +25,7 @@
 
     <li>
         <a href="javascript: void(0);" aria-expanded="true"><i class="ti-credit-card"></i> Tarjetas <span class="fa arrow"></span></a>
-        <ul class="nav-second-level nav collapse in" aria-expanded="true" style="">
+        <ul class="nav-second-level nav collapse" aria-expanded="true" style="">
             <li><a href="{{route('tarjetas')}}">Inventario</a></li>
             <li><a href="javascript: void(0);" aria-expanded="true">Tarjeta Regalo <span class="fa arrow"></span></a>
                 <ul class="nav-third-level nav collapse" aria-expanded="false">
