@@ -22,7 +22,7 @@
             <div class="form-group">
                 <label class="col-md-2 control-label">Contraseña</label>
                 <div class="col-md-10">
-                    {{Form::password('password', ['class'=>'form-control', "required", "maxlength"=>"4", "id"=>"password"])}}
+                    {{Form::password('password', ['class'=>'form-control', "required", "maxlength"=>"4", "id"=>"password", "data-parsley-type"=>"number"])}}
                 </div>
             </div>
             <div class="form-group">

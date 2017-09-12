@@ -56,6 +56,12 @@ class ConveniosEstablecimientosController extends Controller
     public function crearConvenio(Request $request, $id)
     {
         $result = [];
+        $exite = ConveniosEsta::where('establecimiento_id',$id)->where('estado','A')->get();
+        if(count($exite)>0){
+            $result['estado'] = false;
+            $result['mensaje'] = 'Ya existe un convenio activo para este establecimiento.';
+            return $result;
+        }
         DB::beginTransaction();
         try {
             $validator = \Validator::make($request->all(), [
