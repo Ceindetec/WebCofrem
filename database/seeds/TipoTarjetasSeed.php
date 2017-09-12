@@ -11,7 +11,7 @@ class TipoTarjetasSeed extends Seeder
      */
     public function run()
     {
-        DB::table('tipo_tarjetas')->insert([
+        DB::table('servicios')->insert([
             ["id" => "1", "codigo" => 'A', "descripcion" => 'AFILIADO'],
             ["id" => "2", "codigo" => 'R', "descripcion" => 'REGALO'],
             ["id" => "3", "codigo" => 'B', "descripcion" => 'BONO EMPRESARIAL']
