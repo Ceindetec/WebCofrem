@@ -26,7 +26,7 @@
                     <div class="row">
                         <div class="col-lg-3 col-sm-6">
                             <div class="widget-inline-box">
-                                <a href="{{route('establecimiento.crear')}}" data-modal class="btn btn-custom waves-effect waves-light" data-toggle="modal" data-target="#modalrol">Agregar Establecimiento</a>
+                              <a href="{{route('empresa.crear')}}" data-modal class="btn btn-custom waves-effect waves-light" data-toggle="modal" data-target="#modalrol">Agregar Empresa</a>
                             </div>
                         </div>
                     </div>
@@ -42,7 +42,12 @@
                         <tr>
                             <th>Nit</th>
                             <th>Razon social</th>
-                            <th>Estado</th>
+                            <th>Representante Legal</th>
+                            <th>Municipio</th>
+                            <th>Email</th>
+                            <th>Telefono</th>
+                            <th>Celular</th>
+                            <th>Direccion</th>
                             <th>Acciones</th>
                         </tr>
                         </thead>
@@ -82,23 +87,19 @@
                     "url": "{!!route('datatable_es')!!}"
                 },
                 ajax: {
-                    url: "{!!route('gridestablecimientos')!!}",
+                    url: "{!!route('gridempresas')!!}",
                     "type": "get"
                 },
                 columns: [
                     {data: 'nit', name: 'nit'},
                     {data: 'razon_social', name: 'razon_social'},
-                    {
-                        data: 'estado',
-                        name: 'estado',
-                        render: function (data) {
-                            if(data=='A')
-                                return 'Activo';
-                            else
-                                return 'Inactivo';
+                    {data: 'representante_legal', name: 'representante_legal'},
+                    {data: 'municipio_codigo', name: 'municipio_codigo'},
+                    {data: 'email', name: 'email'},
+                    {data: 'telefono', name: 'telefono'},
+                    {data: 'celular', name: 'celular'},
+                    {data: 'direccion', name: 'direccion'},
 
-                        }
-                    },
                     {data: 'action', name: 'action', orderable: false, searchable: false}
                 ],
                 order: [[1, 'asc']]
