@@ -12,7 +12,35 @@
         </ul>
     </li>
     <li><a href="{{route('establecimientos')}}"><i class="ti-layout"></i> Establecimientos </a></li>
-    <li><a href="{{route('tarjetas')}}"><i class="ti-credit-card"></i> Tarjetas </a></li>
+    {{--<li>--}}
+        {{--<a href="javascript: void(0);" aria-expanded="true"><i class="ti-credit-card"></i> Tarjetas--}}
+            {{--<span class="fa arrow"></span></a>--}}
+        {{--<ul class="nav-second-level nav" aria-expanded="true">--}}
+            {{--<li><a href="{{route('usuarios')}}">Usuarios</a></li>--}}
+            {{--<li><a href="{{route('roles')}}">Roles</a></li>--}}
+            {{--<li><a href="{{route('permisos')}}">Permisos</a></li>--}}
+        {{--</ul>--}}
+        {{--<a href="{{route('tarjetas')}}"><i class="ti-credit-card"></i> Inventario </a>--}}
+    {{--</li>--}}
+
+    <li>
+        <a href="javascript: void(0);" aria-expanded="true"><i class="ti-credit-card"></i> Tarjetas <span class="fa arrow"></span></a>
+        <ul class="nav-second-level nav collapse in" aria-expanded="true" style="">
+            <li><a href="{{route('tarjetas')}}">Inventario</a></li>
+            <li><a href="javascript: void(0);" aria-expanded="true">Tarjeta Regalo <span class="fa arrow"></span></a>
+                <ul class="nav-third-level nav collapse" aria-expanded="false">
+                    <li><a href="javascript: void(0);">Individualmente</a></li>
+                    <li><a href="javascript: void(0);">En Bloque</a></li>
+                </ul>
+            </li>
+            <li><a href="javascript: void(0);" aria-expanded="true">Tarjeta Bono <span class="fa arrow"></span></a>
+                <ul class="nav-third-level nav collapse" aria-expanded="false">
+                    <li><a href="javascript: void(0);">Individualmente</a></li>
+                    <li><a href="javascript: void(0);">En Bloque</a></li>
+                </ul>
+            </li>
+        </ul>
+    </li>
    <!-- <li><a href="{ {route('tarjetasregalo')}}"><i class="ti-layout"></i> Tarjetas Regalo</a></li> -->
 @endrole
 
