@@ -14,6 +14,6 @@ class AdminisTarjetas extends Model implements AuditableContract
     protected $fillable = ['tarjeta_codigo','porcentaje'];
 
     public function getTipoTarjeta(){
-        return $this->belongsTo('creditocofrem\TipoTarjetas','tarjeta_codigo','codigo');
+        return $this->belongsTo('creditocofrem\Servicios','servicio_codigo','codigo');
     }
 }

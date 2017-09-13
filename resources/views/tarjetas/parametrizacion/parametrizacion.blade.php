@@ -60,7 +60,7 @@
         </div> <!-- end row -->
 
         <div class="card-box">
-            <h4 class="m-t-0">Selecione servicio</h4>
+            <h4 class="m-t-0">Seleccione servicio a parametrizar</h4>
             <br>
             <div class="form-group">
                 <div class="col-md-8">
@@ -185,8 +185,10 @@
                     },
                     {data: 'estado', name: 'estado',
                         render: function(data){
-                            if(data=='A')
-                                return 'Activo';
+                            if(data=='A'){
+                                html= '<div class="label-success" > <strong style="color:#fff">Activo</strong></div>';
+                                return html;
+                            }
                             else
                                 return 'Inactivo';
                         }
