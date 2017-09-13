@@ -141,14 +141,17 @@ Route::group(['middleware' => 'auth'], function () {
         /*INICIA PARAMETRIZACION TARJETAS*/
         Route::get('tarjetas/parametrizacion','ParametrizacionTarjetasController@viewParametrosTarjetas')->name('tarjetas.parametros');
         Route::post('tarjeta/parametrovalor/crear','ParametrizacionTarjetasController@tarjetaCrearParametroValor')->name('tarjeta.parametro.valor');
-        Route::post('tarjeta/parametroadministracion/crear','ParametrizacionTarjetasController@tarjetaCrearParametroAdministracion')->name('tarjeta.parametro.administracion');
-        Route::get('gridadministraciontarjetas','ParametrizacionTarjetasController@gridAdministracionTarjetas')->name('gridadministraciontarjetas');
+        Route::post('tarjeta/parametroadministracion/crear/{codigo}','ParametrizacionTarjetasController@tarjetaCrearParametroAdministracion')->name('tarjeta.parametro.administracion');
+        Route::get('gridadministraciontarjetas/{codigo}','ParametrizacionTarjetasController@gridAdministracionTarjetas')->name('gridadministraciontarjetas');
         Route::post('tarjeta/parametro/administracion/eliminar','ParametrizacionTarjetasController@tarjetaEliminarParametroAdministracion')->name('tarjeta.parametro.administracion.eliminar');
 
         Route::get('tarjeta/parametrizacion/servicio','ParametrizacionTarjetasController@getViewParametrizarServicio')->name('viewparametrizarservicio');
         Route::get('tarjeta/parametrizacion/gridvalorplatico','ParametrizacionTarjetasController@gridValorPlastico')->name('gridvalorplatico');
         Route::post('tarjeta/parametro/pagaplastico/{codigo}','ParametrizacionTarjetasController@tarjetaCrearParametroPagaplastico')->name('tarjeta.parametro.pagaplastico');
         Route::get('tarjeta/parametro/pagaplastico/gridpagaplastico/{codigo}','ParametrizacionTarjetasController@gridServicioPagaPlastico')->name('gridpagaplastico');
+
+        Route::post('tarjeta/parametro/cuentacontablerb/crear/{codigo}','ParametrizacionTarjetasController@tarjetaCrearParametroCuentaRB')->name('tarjeta.parametro.cuentaRB');
+        Route::get('tarjeta/parametro/gridcuentascontables/{codigo}','ParametrizacionTarjetasController@gridParametrosCuentasContables')->name('gridcuentascontables');
 
         /*FINALIZA PARAMETRIZACION TARJETAS*/
     });
