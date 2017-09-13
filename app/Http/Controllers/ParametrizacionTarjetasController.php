@@ -4,6 +4,7 @@ namespace creditocofrem\Http\Controllers;
 
 use creditocofrem\AdminisTarjetas;
 use creditocofrem\CuenContaTarjeta;
+use creditocofrem\Departamentos;
 use creditocofrem\PagaPlastico;
 use creditocofrem\Servicios;
 use creditocofrem\ValorTarjeta;
@@ -140,11 +141,10 @@ class ParametrizacionTarjetasController extends Controller
      */
     public function getViewParametrizarServicio(Request $request){
         $servicio = Servicios::where('codigo',$request->codigo)->first();
+        $departamentos = Departamentos::all()->pluck('descripcion','codigo');
         //dd($servicio);
         if($servicio->tipo=='P'){
-            if($servicio->codigo != 'A'){
-                return view('tarjetas.parametrizacion.parametrizacionregalobono', compact('servicio'));
-            }
+                return view('tarjetas.parametrizacion.partialparametrizacionproducto', compact(['servicio','departamentos']));
         }else{
 
         }
@@ -204,16 +204,33 @@ class ParametrizacionTarjetasController extends Controller
         $result =[];
         DB::beginTransaction();
         try{
-            $existeCuenta = CuenContaTarjeta::where('estado','A')->where('servicio_codigo',$codigo)->first();
-            if(count($existeCuenta)>0){
-                $existeCuenta->estado = 'I';
-                $existeCuenta->save();
+            if($codigo != 'A'){
+                $existeCuenta = CuenContaTarjeta::where('estado','A')->where('servicio_codigo',$codigo)->first();
+                if(count($existeCuenta)>0){
+                    $existeCuenta->estado = 'I';
+                    $existeCuenta->save();
+                }
+                $newCutenta = new CuenContaTarjeta();
+                $newCutenta->estado = 'A';
+                $newCutenta->servicio_codigo = $codigo;
+                $newCutenta->cuenta = $request->cuentacontable;
+                $newCutenta->municipio_codigo = '50001';
+                $newCutenta->save();
+            }else{
+                $existeCuenta = CuenContaTarjeta::where('estado','A')
+                    ->where('servicio_codigo',$codigo)
+                    ->where('municipio_codigo',$request->municipio_codigo)
+                    ->first();
+                if(count($existeCuenta)>0){
+                    $existeCuenta->estado = 'I';
+                    $existeCuenta->save();
+                }
             }
             $newCutenta = new CuenContaTarjeta();
             $newCutenta->estado = 'A';
             $newCutenta->servicio_codigo = $codigo;
             $newCutenta->cuenta = $request->cuentacontable;
-            $newCutenta->municipio_codigo = '50001';
+            $newCutenta->municipio_codigo = $codigo!='A'?'50001':$request->municipio_codigo;
             $newCutenta->save();
             $result['estado'] = true;
             $result['mensaje'] = 'Se actualizado la cuenta contable satisfactoriamente.';
@@ -228,6 +245,9 @@ class ParametrizacionTarjetasController extends Controller
 
     public function gridParametrosCuentasContables($codigo){
         $cuentas = CuenContaTarjeta::where('servicio_codigo',$codigo)->get();
+        foreach ($cuentas as $cuenta){
+            $cuenta->getMunicipio;
+        }
         return Datatables::of($cuentas)->make(true);
     }
 }
