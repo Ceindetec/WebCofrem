@@ -13,7 +13,7 @@
     </li>
     <li><a href="{{route('establecimientos')}}"><i class="ti-layout"></i> Establecimientos </a></li>
     {{--<li>--}}
-        {{--<a href="javascript: void(0);" aria-expanded="true"><i class="ti-credit-card"></i> Tarjetas--}}
+    <li><a href="{{route('empresas')}}"><i class="ti-layout"></i> Empresas </a></li>
             {{--<span class="fa arrow"></span></a>--}}
         {{--<ul class="nav-second-level nav" aria-expanded="true">--}}
             {{--<li><a href="{{route('usuarios')}}">Usuarios</a></li>--}}

@@ -3,9 +3,11 @@
 namespace creditocofrem\Http\Controllers;
 
 use creditocofrem\AdminisTarjetas;
+use creditocofrem\PagaPlastico;
 use creditocofrem\Servicios;
 use creditocofrem\ValorTarjeta;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Yajra\Datatables\Datatables;
 
 class ParametrizacionTarjetasController extends Controller
@@ -126,5 +128,62 @@ class ParametrizacionTarjetasController extends Controller
             $result['mensaje'] = 'Eliminado parametro de administracion satisfactoriamente';
         }
         return $result;
+    }
+
+
+    /**
+     * metodo encargado de tarer la vista parcial de parametrizacion de tarjetas
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function getViewParametrizarServicio(Request $request){
+        $servicio = Servicios::where('codigo',$request->codigo)->first();
+        //dd($servicio);
+        if($servicio->tipo=='P'){
+            if($servicio->codigo != 'A'){
+                return view('tarjetas.parametrizacion.parametrizacionregalobono', compact('servicio'));
+            }
+        }else{
+
+        }
+    }
+
+    /**
+     * metodo que me carga el historial del cambio del valor del plastico
+     * @return mixed
+     */
+    public function gridValorPlastico(){
+        $valorPlasticos = ValorTarjeta::all();
+        return Datatables::of($valorPlasticos)->make(true);
+    }
+
+    public function tarjetaCrearParametroPagaplastico(Request $request, $codigo){
+        $result = [];
+        DB::beginTransaction();
+       try{
+           $existePaga = PagaPlastico::where('estado','A')->where('servicio_codigo',$codigo)->first();
+           if(count($existePaga)>0){
+               $existePaga->estado = 'I';
+               $existePaga->save();
+           }
+           $newPagaPlastico = new PagaPlastico();
+           $newPagaPlastico->pagaplastico = 1;
+           $newPagaPlastico->estado = 'A';
+           $newPagaPlastico->servicio_codigo = $codigo;
+           $newPagaPlastico->save();
+           $result['estado'] = true;
+           $result['mensaje'] = 'Actualizado satisfactoriamente';
+           DB::commit();
+       }catch (\Exception $exception){
+           DB::rollBack();
+           $result['estado'] = false;
+           $result['mensaje'] = 'No fue posible actualizar el pago de platico '.$exception->getMessage();
+       }
+        return $result;
+    }
+
+    public function gridServicioPagaPlastico($codigo){
+        $pagaPlastico = PagaPlastico::where('servicio_codigo',$codigo)->get();
+        return Datatables::of($pagaPlastico)->make(true);
     }
 }
