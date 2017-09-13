@@ -1,0 +1,28 @@
+<?php
+
+use Illuminate\Database\Seeder;
+
+class TipoTarjetasSeed extends Seeder
+{
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
+    {
+<<<<<<< HEAD
+        DB::table('servicios')->insert([
+            ["id" => "1", "codigo" => 'A', "descripcion" => 'AFILIADO'],
+            ["id" => "2", "codigo" => 'R', "descripcion" => 'REGALO'],
+            ["id" => "3", "codigo" => 'B', "descripcion" => 'BONO EMPRESARIAL']
+=======
+        DB::table('tipo_tarjetas')->insert([
+            ["codigo"=>'A', "descripcion"=>'AFILIADO'],
+            ["codigo"=>'R', "descripcion"=>'REGALO'],
+            ["codigo"=>'B', "descripcion"=>'BONO EMPRESARIAL']
+>>>>>>> creacion en bloque de tarjetas
+            ]
+        );
+    }
+}

@@ -82,6 +82,7 @@
     <script>
         var table;
         $(function () {
+            console.log();
             table = $('#datatable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -94,15 +95,8 @@
                 },
                 columns: [
                     {data: 'numero_tarjeta', name: 'numero_tarjeta'},
-                    {data: 'tipo', name: 'tipo',
-                        render: function(data){
-                            if(data=='R')
-                                return 'Regalo';
-                            else if(data=='B')
-                                return 'Bono';
-                            else
-                                return 'Afiliado';
-                            }
+                    {data: 'servicios', name: 'servicios'
+
                     },
                     {data: 'cambioclave', name: 'cambioclave',
                         render: function(data){
