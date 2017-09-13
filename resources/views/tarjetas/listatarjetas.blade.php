@@ -82,6 +82,7 @@
     <script>
         var table;
         $(function () {
+            console.log();
             table = $('#datatable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -94,7 +95,7 @@
                 },
                 columns: [
                     {data: 'numero_tarjeta', name: 'numero_tarjeta'},
-                    {data: 'tarjeta_codigo', name: 'tipo',
+                    {data: 'servicios', name: 'servicios'
 
                     },
                     {data: 'cambioclave', name: 'cambioclave',
