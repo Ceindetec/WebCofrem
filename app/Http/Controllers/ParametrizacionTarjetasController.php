@@ -3,6 +3,7 @@
 namespace creditocofrem\Http\Controllers;
 
 use creditocofrem\AdminisTarjetas;
+use creditocofrem\CuenContaTarjeta;
 use creditocofrem\PagaPlastico;
 use creditocofrem\Servicios;
 use creditocofrem\ValorTarjeta;
@@ -66,12 +67,12 @@ class ParametrizacionTarjetasController extends Controller
      * @param Request $request
      * @return array
      */
-    public function tarjetaCrearParametroAdministracion(Request $request){
+    public function tarjetaCrearParametroAdministracion(Request $request, $codigo){
         $result = [];
         try{
             $existe = AdminisTarjetas::all();
             if(count($existe)>0){
-                $oldAdministraciones = AdminisTarjetas::where('estado','A')->where('tarjeta_codigo',$request->tarjeta_codigo)->get();
+                $oldAdministraciones = AdminisTarjetas::where('estado','A')->where('servicio_codigo',$codigo)->get();
                 foreach ($oldAdministraciones as $oldAdministracione){
                     if($oldAdministracione->porcentaje == $request->porcentaje){
                         $result['estado'] = false;
@@ -81,6 +82,7 @@ class ParametrizacionTarjetasController extends Controller
                 }
             }
            $parametro = new AdminisTarjetas($request->all());
+            $parametro->servicio_codigo = $codigo;
            $parametro->save();
             $result['estado'] = true;
             $result['mensaje'] = 'Administracion agregada satisfactoriamente';
@@ -95,8 +97,8 @@ class ParametrizacionTarjetasController extends Controller
      * metodo encargado de llenar la grid con las configuraciones de administracion existentes para una tarjeta
      * @return mixed
      */
-    public function gridAdministracionTarjetas(){
-        $administraciones = AdminisTarjetas::where('estado','A')->get();
+    public function gridAdministracionTarjetas($codigo){
+        $administraciones = AdminisTarjetas::where('estado','A')->where('servicio_codigo',$codigo)->get();
         foreach ($administraciones as $administracione){
             $administracione->getTipoTarjeta;
         }
@@ -167,7 +169,7 @@ class ParametrizacionTarjetasController extends Controller
                $existePaga->save();
            }
            $newPagaPlastico = new PagaPlastico();
-           $newPagaPlastico->pagaplastico = 1;
+           $newPagaPlastico->pagaplastico = $request->pagaplatico;
            $newPagaPlastico->estado = 'A';
            $newPagaPlastico->servicio_codigo = $codigo;
            $newPagaPlastico->save();
@@ -182,8 +184,50 @@ class ParametrizacionTarjetasController extends Controller
         return $result;
     }
 
+    /**
+     * metodo que alimenta la parametrica para saber si un servicio paga o no plastico
+     * @param $codigo
+     * @return mixed
+     */
     public function gridServicioPagaPlastico($codigo){
         $pagaPlastico = PagaPlastico::where('servicio_codigo',$codigo)->get();
         return Datatables::of($pagaPlastico)->make(true);
+    }
+
+    /**
+     * metodo que agrega una cuenta contable a el servicio de bono y tarjeta regalo
+     * @param Request $request
+     * @param $codigo
+     * @return array
+     */
+    public function tarjetaCrearParametroCuentaRB(Request $request, $codigo){
+        $result =[];
+        DB::beginTransaction();
+        try{
+            $existeCuenta = CuenContaTarjeta::where('estado','A')->where('servicio_codigo',$codigo)->first();
+            if(count($existeCuenta)>0){
+                $existeCuenta->estado = 'I';
+                $existeCuenta->save();
+            }
+            $newCutenta = new CuenContaTarjeta();
+            $newCutenta->estado = 'A';
+            $newCutenta->servicio_codigo = $codigo;
+            $newCutenta->cuenta = $request->cuentacontable;
+            $newCutenta->municipio_codigo = '50001';
+            $newCutenta->save();
+            $result['estado'] = true;
+            $result['mensaje'] = 'Se actualizado la cuenta contable satisfactoriamente.';
+            DB::commit();
+        }catch (\Exception $exception){
+            DB::rollBack();
+            $result['estado'] = false;
+            $result['mensaje'] = 'No fue posible actualizar la cuenta contable. '.$exception->getMessage();
+        }
+        return $result;
+    }
+
+    public function gridParametrosCuentasContables($codigo){
+        $cuentas = CuenContaTarjeta::where('servicio_codigo',$codigo)->get();
+        return Datatables::of($cuentas)->make(true);
     }
 }

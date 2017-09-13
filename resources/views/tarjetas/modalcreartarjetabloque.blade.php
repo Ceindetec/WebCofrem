@@ -21,7 +21,7 @@
             <div class="form-group">
                 <label class="col-md-2 control-label">Tipo</label>
                 <div class="col-md-10">
-                    {{Form::select('tipo', ['A' => 'Afiliado', 'R' => 'Regalo', 'B' => 'Bono'],null, ['class'=>'form-control',"id"=>"tipo", "required"])}}
+                    {{Form::select("tarjeta_codigo",$tipo_tarjetas,null,['class'=>'form-control', "tabindex"=>"2",'id'=>'tarjeta_codigo', "required"])}}
                 </div>
             </div>
 
