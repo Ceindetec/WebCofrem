@@ -15,7 +15,7 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-12">
-                <h4 class="header-title m-t-0 m-b-20">Parametrizar servicios </h4>
+                <h4 class="header-title m-t-0 m-b-20">Parametrización de servicios </h4>
             </div>
         </div> <!-- end row -->
 
@@ -32,91 +32,53 @@
                            value="{{$valorTarjeta==null?'':$valorTarjeta->valor}}" id="valor">
                 </div>
             </div>
-
-            <button type="submit" class="btn btn-custom">Guardar</button>
+            <div class="form-group">
+                <button type="submit" class="btn btn-custom">Guardar</button>
+            </div>
             {{Form::close()}}
+            <br>
+            <div class="table-responsive m-b-20">
+                <table id="datatablevalorplatico" class="table table-striped table-bordered" width="100%">
+                    <thead>
+                    <tr>
+                        <th>Valor</th>
+                        <th>Estado</th>
+                        <th>Fecha creacion</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
         </div>
+
+
 
 
         <div class="row">
             <div class="col-sm-12">
-                <h4 class="header-title m-t-0 m-b-20 col-md-6" style="display: inline">Parametrizar servicio </h4>
-                <div class="col-md-6">
-                    {{Form::select("tarjeta_codigo",$tipotarjetas,null,['class'=>'form-control', "tabindex"=>"2",'id'=>'departamento'])}}
-                </div>
+                <h4 class="header-title m-t-0 m-b-20 ">Parametrizar servicio </h4>
             </div>
         </div> <!-- end row -->
 
         <div class="card-box">
-            <h4 class="m-t-0">Procentaje de administracion</h4>
+            <h4 class="m-t-0">Selecione servicio</h4>
             <br>
-            {{Form::open(['route'=>['tarjeta.parametro.administracion'], 'class'=>'form-inline', 'id'=>'parametroadministracion'])}}
             <div class="form-group">
-                <label for="valor">Tipo tarjeta: </label>
-                {{Form::select("tarjeta_codigo",$tipotarjetas,null,['class'=>'form-control', "tabindex"=>"2",'id'=>'departamento'])}}
-            </div>
-            <div class="form-group">
-                <label for="valor">Administracion: </label>
-                <div class="input-group">
-                    <input type="number" name="porcentaje" class="form-control" required maxlength="2"
-                           data-parsley-type="number"
-                           data-parsley-max="100" data-parsley-min="0">
-                    <span class="input-group-addon"><i class="fa fa-percent" aria-hidden="true"></i></span>
+                <div class="col-md-8">
+                {{Form::select("tarjeta_codigo",$tipotarjetas,null,['class'=>'form-control', "tabindex"=>"2",'id'=>'serviciocodigo'])}}
+                </div>
+                <div class="col-md-4">
+                    <button type="button" class="btn btn-custom" id="selecparametrizar">Parametrizar</button>
                 </div>
             </div>
+            <br>
 
-
-            <button type="submit" class="btn btn-custom">Agregar</button>
-            <p>&nbsp;</p>
-            {{Form::close()}}
-
-            <div class="table-responsive m-b-20">
-                <table id="datatableadministracion" class="table table-striped table-bordered" width="100%">
-                    <thead>
-                    <tr>
-                        <th>Tarjeta</th>
-                        <th>Administracion %</th>
-                        <th>accion</th>
-                    </tr>
-                    </thead>
-                </table>
-            </div>
         </div>
 
-        <div class="card-box">
-            <h4 class="m-t-0">Ceuntas contables</h4>
-            <div class="table-responsive m-b-20">
-                <table id="datatablehistorial" class="table table-striped table-bordered" width="100%">
-                    <thead>
-                    <tr>
-                        <th>id</th>
-                        <th>Evento</th>
-                        <th>Antrior valor</th>
-                        <th>Nuevo valor</th>
-                        <th>Fecha</th>
-                        <th>Usuario</th>
-                    </tr>
-                    </thead>
-                </table>
-            </div>
+        <div id="contenparametrizacion">
+
         </div>
 
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="table-responsive m-b-20">
-                    <table id="datatable" class="table table-striped table-bordered" width="100%">
-                        <thead>
-                        <tr>
-                            <th>Nit</th>
-                            <th>Razon social</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                        </thead>
-                    </table>
-                </div>
-            </div>
-        </div>
+
 
     </div>
 
@@ -143,23 +105,6 @@
     <script>
         var table;
         $(function () {
-            table = $('#datatableadministracion').DataTable({
-                processing: true,
-                serverSide: true,
-                "language": {
-                    "url": "{!!route('datatable_es')!!}"
-                },
-                ajax: {
-                    url: "{!!route('gridadministraciontarjetas')!!}",
-                    "type": "get"
-                },
-                columns: [
-                    {data: 'get_tipo_tarjeta.descripcion', name: 'tarjeta'},
-                    {data: 'porcentaje', name: 'porcentaje'},
-                    {data: 'action', name: 'action', orderable: false, searchable: false}
-                ],
-                order: [[1, 'asc']]
-            });
 
             $('.dinero').mask('000.000.000.000,00', {reverse: true});
 
@@ -186,65 +131,6 @@
                                     confirmButtonColor: '#4fa7f3'
                                 }
                             );
-                            modalBs.modal('hide');
-                        } else if (result.estado == false) {
-                            swal(
-                                'Error!!',
-                                result.mensaje,
-                                'error'
-                            )
-                        } else {
-                            html = '';
-                            for (i = 0; i < result.length; i++) {
-                                html += result[i] + '\n\r';
-                            }
-                            swal(
-                                'Error!!',
-                                html,
-                                'error'
-                            )
-                        }
-                        table.ajax.reload();
-                    },
-                    error: function (xhr, status) {
-                        var message = "Error de ejecución: " + xhr.status + " " + xhr.statusText;
-                        swal(
-                            'Error!!',
-                            message,
-                            'error'
-                        )
-                    },
-                    // código a ejecutar sin importar si la petición falló o no
-                    complete: function (xhr, status) {
-                        fincarga();
-                    }
-                });
-            })
-
-            $("#parametroadministracion").parsley();
-
-            $("#parametroadministracion").submit(function (e) {
-                e.preventDefault();
-                var form = $(this);
-                $.ajax({
-                    url: form.attr('action'),
-                    data: form.serialize(),
-                    type: 'POST',
-                    dataType: 'json',
-                    beforeSend: function () {
-                        cargando();
-                    },
-                    success: function (result) {
-                        if (result.estado) {
-                            swal(
-                                {
-                                    title: 'Bien!!',
-                                    text: result.mensaje,
-                                    type: 'success',
-                                    confirmButtonColor: '#4fa7f3'
-                                }
-                            );
-                            modalBs.modal('hide');
                         } else if (result.estado == false) {
                             swal(
                                 'Error!!',
@@ -278,65 +164,69 @@
                     }
                 });
             });
+            
+            table = $('#datatablevalorplatico').DataTable({
+                processing: true,
+                serverSide: true,
+                "language": {
+                    "url": "{!!route('datatable_es')!!}"
+                },
+                ajax: {
+                    url: "{!!route('gridvalorplatico')!!}",
+                    "type": "get"
+                },
+                columns: [
+                    {
+                        data: 'valor',
+                        name: 'valor',
+                        render: function (data) {
+                            return "$ "+enmascarar(data);
+                        }
+                    },
+                    {data: 'estado', name: 'estado',
+                        render: function(data){
+                            if(data=='A')
+                                return 'Activo';
+                            else
+                                return 'Inactivo';
+                        }
+                    },
+                    {data: 'created_at', name: 'created_at'},
+                ],
+                "order": [[ 2, "desc" ]]
+            });
 
+            $('#selecparametrizar').click(function () {
+                $('#contenparametrizacion').load("{{route('viewparametrizarservicio')}}"+"?codigo="+$('#serviciocodigo').val(), function (response, status, xhr) {
+                    switch (status) {
+                        case "success":
 
+                            break;
+
+                        case "error":
+                            var message = "Error de ejecución: " + xhr.status + " " + xhr.statusText;
+                            if (xhr.status == 403) {
+                                swal(
+                                    'Error!!',
+                                    response,
+                                    'error'
+                                )
+                            }
+                            else {
+                                swal(
+                                    'Error!!',
+                                    message,
+                                    'error'
+                                )
+                            }
+                            break;
+                    }
+
+                });
+            })
+            
         });
 
-        function eliminarAdministracion(id) {
-            swal({
-                    title: '¿Estas seguro?',
-                    text: "¡Desea eliminar este valor de administracion!",
-                    type: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Si',
-                    cancelButtonText: 'No',
-                    confirmButtonClass: 'btn btn-success',
-                    cancelButtonClass: 'btn btn-danger m-l-10',
-                    buttonsStyling: false
-                },
-                function () {
-                    $.ajax({
-                        url: "{{route('tarjeta.parametro.administracion.eliminar')}}",
-                        data: {'id': id},
-                        type: 'POST',
-                        dataType: 'json',
-                        beforeSend: function () {
-                            cargando();
-                        },
-                        success: function (result) {
-                            setTimeout(function () {
-                                if (result.estado) {
-                                    swal({
-                                        title: 'Bien!!',
-                                        text: result.mensaje,
-                                        type: 'success',
-                                        confirmButtonColor: '#4fa7f3'
-                                    });
-                                    table.ajax.reload();
-                                } else {
-                                    swal(
-                                        'Error!!',
-                                        result.mensaje,
-                                        'error'
-                                    )
-                                }
 
-                            }, 200);
-                        },
-                        error: function (xhr, status) {
-                            var message = "Error de ejecución: " + xhr.status + " " + xhr.statusText;
-                            swal(
-                                'Error!!',
-                                message,
-                                'error'
-                            )
-                        },
-                        // código a ejecutar sin importar si la petición falló o no
-                        complete: function (xhr, status) {
-                            fincarga();
-                        }
-                    });
-                });
-        }
     </script>
 @endsection
