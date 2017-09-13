@@ -18,7 +18,7 @@
     </div>
     &nbsp;
     <div class="form-group">
-    <button type="submit" class="btn btn-custom">Actualizar</button>
+        <button type="submit" class="btn btn-custom">Actualizar</button>
     </div>
     <p>&nbsp;</p>
     {{Form::close()}}
@@ -53,7 +53,7 @@
     </div>
 
     <div class="form-group">
-    <button type="submit" class="btn btn-custom">Agregar</button>
+        <button type="submit" class="btn btn-custom">Agregar</button>
     </div>
     <p>&nbsp;</p>
     {{Form::close()}}
@@ -73,40 +73,95 @@
     </div>
 </div>
 
-<div class="card-box">
+<div class="card-box col-md-12">
     <h4 class="m-t-0">Ceuntas contables</h4>
     <br>
-    {{Form::open(['route'=>['tarjeta.parametro.cuentaRB', $servicio->codigo], 'class'=>'form-inline', 'id'=>'parametrocuentacontable'])}}
-    <div class="form-group">
-        <label for="valor">Cuenta contable: </label>
-        <div class="input-group">
-            <input type="text" name="cuentacontable" class="form-control" required maxlength="10" data-parsley-type="number" data-parsley-min="0">
+    @if($servicio->codigo!='A')
+        {{Form::open(['route'=>['tarjeta.parametro.cuentaRB', $servicio->codigo], 'class'=>'form-inline', 'id'=>'parametrocuentacontable'])}}
+        <div class="form-group">
+            <label for="valor">Cuenta contable: </label>
+            <div class="input-group">
+                <input type="text" name="cuentacontable" class="form-control" required maxlength="10"
+                       data-parsley-type="number" data-parsley-min="0">
+            </div>
         </div>
-    </div>
 
-    <div class="form-group">
-        <button type="submit" class="btn btn-custom">Agregar</button>
-    </div>
-    <p>&nbsp;</p>
-    {{Form::close()}}
-    <div class="table-responsive m-b-20">
-        <table id="datatablecuentaContables" class="table table-striped table-bordered" width="100%">
-            <thead>
-            <tr>
-                <th>Cuenta</th>
-                <th>Estado</th>
-                <th>Creacion</th>
-                <th>Actualizacion</th>
-            </tr>
-            </thead>
-        </table>
-    </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-custom">Agregar</button>
+        </div>
+        <p>&nbsp;</p>
+        {{Form::close()}}
+        <div class="table-responsive m-b-20">
+            <table id="datatablecuentaContables" class="table table-striped table-bordered" width="100%">
+                <thead>
+                <tr>
+                    <th>Cuenta</th>
+                    <th>Estado</th>
+                    <th>Creacion</th>
+                    <th>Actualizacion</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    @else
+
+        {{Form::open(['route'=>['tarjeta.parametro.cuentaRB', $servicio->codigo], 'class'=>'form-horizontal col-md-6', 'id'=>'parametrocuentacontable'])}}
+
+
+        <div class="form-group">
+            <label for="departamento_codigo">Departamento: </label>
+            {{Form::select("departamento_codigo",$departamentos,null,['class'=>'form-control', "tabindex"=>"2",'id'=>'departamento'])}}
+        </div>
+        <div class="form-group">
+            <label for="municipio_codigo">Municipio: </label>
+            <select name="municipio_codigo" id="municipio" tabindex="3" class="form-control">
+                <option>Seleccione...</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="cuentacontable">Cuenta contable: </label>
+            <input type="text" name="cuentacontable" class="form-control" required maxlength="10"
+                   data-parsley-type="number" data-parsley-min="0">
+
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-custom">Agregar</button>
+        </div>
+
+        <p>&nbsp;</p>
+        {{Form::close()}}
+
+        <div class="table-responsive m-b-20 col-md-12">
+            <table id="datatablecuentaContables" class="table table-striped table-bordered" width="100%">
+                <thead>
+                <tr>
+                    <th>Cuenta</th>
+                    @if($servicio->codigo == 'A')
+                        <th>Municipio</th>
+                    @endif
+                    <th>Estado</th>
+                    <th>Creacion</th>
+                    <th>Actualizacion</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+
+    @endif
+
 </div>
 
 
 <script>
     var tablePaga, tableAdministracion, tablecuentaContableRB;
     $(function () {
+
+        setTimeout(getMunicipios, '300');
+        $("#departamento").change(function () {
+            getMunicipios();
+        });
+
         $("#prametropagaplastico").parsley();
         $("#parametroadministracion").parsley();
         $("#parametrocuentacontable").parsley();
@@ -182,17 +237,18 @@
                     data: 'pagaplastico',
                     name: 'pagaplastico',
                     render: function (data) {
-                        if(data==1){
+                        if (data == 1) {
                             return 'Si';
-                        }else{
+                        } else {
                             return 'No';
                         }
                     }
                 },
-                {data: 'estado', name: 'estado',
-                    render: function(data){
-                        if(data=='A'){
-                            html= '<div class="label-success" > <strong style="color:#fff">Activo</strong></div>';
+                {
+                    data: 'estado', name: 'estado',
+                    render: function (data) {
+                        if (data == 'A') {
+                            html = '<div class="label-success" > <strong style="color:#fff">Activo</strong></div>';
                             return html;
                         }
                         else
@@ -202,7 +258,7 @@
                 {data: 'created_at', name: 'created_at'},
                 {data: 'updated_at', name: 'updated_at'},
             ],
-            "order": [[ 2, "desc" ]]
+            "order": [[2, "desc"]]
         });
 
         tableAdministracion = $('#datatableadministracion').DataTable({
@@ -217,10 +273,11 @@
             },
             columns: [
                 {data: 'porcentaje', name: 'porcentaje',},
-                {data: 'estado', name: 'estado',
-                    render: function(data){
-                        if(data=='A'){
-                            html= '<div class="label-success" > <strong style="color:#fff">Activo</strong></div>';
+                {
+                    data: 'estado', name: 'estado',
+                    render: function (data) {
+                        if (data == 'A') {
+                            html = '<div class="label-success" > <strong style="color:#fff">Activo</strong></div>';
                             return html;
                         }
                         else
@@ -231,7 +288,7 @@
                 {data: 'updated_at', name: 'updated_at'},
                 {data: 'action', name: 'action'},
             ],
-            "order": [[ 2, "desc" ]]
+            "order": [[2, "desc"]]
         });
 
         tablecuentaContableRB = $('#datatablecuentaContables').DataTable({
@@ -245,11 +302,15 @@
                 "type": "get"
             },
             columns: [
-                {data: 'cuenta', name: 'cuenta',},
-                {data: 'estado', name: 'estado',
-                    render: function(data){
-                        if(data=='A'){
-                            html= '<div class="label-success" > <strong style="color:#fff">Activo</strong></div>';
+                {data: 'cuenta', name: 'cuenta'},
+                @if($servicio->codigo=='A')
+                {data: 'get_municipio.descripcion', name: 'get_municipio.descripcion'},
+                @endif
+                {
+                    data: 'estado', name: 'estado',
+                    render: function (data) {
+                        if (data == 'A') {
+                            html = '<div class="label-success" > <strong style="color:#fff">Activo</strong></div>';
                             return html;
                         }
                         else
@@ -259,7 +320,7 @@
                 {data: 'created_at', name: 'created_at'},
                 {data: 'updated_at', name: 'updated_at'},
             ],
-            "order": [[ 2, "desc" ]]
+            "order": [[3, "desc"],[2,'asc']]
         });
 
     });
@@ -329,5 +390,17 @@
                     }
                 });
             });
+
+
+    }
+
+    function getMunicipios() {
+        var dept = $("#departamento").val();
+        $.get('{{route('municipios')}}', {data: dept}, function (result) {
+            $('#municipio').html("");
+            $.each(result, function (i, value) {
+                $('#municipio').append($('<option>').text(value.descripcion).attr('value', value.codigo));
+            });
+        })
     }
 </script>
