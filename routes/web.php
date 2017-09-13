@@ -145,6 +145,11 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('gridadministraciontarjetas','ParametrizacionTarjetasController@gridAdministracionTarjetas')->name('gridadministraciontarjetas');
         Route::post('tarjeta/parametro/administracion/eliminar','ParametrizacionTarjetasController@tarjetaEliminarParametroAdministracion')->name('tarjeta.parametro.administracion.eliminar');
 
+        Route::get('tarjeta/parametrizacion/servicio','ParametrizacionTarjetasController@getViewParametrizarServicio')->name('viewparametrizarservicio');
+        Route::get('tarjeta/parametrizacion/gridvalorplatico','ParametrizacionTarjetasController@gridValorPlastico')->name('gridvalorplatico');
+        Route::post('tarjeta/parametro/pagaplastico/{codigo}','ParametrizacionTarjetasController@tarjetaCrearParametroPagaplastico')->name('tarjeta.parametro.pagaplastico');
+        Route::get('tarjeta/parametro/pagaplastico/gridpagaplastico/{codigo}','ParametrizacionTarjetasController@gridServicioPagaPlastico')->name('gridpagaplastico');
+
         /*FINALIZA PARAMETRIZACION TARJETAS*/
     });
 
