@@ -87,8 +87,6 @@ class TarjetasController extends Controller
             //$paso = 1;
             //crearHtarjeta($tarjetas);//insertar la historia
             $result = $this->crearHtarjeta($tarjetas, 'C', $request->servicio_codigo);
-
-
             $result = $this->crearTarjetaSer($tarjetas, 'I', $request->servicio_codigo);
             \DB::commit();
         } catch (\Exception $exception) {
@@ -196,10 +194,10 @@ class TarjetasController extends Controller
     //metodo para llamar a la vista modal para crear tarjetas en bloque - masivo
     public function viewCrearTarjetaBloque(Request $request)
     {
-        //$tarjeta = Tarjetas::find($request->id);
-        //return view('tarjetas.modalcreartarjetabloque', compact('tarjeta'));
-        $tipo_tarjetas = TipoTarjetas::pluck('descripcion', 'codigo');
-        return view('tarjetas.modalcreartarjetabloque', compact(['tipo_tarjetas']));
+       // $tipo_tarjetas = TipoTarjetas::pluck('descripcion', 'codigo');
+        //return view('tarjetas.modalcreartarjetabloque', compact(['tipo_tarjetas']));
+        $servicios = Servicios::pluck('descripcion', 'codigo');
+        return view('tarjetas.modalcreartarjetabloque', compact(['servicios']));
     }
 
     //metodo para agregar  tarjetas en bloque: insertar en bd de forma masiva
@@ -227,7 +225,8 @@ class TarjetasController extends Controller
                 if ($validator->fails()) {
                     return $validator->errors()->all();
                 }
-                $tarjetas->tarjeta_codigo = $request->tarjeta_codigo;
+                $tarjetas->estado = 'C';
+               // $tarjetas->tarjeta_codigo = $request->tarjeta_codigo;
                 $tarjetas->numero_tarjeta = $codigo;
                 $ultimos = substr($codigo, -4);
                 //$tarjetas->password = bcrypt($ultimos);
@@ -238,7 +237,8 @@ class TarjetasController extends Controller
                 //crearHtarjeta($tarjetas);//insertar la historia
                 $result['estado'] = true;
                 $result['mensaje'] = 'la tarjeta' . $codigo . ' ha sido creada satisfactoriamente';
-                $this->crearHtarjeta($tarjetas, 'C');
+                $result = $this->crearHtarjeta($tarjetas, 'C', $request->servicio_codigo);
+                $result = $this->crearTarjetaSer($tarjetas, 'I', $request->servicio_codigo);
             }
             if ($cont == $total) {
                 $result['estado'] = true;
