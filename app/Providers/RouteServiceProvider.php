@@ -43,6 +43,8 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapIngridRoutes();
 
+        $this->mapPinedaiRoutes();
+
         //
     }
 
