@@ -19,7 +19,8 @@ Route::group(['middleware' => 'auth'], function () {
         /*INICIO TARJETAS*/
 
         route::get('crearTarjetaRegalo','TarjetasRegaloController@crearTarjetaRegalo')->name('crearTarjetaRegalo');
-
+        route::post('addTarjetaRegalo','TarjetasRegaloController@addTarjetaRegalo')->name('addTarjetaRegalo');
+        route::get('autoCompleNumTarjeta','TarjetasRegaloController@autoCompleNumTarjeta')->name('autoCompleNumTarjeta');
         //route::get('tarjetas','TarjetasController@index')->name('tarjetas');
 
         /*FINALIZA TARJETAS*/
