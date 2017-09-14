@@ -10,4 +10,8 @@ class Terminales extends Model implements AuditableContract
 {
     //
     use Auditable;
+
+    public function getSucursal(){
+        return $this->belongsTo('creditocofrem\Sucursales','sucursal_id','id');
+    }
 }

@@ -11,9 +11,15 @@
             <li><a href="{{route('permisos')}}">Permisos</a></li>
         </ul>
     </li>
-    <li><a href="{{route('establecimientos')}}"><i class="ti-layout"></i> Establecimientos </a></li>
+    <li>
+        <a href="javascript: void(0);"  aria-expanded="true"><i class="ti-layout"></i> Establecimientos <span class="fa arrow"></span></a>
+        <ul class="nav-second-level nav collapse" aria-expanded="true" style="">
+            <li><a href="{{route('establecimientos')}}">Crear establecimeintos</a></li>
+            <li><a href="{{route('traladoterminal')}}">Trasladar terminal</a></li>
+        </ul>
+    </li>
     {{--<li>--}}
-    <li><a href="{{route('empresas')}}"><i class="ti-layout"></i> Empresas </a></li>
+    <li><a href="{{route('empresas')}}"><i class="fa fa-university" aria-hidden="true"></i> Empresas </a></li>
             {{--<span class="fa arrow"></span></a>--}}
         {{--<ul class="nav-second-level nav" aria-expanded="true">--}}
             {{--<li><a href="{{route('usuarios')}}">Usuarios</a></li>--}}

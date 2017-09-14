@@ -186,7 +186,7 @@ class ParametrizacionTarjetasController extends Controller
 
     /**
      * metodo que alimenta la parametrica para saber si un servicio paga o no plastico
-     * @param $codigo
+     * @param $codigo el codigo del servicio
      * @return mixed
      */
     public function gridServicioPagaPlastico($codigo){
@@ -197,7 +197,7 @@ class ParametrizacionTarjetasController extends Controller
     /**
      * metodo que agrega una cuenta contable a el servicio de bono y tarjeta regalo
      * @param Request $request
-     * @param $codigo
+     * @param $codigo el codigo del servicio
      * @return array
      */
     public function tarjetaCrearParametroCuentaRB(Request $request, $codigo){
@@ -243,6 +243,11 @@ class ParametrizacionTarjetasController extends Controller
         return $result;
     }
 
+    /**
+     * metodo que me carga la grid, que me muestra las cuentas contables que tenga un servicio
+     * @param $codigo el codigo del servicio
+     * @return mixed
+     */
     public function gridParametrosCuentasContables($codigo){
         $cuentas = CuenContaTarjeta::where('servicio_codigo',$codigo)->get();
         foreach ($cuentas as $cuenta){
