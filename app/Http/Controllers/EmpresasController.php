@@ -3,6 +3,7 @@
 namespace creditocofrem\Http\Controllers;
 
 use creditocofrem\Establecimientos;
+use creditocofrem\Municipios;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 use creditocofrem\Empresas;
@@ -24,15 +25,14 @@ class EmpresasController extends Controller
      */
     public function gridEmpresas()
     {
-        $empresas = Empresas::all();
-        foreach ($empresas as $empresa){
-            $empresa->municipio;
-        }
-        dd($empresas);
+        $empresas = Empresas::join("municipios","empresas.municipio_codigo","=","municipios.codigo")->get();
+                /*foreach ($empresas as $empresa){
+            $empresa->getMunicipio();
+        }*/
         return Datatables::of($empresas)
             ->addColumn('action', function ($empresas) {
                 $acciones = '<div class="btn-group">';
-                $acciones = $acciones . '<a href="' . route("empresa.editar", ["id" => $empresas->id]) . '" class="btn btn-xs btn-custom" ><i class="ti-pencil-alt"></i> Edit</a>';
+               // $acciones = $acciones . '<a href="' . route("empresa.editar", ["id" => $empresas->id]) . '" class="btn btn-xs btn-custom" ><i class="ti-pencil-alt"></i> Edit</a>';
                 //$acciones = $acciones . '<a class="btn btn-xs btn-primary" href="' . route("listsucursales", [$establecimientos->id]) . '"><i class="ti-layers-alt"></i> Sucursales</a>';
                 $acciones = $acciones . '</div>';
                 return $acciones;
@@ -46,7 +46,8 @@ class EmpresasController extends Controller
      */
     public function viewCrearEmpresa()
     {
-        return view('empresas.modalcrearempresas');
+        $municipios = Municipios::pluck('descripcion', 'codigo');
+        return view('empresas.modalcrearempresas', compact(['municipios']));
     }
 
     /**
@@ -54,7 +55,7 @@ class EmpresasController extends Controller
      * @param Request $request trae la informacion del formulario, para agregar el establecimiento
      * @return mixed returna una respuesta positiva o negativa dependiendo de la transaccion
      */
-    public function crearEmpresa(Request $request)
+    public function crearEmpresa(Request $request)//que datos son importantes que queden al crear la empresa
     {
         $result = [];
         try {
@@ -67,14 +68,14 @@ class EmpresasController extends Controller
                 return $validator->errors()->all();
             }
             $empresa = new Empresas($request->all());
+            //var_dump($empresa);
             $empresa->razon_social = strtoupper($empresa->razon_social);
-            $empresa->estado = 'I';
             $empresa->save();
             $result['estado'] = true;
-            $result['mensaje'] = 'El establecimiento ha sido creado satisfactoriamente';
+            $result['mensaje'] = 'La empresa ha sido creada satisfactoriamente';
         } catch (\Exception $exception) {
             $result['estado'] = false;
-            $result['mensaje'] = 'No fue posible crear el establicimiento ' . $exception->getMessage();
+            $result['mensaje'] = 'No fue posible crear la empresa' . $exception->getMessage();
         }
         return $result;
     }

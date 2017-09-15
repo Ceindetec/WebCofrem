@@ -48,6 +48,7 @@
                             <th>Telefono</th>
                             <th>Celular</th>
                             <th>Direccion</th>
+                            <th>Tipo</th>
                             <th>Acciones</th>
                         </tr>
                         </thead>
@@ -94,11 +95,12 @@
                     {data: 'nit', name: 'nit'},
                     {data: 'razon_social', name: 'razon_social'},
                     {data: 'representante_legal', name: 'representante_legal'},
-                    {data: 'municipio_codigo', name: 'municipio_codigo'},
+                    {data: 'descripcion', name: 'descripcion'},//como hacer que no me traiga el codigo sino descripcion
                     {data: 'email', name: 'email'},
                     {data: 'telefono', name: 'telefono'},
                     {data: 'celular', name: 'celular'},
                     {data: 'direccion', name: 'direccion'},
+                    {data: 'tipo', name: 'tipo'},
 
                     {data: 'action', name: 'action', orderable: false, searchable: false}
                 ],

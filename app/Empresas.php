@@ -11,12 +11,12 @@ class Empresas extends Model implements AuditableContract
     //
     use Auditable;
     protected $fillable = [
-        'nit', 'razon_social', 'representante_legal', 'municipio_codigo', 'email', 'email', 'telefono','celular','direccion',
+        'nit', 'razon_social', 'representante_legal', 'municipio_codigo', 'email', 'telefono','celular','direccion','tipo',
     ];
 
 
-    public function municipio()
+    public function getMunicipio()
     {
-        return $this->belongsTo('creditocofrem\Municipios','municipio_codigo','codigo');
+        return $this->belongsTo('creditocofrem\municipios','municipio_codigo','codigo');
     }
 }

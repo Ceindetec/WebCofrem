@@ -1,5 +1,5 @@
 <div id="modalcrearempresas">
-    {{Form::open(['route'=>['establecimiento.crearp'], 'class'=>'form-horizontal', 'id'=>'crearempresas'])}}
+    {{Form::open(['route'=>['empresa.crearp'], 'class'=>'form-horizontal', 'id'=>'crearempresas'])}}
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h4 class="modal-title">Agregar empresa</h4>
@@ -21,23 +21,55 @@
             </div>
 
             <div class="form-group">
-                <label class="col-md-2 control-label">E-mail</label>
+                <label class="col-md-2 control-label">Representante Legal</label>
                 <div class="col-md-10">
-                    {{Form::email('email', null ,['class'=>'form-control', "required"])}}
+                    {{Form::text('representante_legal', null ,['class'=>'form-control', "required", "maxlength"=>"40", "data-parsley-pattern"=>"^[a-zA-Z0-9]+(\s*[a-zA-Z0-9]*)*[a-zA-Z0-9]+$"])}}
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="col-md-2 control-label">Telefono</label>
-                <div class="col-md-10">
-                    {{Form::text('telefono', null ,['class'=>'form-control', "required", "data-parsley-type"=>"number", "maxlength"=>"10"])}}
+                <label class="col-md-2 control-label">Municipio</label>
+                <div class="col-md-4">
+                    {{Form::select("municipio_codigo",$municipios,null,['class'=>'form-control', "tabindex"=>"2", "required"])}}
                 </div>
             </div>
+
+
+            <div class="form-group">
+                    <label class="col-md-2 control-label">E-mail</label>
+                    <div class="col-md-10">
+                        {{Form::email('email', null ,['class'=>'form-control', "required"])}}
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Telefono</label>
+                    <div class="col-md-10">
+                        {{Form::text('telefono', null ,['class'=>'form-control', "required", "data-parsley-type"=>"number", "maxlength"=>"10"])}}
+                    </div>
+                </div>
+
 
             <div class="form-group">
                 <label class="col-md-2 control-label">Celular</label>
                 <div class="col-md-10">
                     {{Form::text('celular', null ,['class'=>'form-control', "required", "data-parsley-type"=>"number", "maxlength"=>"10"])}}
+                </div>
+            </div>
+
+
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Direccion</label>
+                    <div class="col-md-10">
+                        {{Form::text('direccion', null ,['class'=>'form-control', "required", "maxlength"=>"40"])}}
+                    </div>
+                </div>
+
+            <div class="form-group">
+                <label class="col-md-2 control-label">Tipo</label>
+                <div class="col-md-10">
+                     {{Form::select('tipo', ['T' => 'Tercero', 'A' => 'Afiliado'], 'T',['class'=>'form-control', "tabindex"=>"2", "required"])}}
                 </div>
             </div>
 
@@ -52,8 +84,8 @@
 
 <script>
     $(function () {
-        $("#crearestablecimientos").parsley();
-        $("#crearestablecimientos").submit(function (e) {
+        $("#crearempresas").parsley();
+        $("#crearempresas").submit(function (e) {
             e.preventDefault();
             var form = $(this);
             $.ajax({
