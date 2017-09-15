@@ -19,4 +19,9 @@ class Empresas extends Model implements AuditableContract
     {
         return $this->belongsTo('creditocofrem\municipios','municipio_codigo','codigo');
     }
-}
+
+    public function getEstablecimiento()
+    {
+        return $this->belongsTo('creditocofrem\Establecimientos', 'establecimiento_id','id');
+    }
+}// se relaciona es con el modelo municipios

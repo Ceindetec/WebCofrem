@@ -23,12 +23,8 @@ Route::group(['middleware' => 'auth'], function () {
         route::get('empresas/gridempresas','EmpresasController@gridEmpresas')->name('gridempresas');
         route::get('empresas/crear','EmpresasController@viewCrearEmpresa')->name('empresa.crear');
         route::post('empresas/crear','EmpresasController@crearEmpresa')->name('empresa.crearp');
-        /*
         route::get('empresas/editar/{id}','EmpresasController@viewEditarEmpresa')->name('empresa.editar');
         route::post('emmpresas/editar','EmpresasController@editarEmpresa')->name('empresa.editarp');
-
-        */
-
 
 
         /*FINALIZA EMPRESAS*/

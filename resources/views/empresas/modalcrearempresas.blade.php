@@ -16,21 +16,27 @@
             <div class="form-group">
                 <label class="col-md-2 control-label">Razon social</label>
                 <div class="col-md-10">
-                    {{Form::text('razon_social', null ,['class'=>'form-control', "required", "maxlength"=>"40", "data-parsley-pattern"=>"^[a-zA-Z0-9]+(\s*[a-zA-Z0-9]*)*[a-zA-Z0-9]+$"])}}
+                    {{Form::text('razon_social', null ,['class'=>'form-control', "required", "maxlength"=>"40", "data-parsley-pattern"=>"^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]+(\s*[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]*)*[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]+$"])}}
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="col-md-2 control-label">Representante Legal</label>
                 <div class="col-md-10">
-                    {{Form::text('representante_legal', null ,['class'=>'form-control', "required", "maxlength"=>"40", "data-parsley-pattern"=>"^[a-zA-Z0-9]+(\s*[a-zA-Z0-9]*)*[a-zA-Z0-9]+$"])}}
+                    {{Form::text('representante_legal', null ,['class'=>'form-control', "required", "maxlength"=>"40", "data-parsley-pattern"=>"^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]+(\s*[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]*)*[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]+$"])}}
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="col-md-2 control-label">Municipio</label>
+                <label class="col-md-2 control-label">Departamento</label>
                 <div class="col-md-4">
-                    {{Form::select("municipio_codigo",$municipios,null,['class'=>'form-control', "tabindex"=>"2", "required"])}}
+                    {{Form::select("departamento_codigo",$departamentos,null,['class'=>'form-control', "tabindex"=>"2", 'id'=>'departamento'])}}
+                </div>
+                <label class="col-md-2 control-label">Ciudad</label>
+                <div class="col-md-4">
+                    <select name="municipio_codigo" id="municipio" tabindex="3" class="form-control">
+                        <option>Seleccione...</option>
+                    </select>
                 </div>
             </div>
 
@@ -40,7 +46,7 @@
                     <div class="col-md-10">
                         {{Form::email('email', null ,['class'=>'form-control', "required"])}}
                     </div>
-                </div>
+            </div>
 
 
                 <div class="form-group">
@@ -77,27 +83,30 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Cerrar</button>
-        <button type="submit" class="btn btn-custom waves-effect waves-light">Guardar</button>
+        <button type="submit" class="btn btn-custom waves-effect waves-light" >Guardar</button>
     </div>
     {{Form::close()}}
 </div>
 
 <script>
     $(function () {
+        setTimeout(function () {
+            $('#nombre').focus();
+        },1000);
         $("#crearempresas").parsley();
         $("#crearempresas").submit(function (e) {
             e.preventDefault();
             var form = $(this);
             $.ajax({
-                url : form.attr('action'),
-                data : form.serialize(),
-                type : 'POST',
-                dataType : 'json',
+                url: form.attr('action'),
+                data: form.serialize(),
+                type: 'POST',
+                dataType: 'json',
                 beforeSend: function () {
                     cargando();
                 },
-                success : function(result) {
-                    if(result.estado){
+                success: function (result) {
+                    if (result.estado) {
                         swal(
                             {
                                 title: 'Bien!!',
@@ -105,18 +114,19 @@
                                 type: 'success',
                                 confirmButtonColor: '#4fa7f3'
                             }
-                        )
+                        );
+                        table.ajax.reload();
                         modalBs.modal('hide');
-                    }else if(result.estado == false){
+                    } else if (result.estado == false) {
                         swal(
                             'Error!!',
                             result.mensaje,
                             'error'
                         )
-                    }else{
-                        html='';
-                        for(i=0; i<result.length;i++){
-                            html+=result[i]+'\n\r';
+                    } else {
+                        html = '';
+                        for (i = 0; i < result.length; i++) {
+                            html += result[i] + '\n\r';
                         }
                         swal(
                             'Error!!',
@@ -124,9 +134,8 @@
                             'error'
                         )
                     }
-                    table.ajax.reload();
                 },
-                error : function(xhr, status) {
+                error: function (xhr, status) {
                     var message = "Error de ejecución: " + xhr.status + " " + xhr.statusText;
                     swal(
                         'Error!!',
@@ -135,14 +144,28 @@
                     )
                 },
                 // código a ejecutar sin importar si la petición falló o no
-                complete : function(xhr, status) {
+                complete: function (xhr, status) {
                     fincarga();
                 }
             });
+        });
+
+        setTimeout(getMunicipios, '300');
+        $("#departamento").change(function () {
+            getMunicipios();
+        });
+
+    });
+
+
+    function getMunicipios() {
+        var dept = $("#departamento").val();
+        $.get('{{route('municipios')}}', {data: dept}, function (result) {
+            $('#municipio').html("");
+            $.each(result, function (i, value) {
+                $('#municipio').append($('<option>').text(value.descripcion).attr('value', value.codigo));
+            });
         })
-
-
-    })
-
+    }
 
 </script>

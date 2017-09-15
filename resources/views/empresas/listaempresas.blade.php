@@ -43,6 +43,7 @@
                             <th>Nit</th>
                             <th>Razon social</th>
                             <th>Representante Legal</th>
+                            <th>Departamento</th>
                             <th>Municipio</th>
                             <th>Email</th>
                             <th>Telefono</th>
@@ -95,12 +96,21 @@
                     {data: 'nit', name: 'nit'},
                     {data: 'razon_social', name: 'razon_social'},
                     {data: 'representante_legal', name: 'representante_legal'},
-                    {data: 'descripcion', name: 'descripcion'},//como hacer que no me traiga el codigo sino descripcion
+                    {data: 'get_municipio.get_departamento.descripcion', name: 'descripcion'},
+                    {data: 'get_municipio.descripcion', name: 'descripcion'},
                     {data: 'email', name: 'email'},
                     {data: 'telefono', name: 'telefono'},
                     {data: 'celular', name: 'celular'},
                     {data: 'direccion', name: 'direccion'},
-                    {data: 'tipo', name: 'tipo'},
+                    {data: 'tipo', name: 'tipo',
+                        render: function (data) {
+                            if(data=='A'){
+                                return 'Afiliado'
+                            }else{
+                                return 'Tercero'
+                            }
+                        }
+                    },//como hacer que no me traiga el codigo sino descripcion
 
                     {data: 'action', name: 'action', orderable: false, searchable: false}
                 ],
