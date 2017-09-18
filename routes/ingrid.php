@@ -29,6 +29,10 @@ Route::group(['middleware' => 'auth'], function () {
         //route::get('tarjetas','TarjetasController@index')->name('tarjetas');
 
         /*FINALIZA TARJETAS*/
+        /* INICIA TARJETAS BONO */
+        route::get('tarjetasBono','TarjetasBonoController@viewCrearTarjetaIndividual')->name('tarjetasBono');
+        route::post('bono.crearindividual','TarjetasBonoController@CrearTarjetaIndividual')->name('bono.crearindividual');
+        /*FINALIZA TARJETAS BONO */
 
     });
     });
