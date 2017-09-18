@@ -8,6 +8,12 @@
     <link href="{{asset('plugins/datatables/dataTables.colVis.css')}}" rel="stylesheet" type="text/css"/>
     <link href="{{asset('plugins/datatables/dataTables.bootstrap.min.css')}}" rel="stylesheet" type="text/css"/>
     <link href="{{asset('plugins/datatables/fixedColumns.dataTables.min.css')}}" rel="stylesheet" type="text/css"/>
+
+    <style>
+        div.ajuste li{
+            font-size: 3em !important;
+        }
+    </style>
 @endsection
 
 @section('contenido')
@@ -19,6 +25,7 @@
             </div>
         </div> <!-- end row -->
 
+
         <div class="row">
             <div class="col-sm-12">
                 <h5>Acciones</h5>
@@ -26,12 +33,16 @@
                     <div class="row">
                         <div class="col-lg-3 col-sm-6">
                             <div class="widget-inline-box">
-                                <a href="{{route('tarjetas.crear')}}" data-modal class="btn btn-custom waves-effect waves-light" data-toggle="modal" data-target="#modalrol">Agregar Tarjeta</a>
+                                <a href="{{route('tarjetas.crear')}}" data-modal
+                                   class="btn btn-custom waves-effect waves-light" data-toggle="modal"
+                                   data-target="#modalrol">Agregar Tarjeta</a>
                             </div>
                         </div>
                         <div class="col-lg-3 col-sm-6">
                             <div class="widget-inline-box">
-                                <a href="{{route('tarjetas.crearbloque')}}" data-modal class="btn btn-custom waves-effect waves-light" data-toggle="modal" data-target="#modalrol">Agregar Tarjetas en bloque</a>
+                                <a href="{{route('tarjetas.crearbloque')}}" data-modal
+                                   class="btn btn-custom waves-effect waves-light" data-toggle="modal"
+                                   data-target="#modalrol">Agregar Tarjetas en bloque</a>
                             </div>
                         </div>
                     </div>
@@ -95,12 +106,14 @@
                 },
                 columns: [
                     {data: 'numero_tarjeta', name: 'numero_tarjeta'},
-                    {data: 'servicios', name: 'servicios'
+                    {
+                        data: 'servicios', name: 'servicios'
 
                     },
-                    {data: 'cambioclave', name: 'cambioclave',
-                        render: function(data){
-                            if(data=='0')
+                    {
+                        data: 'cambioclave', name: 'cambioclave',
+                        render: function (data) {
+                            if (data == '0')
                                 return 'Pendiente';
                             else
                                 return 'Hecho';

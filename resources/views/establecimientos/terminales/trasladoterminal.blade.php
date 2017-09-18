@@ -8,6 +8,13 @@
     <link href="{{asset('plugins/datatables/dataTables.colVis.css')}}" rel="stylesheet" type="text/css"/>
     <link href="{{asset('plugins/datatables/dataTables.bootstrap.min.css')}}" rel="stylesheet" type="text/css"/>
     <link href="{{asset('plugins/datatables/fixedColumns.dataTables.min.css')}}" rel="stylesheet" type="text/css"/>
+    <style>
+        tfoot input {
+            width: 100%;
+            padding: 3px;
+            box-sizing: border-box;
+        }
+    </style>
 @endsection
 
 @section('contenido')
@@ -24,28 +31,32 @@
                 <div class="row">
                     <div class="col-lg-3 col-sm-6">
                         <div class="widget-inline-box text-center">
-                            <h3 class="m-t-10"><i class="text-primary fa fa-university"></i> <b data-plugin="counterup">{{count($establecimientos)}}</b></h3>
+                            <h3 class="m-t-10"><i class="text-primary fa fa-university"></i> <b
+                                        data-plugin="counterup">{{count($establecimientos)}}</b></h3>
                             <p class="text-muted">Establecimientos activos</p>
                         </div>
                     </div>
 
                     <div class="col-lg-3 col-sm-6">
                         <div class="widget-inline-box text-center">
-                            <h3 class="m-t-10"><i class="text-custom mdi mdi-airplay"></i> <b data-plugin="counterup">{{count($sucursales)}}</b></h3>
+                            <h3 class="m-t-10"><i class="text-custom mdi mdi-airplay"></i> <b
+                                        data-plugin="counterup">{{count($sucursales)}}</b></h3>
                             <p class="text-muted">Sucursales activas</p>
                         </div>
                     </div>
 
                     <div class="col-lg-3 col-sm-6">
                         <div class="widget-inline-box text-center">
-                            <h3 class="m-t-10"><i class="text-custom mdi mdi-cellphone-link"></i> <b data-plugin="counterup">{{count($terminalesActivas)}}</b></h3>
+                            <h3 class="m-t-10"><i class="text-custom mdi mdi-cellphone-link"></i> <b
+                                        data-plugin="counterup">{{count($terminalesActivas)}}</b></h3>
                             <p class="text-muted">Terminales activas</p>
                         </div>
                     </div>
 
                     <div class="col-lg-3 col-sm-6">
                         <div class="widget-inline-box text-center b-0">
-                            <h3 class="m-t-10"><i class="text-danger mdi mdi-cellphone-link"></i> <b data-plugin="counterup">{{count($terminalesInactivas)}}</b></h3>
+                            <h3 class="m-t-10"><i class="text-danger mdi mdi-cellphone-link"></i> <b
+                                        data-plugin="counterup">{{count($terminalesInactivas)}}</b></h3>
                             <p class="text-muted">Terminales Inactivas</p>
                         </div>
                     </div>
@@ -69,6 +80,17 @@
                             <th>Acciones</th>
                         </tr>
                         </thead>
+                        <tfoot>
+                        <tr>
+                            <th>Codigo</th>
+                            <th>Celular</th>
+                            <th>Numero activo</th>
+                            <th>Establecimiento</th>
+                            <th>Sucursal</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -99,6 +121,12 @@
     <script>
         var table;
         $(function () {
+
+            $('#datatable tfoot th').each(function () {
+                var title = $(this).text();
+                $(this).html('<input type="text" placeholder="Search ' + title + '" />');
+            });
+
             table = $('#datatable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -128,9 +156,21 @@
                     },
                     {data: 'action', name: 'action', orderable: false, searchable: false}
                 ],
+                initComplete: function () {
+                    this.api().columns().every(function () {
+                        var column = this;
+                        var input = document.createElement("input");
+                        $(input).appendTo($(column.footer()).empty())
+                            .on('keyup', function () {
+                                column.search($(this).val(), false, false, true).draw();
+                            });
+                    });
+                },
                 order: [[1, 'asc']]
             });
-        })
+
+
+        });
 
     </script>
 @endsection

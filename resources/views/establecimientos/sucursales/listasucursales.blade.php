@@ -85,6 +85,17 @@
                             <th>Acciones</th>
                         </tr>
                         </thead>
+                        <tfoot>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Ciudad</th>
+                            <th>Direccion</th>
+                            <th>Email</th>
+                            <th>Telefono</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -147,6 +158,16 @@
                     },
                     {data: 'action', name: 'action', orderable: false, searchable: false}
                 ],
+                initComplete: function () {
+                    this.api().columns().every(function () {
+                        var column = this;
+                        var input = document.createElement("input");
+                        $(input).appendTo($(column.footer()).empty())
+                            .on('keyup', function () {
+                                column.search($(this).val(), false, false, true).draw();
+                            });
+                    });
+                },
                 order: [[1, 'asc']]
             });
 
