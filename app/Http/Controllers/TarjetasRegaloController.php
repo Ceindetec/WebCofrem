@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\DB;
 
 class TarjetasRegaloController extends Controller {
 
-
     /**
      * metodo encargado de mostrar la vista principal para crear las Tarjetas
      * Regalo
@@ -24,6 +23,16 @@ class TarjetasRegaloController extends Controller {
      */
     public function crearTarjetaRegalo() {
         return view("tarjetas.regalo.individualmente");
+    }
+
+    /**
+     * metodo encargado de mostrar la vista principal para crear las Tarjetas en Bloque
+     * Regalo
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function crearTarjetaBloque() {
+        return view("tarjetas.regalo.bloque");
     }
 
     /**
@@ -84,65 +93,13 @@ class TarjetasRegaloController extends Controller {
 
             //TODO: reemplazar el monto del array por el monto de la factura del WS
             //validamos si los montos que estan en los detalle_producto masl el monto de la tarjeta que se esta tratando de crear es permitido
-            if ($monto_inicial < $factura["monto"]) {
+            if ($monto_inicial <= $factura["monto"]) {
 
-                //buscamos si el munero de tarjeta existe en nuestros registros
-                $tarjeta = Tarjetas::where("numero_tarjeta", $request->numero_tarjeta)->first();
 
-                if ($tarjeta == NULL) {
-                    // transaccion para la creacion de la tarjetas
-                    DB::beginTransaction();
-                    try {
+                DB::beginTransaction();
+                $data = $this->crearTarjeteDetalleServicio($request->numero_tarjeta, $request->numero_factura, $monto);
+                DB::commit();
 
-                        $data = $this->crearTarjeta($request->numero_tarjeta);
-
-                        if ($data['estado'] == TRUE) {
-                            $tarjeta = $data['tarjeta'];
-
-                            $data = $this->crearTarjetaServicio($tarjeta->numero_tarjeta,
-                                                                Tarjetas::$ESTADO_TARJETA_INACTIVA,
-                                                                Tarjetas::$CODIGO_SERVICIO_REGALO);
-
-                            $data = $this->crearHtarjeta($tarjeta->id, Tarjetas::$ESTADO_TARJETA_CREADA,
-                                                         Tarjetas::$CODIGO_SERVICIO_REGALO);
-
-                            $data = $this->crearDetalleProducto($tarjeta->numero_tarjeta, $monto,
-                                                                $request->numero_factura);
-                        }
-                        DB::commit();
-
-                    } catch (\Exception $e) {
-                        DB::rollBack();
-                        $data = ["estado" => FALSE,
-                                 "mensaje" => "error:" . $e->getMessage()];
-                    }
-
-                } else {
-                    // Transaccion para la modificacion o creacion del servicio
-                    DB::beginTransaction();
-                    try {
-
-                        $tarjeta_servicio = TarjetaServicios::where("numero_tarjeta", $tarjeta->numero_tarjeta)
-                          ->where("servicio_codigo", Tarjetas::$CODIGO_SERVICIO_REGALO)
-                          ->first();
-                        
-                        if($tarjeta_servicio == NULL){
-                            $data = $this->crearTarjetaServicio($tarjeta->numero_tarjeta,
-                                                                Tarjetas::$ESTADO_TARJETA_INACTIVA,
-                                                                Tarjetas::$CODIGO_SERVICIO_REGALO);
-                        }
-
-                        $data = $this->crearDetalleProducto($tarjeta->numero_tarjeta, $monto,
-                                                            $request->numero_factura);
-                        DB::commit();
-
-                    } catch (\Exception $e) {
-                        DB::rollBack();
-                        $data = ["estado" => FALSE,
-                                 "mensaje" => "error:" . $e->getMessage()];
-                    }
-
-                }
 
             } else {
                 $data = ["estado" => FALSE,
@@ -155,6 +112,132 @@ class TarjetasRegaloController extends Controller {
         } else {
             $data = ["estado" => FALSE,
                      "mensaje" => Tarjetas::$TEXT_RESULT_FACTURA_Y_NUMTARJETA_EXISTEN];
+        }
+
+        return $data;
+    }
+
+
+    public function addTarjetaRegaloBloque(Request $request) {
+
+        //quitamos la mascara de pesos al monto
+        $monto = str_replace(".", "", $request->monto);
+
+        $numTarjetaInicial = $request->numero_tarjeta_inicial;
+
+        $arrayNumTarjetas = [];
+        for ($i = $numTarjetaInicial; $i < $numTarjetaInicial + $request->cantidad; $i++) {
+            $num_tarjeta = $i;
+            while (strlen($num_tarjeta) < 6) {
+                $num_tarjeta = "0" . $num_tarjeta;
+            }
+            $arrayNumTarjetas[] = $num_tarjeta;
+        }
+
+        //consultar todos los detalles producto que existan relacionados con esta factura para validar el monto valido
+        $detalles_producto = DetalleProdutos::where("factura", $request->numero_factura)->get();
+
+        $montos_inicial = 0;
+        foreach ($detalles_producto as $detalle_producto) {
+            $montos_inicial += $detalle_producto->monto_inicial;
+        }
+
+        $montoTotalBloque = $request->cantidad * $monto;
+
+        $montoInicialTotal = $montoTotalBloque + $montos_inicial;
+
+        //TODO: en este punto es necesario consultar la factura para saber el monto
+
+        // array que simula el modelo de la factura que llegaria del WS
+        $factura = ["numero_factura" => "02", "monto" => "200000"];
+
+        if ($montoInicialTotal <= $factura["monto"]) {
+            $collectionDetallesProducto = DetalleProdutos::where("factura", $request->numero_factura)
+              ->whereIn("numero_tarjeta", $arrayNumTarjetas)
+              ->get();
+
+            if ($collectionDetallesProducto->count() == 0) {
+
+
+                DB::beginTransaction();
+                foreach ($arrayNumTarjetas as $numTarjeta) {
+
+                    $data = $this->crearTarjeteDetalleServicio($numTarjeta, $request->numero_factura,
+                                                               $monto);
+                    if ($data["estado"] == FALSE) {
+                        break;
+                    }
+                }
+                DB::commit();
+
+                //                DB::beginTransaction();
+                //                $data = $this->crearTarjeteDetalleServicio($request->numero_tarjeta, $request->numero_factura, $monto);
+                //                DB::commit();
+
+
+            } else {
+                $data["estado"] = FALSE;
+                $data["mensaje"] = (($collectionDetallesProducto->count() > 1) ? Tarjetas::$TEXT_RESULT_FACTURA_Y_NUMTARJETA_EXISTENEN_BLOQUE : Tarjetas::$TEXT_RESULT_FACTURA_Y_NUMTARJETA_EXISTENE_BLOQUE) . $collectionDetallesProducto->implode('numero_tarjeta',
+                                                                                                                                                                                                                                                    ', ');
+            }
+        } else {
+            $data = ["estado" => FALSE,
+                     "mensaje" => Tarjetas::$TEXT_RESULT_MONTO_SUPERADO];
+        }
+
+        //        dd($montoTotalBloque);
+
+        //        $collectionTarjetasExitentes = Tarjetas::whereIn("numero_tarjeta", $arrayNumTarjetas)
+        //          ->select("numero_tarjeta")
+        //          ->get();
+        //
+        //        if ($collectionTarjetasExitentes->count() == 0) {
+        //
+        //            $data["estado"] = TRUE;
+        //        } else {
+        //            $data["estado"] = FALSE;
+        //            $data["mensaje"] = (($collectionTarjetasExitentes->count() > 1) ? Tarjetas::$TEXT_BLOQUE_TARJETAS_YA_EXITEN : Tarjetas::$TEXT_BLOQUE_TARJETA_YA_EXISTE) . $collectionTarjetasExitentes->implode('numero_tarjeta',
+        //                                                                                                                                                                                                            ', ');
+        //        }
+
+        return $data;
+    }
+
+
+    protected function crearTarjeteDetalleServicio($numero_tarjeta, $numero_factura, $monto) {
+
+        //buscamos si el munero de tarjeta existe en nuestros registros
+        $tarjeta = Tarjetas::where("numero_tarjeta", $numero_tarjeta)->first();
+
+        if ($tarjeta == NULL) {
+            // transaccion para la creacion de la tarjetas
+            $data = $this->crearTarjeta($numero_tarjeta);
+
+            if ($data['estado'] == TRUE) {
+                $tarjeta = $data['tarjeta'];
+
+                $data = $this->crearTarjetaServicio($tarjeta->numero_tarjeta, Tarjetas::$ESTADO_TARJETA_INACTIVA,
+                                                    Tarjetas::$CODIGO_SERVICIO_REGALO);
+
+                $data = $this->crearHtarjeta($tarjeta->id, Tarjetas::$ESTADO_TARJETA_CREADA,
+                                             Tarjetas::$CODIGO_SERVICIO_REGALO);
+
+                $data = $this->crearDetalleProducto($tarjeta->numero_tarjeta, $monto, $numero_factura);
+            }
+
+        } else {
+
+            $tarjeta_servicio = TarjetaServicios::where("numero_tarjeta", $tarjeta->numero_tarjeta)
+              ->where("servicio_codigo", Tarjetas::$CODIGO_SERVICIO_REGALO)
+              ->first();
+
+            if ($tarjeta_servicio == NULL) {
+                $data = $this->crearTarjetaServicio($tarjeta->numero_tarjeta, Tarjetas::$ESTADO_TARJETA_INACTIVA,
+                                                    Tarjetas::$CODIGO_SERVICIO_REGALO);
+            }
+
+            $data = $this->crearDetalleProducto($tarjeta->numero_tarjeta, $monto, $numero_factura);
+
         }
 
         return $data;
@@ -266,7 +349,15 @@ class TarjetasRegaloController extends Controller {
         return $data;
     }
 
-
+    /**
+     * Metodo encargado de registrar el detalle del producto a una tarjeta
+     *
+     * @param $numero_tarjeta
+     * @param $monto
+     * @param $factura
+     *
+     * @return array
+     */
     public function crearDetalleProducto($numero_tarjeta, $monto, $factura) {
         try {
             $detalle_producto = new DetalleProdutos();
