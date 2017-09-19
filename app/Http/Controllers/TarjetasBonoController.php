@@ -44,42 +44,42 @@ class TarjetasBonoController extends Controller
         \DB::beginTransaction();
         try {
             //consulta si el contrato existe, SINO, NO permite nada
-            $contrato = Contratos_empr::where("n_contrato",$request->numero_contrato)->first();
-            if($contrato!=null) {
-                if ($contrato->n_contrato == $request->numero_contrato) //solo si existe el contrato con una empresa
-                {
-                    $num_tarjeta = $request->numero_tarjeta;
-                    while (strlen($num_tarjeta) < 6) {
-                        $num_tarjeta = "0" . $num_tarjeta;
-                    }
-                    $tarjeta = Tarjetas::where("numero_tarjeta", $num_tarjeta)->first();
-                    if ($tarjeta->numero_tarjeta != $num_tarjeta) //no existe la tarjeta
-                    {
-                        $tarjeta = new Tarjetas($request->all());
-                        $tarjeta->numero_tarjeta = $num_tarjeta;
-                        $result = $this->crearTarjeta($tarjeta, 'C', 'B');
-                    }
-                    //consulta si existe la persona, SiNO, la inserta.
-                    $persona = Personas::where("identificacion", $request->identificacion)->first();
-                    if ($persona->identificacion != $request->identificacion) //no existe la tarjeta
-                    {
-                        $persona = new Personas($request->all());
-                        $result = $this->crearPersona($persona);
-                    }
-                    //insertar el detalle del producto
-                    $detalle = new DetalleProdutos($request->all());
-                    $result = $this->crearDetalleProd($detalle, $request->monto, $contrato->id, 'I');
-                    \DB::commit();
+            $contrato = Contratos_empr::where("n_contrato", $request->numero_contrato)->first();
+            if ($contrato != null) {
+                //if ($contrato->n_contrato == $request->numero_contrato) //solo si existe el contrato con una empresa
+                //{
+                $num_tarjeta = $request->numero_tarjeta;
+                while (strlen($num_tarjeta) < 6) {
+                    $num_tarjeta = "0" . $num_tarjeta;
                 }
+                $tarjeta = Tarjetas::where("numero_tarjeta", $num_tarjeta)->first();
+                if ($tarjeta->numero_tarjeta != $num_tarjeta) //no existe la tarjeta
+                {
+                    $tarjeta = new Tarjetas($request->all());
+                    $tarjeta->numero_tarjeta = $num_tarjeta;
+                    $result = $this->crearTarjeta($tarjeta, 'C', 'B');
+                }
+                //consulta si existe la persona, SiNO, la inserta.
+                $persona = Personas::where("identificacion", $request->identificacion)->first();
+                if ($persona->identificacion != $request->identificacion) //no existe la tarjeta
+                {
+                    $persona = new Personas($request->all());
+                    $result = $this->crearPersona($persona);
+                }
+                //insertar el detalle del producto
+                $detalle = new DetalleProdutos($request->all());
+                $result = $this->crearDetalleProd($detalle, $request->monto, $contrato->id, 'I');
+                \DB::commit();
+                // }
             }
             else
-            {
-                $result['estado'] = false;
-                $result['mensaje'] = 'No es posible crear la tarjeta bono, el contrato No Existe';//. $exception->getMessage()
-                \DB::rollBack();
-            }
-        }
-        catch (\Exception $exception) {
+                {
+                    $result['estado'] = false;
+                    $result['mensaje'] = 'No es posible crear la tarjeta bono, el contrato No Existe';//. $exception->getMessage()
+                    \DB::rollBack();
+                }
+
+        }catch (\Exception $exception) {
             $result['estado'] = false;
             $result['mensaje'] = 'No fue posible crear la tarjeta bono ' . $exception->getMessage();//. $exception->getMessage()
             \DB::rollBack();
