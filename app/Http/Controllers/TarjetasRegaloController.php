@@ -381,4 +381,8 @@ class TarjetasRegaloController extends Controller {
         return $data;
     }
 
+
+    public function consultaTarjetasRegalo(){
+        return view('tarjetas.regalo.consultaregalo');
+    }
 }
