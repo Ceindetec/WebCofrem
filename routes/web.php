@@ -131,6 +131,11 @@ Route::group(['middleware' => 'auth'], function () {
     /*FINALIZA PARAMETRIZACION TARJETAS*/
 
 
+    /*INICIA CONSULTA TARJETA REGALO*/
+    Route::get('tarjeta/regalo/consulta', 'TarjetasRegaloController@consultaTarjetasRegalo')->name('consultaregalo');
+    /*FINALIZA CONSULTA TARJETA REGALO*/
+
+
     /*combobox*/
     Route::get('select/permisos',"HomeController@selectpermisos")->name('selectpermisos');
 
