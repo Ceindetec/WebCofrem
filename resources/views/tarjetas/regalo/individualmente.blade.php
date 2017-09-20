@@ -22,29 +22,27 @@
                             <div class="form-group">
                                 <label for="nit" class="col-sm-3 control-label">NIT</label>
                                 <div class="col-sm-7">
-                                    <input type="text" class="form-control" id="nit" name="nit" placeholder="NIT">
+                                    {{Form::text('nit', null ,['class'=>'form-control', "required", "required","placeholder"=>"NIT", "maxlength"=>"15"])}}
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="numero_factura" name="numero_factura" class="col-sm-3 control-label">Número
                                     Factura</label>
                                 <div class="col-sm-7">
-                                    <input type="text" class="form-control" id="numero_factura" name="numero_factura"
-                                           placeholder="Número Factura">
+                                    {{Form::text('numero_factura', null ,['class'=>'form-control', "required","placeholder"=>"Número de la Factura", "maxlength"=>"15"])}}
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="numero_tarjeta" class="col-sm-3 control-label">Número Tarjeta</label>
                                 <div class="col-sm-7">
-                                    <input type="text" class="form-control" id="numero_tarjeta" name="numero_tarjeta"
-                                           placeholder="Número Tarjeta">
+                                    {{Form::text('numero_tarjeta', null ,['class'=>'form-control', "required","placeholder"=>"Número Tarjeta", "maxlength"=>"7", "onkeypress"=>"return justNumbers(event)"])}}
+
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="monto" class="col-sm-3 control-label">Monto</label>
                                 <div class="col-sm-7">
-                                    <input type="text" class="form-control money" id="monto" name="monto"
-                                           placeholder="Monto">
+                                    {{Form::text('monto', null ,['class'=>'form-control money', "required", "maxlength"=>"10", "data-parsley-type"=>"number" ,"placeholder"=>"Monto"])}}
                                 </div>
                             </div>
 

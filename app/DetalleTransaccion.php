@@ -4,8 +4,7 @@ namespace creditocofrem;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Contratos_empr extends Model
+class DetalleTransaccion extends Model
 {
     //
-    protected $table = 'contratos_emprs';
 }
