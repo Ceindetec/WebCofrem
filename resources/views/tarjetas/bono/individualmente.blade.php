@@ -112,7 +112,8 @@
                 lookupFilter: function (suggestion, originalQuery, queryLowerCase) {
                     var re = new RegExp('\\b' + $.Autocomplete.utils.escapeRegExChars(queryLowerCase), 'gi');
                     return re.test(suggestion.value);
-                },
+                }
+                /*,
                 onSelect: function (suggestion) {
                     //console.log('You selected: ' + suggestion.value + ', ' + suggestion.data);
                     $("#CrearBIndividual").removeClass("btn-custom").addClass("btn-success");
@@ -124,7 +125,7 @@
                 onInvalidateSelection: function () {
                     $("#CrearBIndividual").removeClass("btn-success").addClass("btn-custom");
                     $("#CrearBIndividual").html("Crear Tarjeta Bono");
-                }
+                }*/
             });
 
             $("#creartarjetabono").submit(function (e) {
