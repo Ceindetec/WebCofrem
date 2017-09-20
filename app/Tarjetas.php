@@ -24,7 +24,7 @@ class Tarjetas extends Model
 
     //
     protected $fillable = [
-        'numero_tarjeta', 'tarjeta_codigo', 'cambioclave', 'password','persona_id','estado'
+        'numero_tarjeta', 'cambioclave', 'password','persona_id','estado',
     ];
 
     public function getTarjetaServicios()

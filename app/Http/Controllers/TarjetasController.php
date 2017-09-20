@@ -162,7 +162,7 @@ class TarjetasController extends Controller
     }
 
     //metodo para insertar la historia de la tarjeta, por cambio de estado: insertar en bd
-    public function crearHtarjeta($tarjetas, $name_estado, $servicio_codigo)
+    public static function crearHtarjeta($tarjetas, $name_estado, $servicio_codigo)
     {
         $result = [];
         //   \DB::beginTransaction();
@@ -197,7 +197,7 @@ class TarjetasController extends Controller
     }
 
     //metodo para insertar la historia de la tarjeta, por cambio de estado: insertar en bd
-    public function crearTarjetaSer($tarjetas, $name_estado, $servicio_codigo)
+    public static function crearTarjetaSer($tarjetas, $name_estado, $servicio_codigo)
     {
         $result = [];
         // \DB::beginTransaction();
