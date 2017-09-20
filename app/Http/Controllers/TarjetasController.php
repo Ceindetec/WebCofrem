@@ -17,7 +17,71 @@ class TarjetasController extends Controller
     //se listan las tarjetas registradas
     public function index()
     {
-        return view('tarjetas.listatarjetas');
+        $totalRegalo = Tarjetas::join('tarjeta_servicios','tarjetas.numero_tarjeta','tarjeta_servicios.numero_tarjeta')
+            ->where('tarjeta_servicios.servicio_codigo','R')
+            ->where('tarjetas.persona_id',null)
+            ->get();
+        $totalRegaloSin = Tarjetas::join('tarjeta_servicios','tarjetas.numero_tarjeta','tarjeta_servicios.numero_tarjeta')
+            ->where('tarjeta_servicios.servicio_codigo','R')
+            ->where('tarjetas.estado','C')
+            ->where('tarjetas.persona_id',null)
+            ->get();
+        $totalRegaloAsin = Tarjetas::join('tarjeta_servicios','tarjetas.numero_tarjeta','tarjeta_servicios.numero_tarjeta')
+            ->where('tarjeta_servicios.servicio_codigo','R')
+            ->where('tarjetas.estado','<>','C')
+            ->where('tarjetas.persona_id',null)
+            ->get();
+        $totalBono = Tarjetas::join('tarjeta_servicios','tarjetas.numero_tarjeta','tarjeta_servicios.numero_tarjeta')
+            ->leftJoin('personas','tarjetas.persona_id','personas.id')
+            ->where('tarjeta_servicios.servicio_codigo','B')
+            ->where('tarjetas.persona_id',null)
+            ->orWhere('personas.tipo_persona','T')
+            ->get();
+        $totalBonoSin = Tarjetas::join('tarjeta_servicios','tarjetas.numero_tarjeta','tarjeta_servicios.numero_tarjeta')
+            ->leftJoin('personas','tarjetas.persona_id','personas.id')
+            ->where('tarjeta_servicios.servicio_codigo','B')
+            ->where('tarjetas.estado','C')
+            ->where('tarjetas.persona_id',null)
+            ->orWhere('personas.tipo_persona','T')
+            ->get();
+        $totalBonoAsin = Tarjetas::join('tarjeta_servicios','tarjetas.numero_tarjeta','tarjeta_servicios.numero_tarjeta')
+            ->leftJoin('personas','tarjetas.persona_id','personas.id')
+            ->where('tarjeta_servicios.servicio_codigo','B')
+            ->where('tarjetas.estado','<>','C')
+            ->where('tarjetas.persona_id',null)
+            ->orWhere('personas.tipo_persona','T')
+            ->get();
+        $totalCupo = Tarjetas::join('tarjeta_servicios','tarjetas.numero_tarjeta','tarjeta_servicios.numero_tarjeta')
+            ->leftJoin('personas','tarjetas.persona_id','personas.id')
+            ->where('tarjeta_servicios.servicio_codigo','A')
+            ->where('tarjetas.persona_id',null)
+            ->orWhere('personas.tipo_persona','A')
+            ->get();
+        $totalCupoSin = Tarjetas::join('tarjeta_servicios','tarjetas.numero_tarjeta','tarjeta_servicios.numero_tarjeta')
+            ->leftJoin('personas','tarjetas.persona_id','personas.id')
+            ->where('tarjeta_servicios.servicio_codigo','A')
+            ->where('tarjetas.estado','C')
+            ->where('tarjetas.persona_id',null)
+            ->orWhere('personas.tipo_persona','A')
+            ->get();
+        $totalCupoAsin = Tarjetas::join('tarjeta_servicios','tarjetas.numero_tarjeta','tarjeta_servicios.numero_tarjeta')
+            ->leftJoin('personas','tarjetas.persona_id','personas.id')
+            ->where('tarjeta_servicios.servicio_codigo','A')
+            ->where('tarjetas.estado','<>','C')
+            ->where('tarjetas.persona_id',null)
+            ->orWhere('personas.tipo_persona','A')
+            ->get();
+        return view('tarjetas.listatarjetas',
+            compact('totalRegalo',
+                'totalRegaloSin',
+                'totalRegaloAsin',
+                'totalBono',
+                'totalBonoSin',
+                'totalBonoAsin',
+                'totalCupo',
+                'totalCupoSin',
+                'totalCupoAsin'
+            ));
     }
 
     //carga la grid

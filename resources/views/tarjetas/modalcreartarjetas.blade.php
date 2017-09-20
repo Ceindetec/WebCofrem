@@ -52,6 +52,7 @@
                                 confirmButtonColor: '#4fa7f3'
                             }
                         );
+                        modalBs.modal('hide');
                     } else if (result.estado == false) {
                         swal(
                             'Error!!',

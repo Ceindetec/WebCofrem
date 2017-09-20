@@ -21,10 +21,27 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-12">
-                <h4 class="header-title m-t-0 m-b-20">Gestionar tarjetas </h4>
+                <h4 class="header-title m-t-0 m-b-20">Inventario general de tarjetas </h4>
             </div>
         </div> <!-- end row -->
-
+        <div class="card-box col-md-4">
+            <h4 class="m-t-0">Regalo</h4>
+            <div class="col-md-12"><label>Total en el sistema: &nbsp; </label><span>{{count($totalRegalo)}}</span></div>
+            <div class="col-md-12"><label>Sin asiganar: &nbsp;</label>{{count($totalRegaloSin)}}</div>
+            <div class="col-md-12"><label>Asignadas: &nbsp;</label>{{count($totalRegaloAsin)}}</div>
+        </div>
+        <div class="card-box col-md-4">
+            <h4 class="m-t-0">Bono</h4>
+            <div class="col-md-12"><label>Total en el sistema: &nbsp;</label><span>{{count($totalBono)}}</span></div>
+            <div class="col-md-12"><label>Sin asiganar: &nbsp;</label>{{count($totalBonoSin)}}</div>
+            <div class="col-md-12"><label>Asignadas: &nbsp;</label>{{count($totalBonoAsin)}}</div>
+        </div>
+        <div class="card-box col-md-4">
+            <h4 class="m-t-0">Cupo</h4>
+            <div class="col-md-12"><label>Total en el sistema: &nbsp;</label><span>{{count($totalCupo)}}</span></div>
+            <div class="col-md-12"><label>Sin asiganar: &nbsp;</label>{{count($totalCupoSin)}}</div>
+            <div class="col-md-12"><label>Asignadas: &nbsp;</label>{{count($totalCupoAsin)}}</div>
+        </div>
 
         <div class="row">
             <div class="col-sm-12">
@@ -59,6 +76,7 @@
                             <th>Numero de tarjeta</th>
                             <th>Tipo</th>
                             <th>Cambio Clave</th>
+                            <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                         </thead>
@@ -117,6 +135,19 @@
                                 return 'Pendiente';
                             else
                                 return 'Hecho';
+                        }
+                    },
+                    {
+                        data: 'estado',
+                        name: 'estado',
+                        render: function (data) {
+                            if(data == 'C'){
+                                return 'Sin asignar'
+                            }else if(data == 'A'){
+                                return 'Activa'
+                            }else{
+                                return 'Inactiva'
+                            }
                         }
                     },
                     {data: 'action', name: 'action', orderable: false, searchable: false}
