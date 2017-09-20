@@ -8,6 +8,6 @@ class Personas extends Model
 {
     //
     protected $fillable = [
-        'identificacion', 'nombres', 'apellidos'
+        'identificacion', 'nombres', 'apellidos',
     ];
 }

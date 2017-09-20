@@ -170,11 +170,14 @@
             $('#identificacion').blur(function(e){
                 $.get('{{route("getNombre")}}',{identificacion:$(this).val()},function(result)
                 {
-                    $("#nombres").val("hola1");
                    if(result)
                    {
                        $("#nombres").val(result.nombres);
                        $("#apellidos").val(result.apellidos);
+                   }
+                   else {
+                       $("#nombres").val("");
+                       $("#apellidos").val("");
                    }
                 });
             });

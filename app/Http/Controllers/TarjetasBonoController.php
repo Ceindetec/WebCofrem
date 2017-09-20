@@ -43,9 +43,9 @@ class TarjetasBonoController extends Controller
         $result = [];
         \DB::beginTransaction();
         try {
-            //consulta si el contrato existe, SINO, NO permite nada
             $contrato = Contratos_empr::where("n_contrato", $request->numero_contrato)->first();
-            if ($contrato != null) {
+            //dd($contrato);
+            if($contrato != null) {
                 //if ($contrato->n_contrato == $request->numero_contrato) //solo si existe el contrato con una empresa
                 //{
                 $num_tarjeta = $request->numero_tarjeta;
@@ -53,22 +53,22 @@ class TarjetasBonoController extends Controller
                     $num_tarjeta = "0" . $num_tarjeta;
                 }
                 $tarjeta = Tarjetas::where("numero_tarjeta", $num_tarjeta)->first();
-                if ($tarjeta->numero_tarjeta != $num_tarjeta) //no existe la tarjeta
+                if($tarjeta==null) //no existe la tarjeta
                 {
-                    $tarjeta = new Tarjetas($request->all());
-                    $tarjeta->numero_tarjeta = $num_tarjeta;
-                    $result = $this->crearTarjeta($tarjeta, 'C', 'B');
+                    $result = $this->crearTarjeta($num_tarjeta, 'C', 'B');
                 }
                 //consulta si existe la persona, SiNO, la inserta.
                 $persona = Personas::where("identificacion", $request->identificacion)->first();
-                if ($persona->identificacion != $request->identificacion) //no existe la tarjeta
+                if($persona==null) //no existe la persona
                 {
-                    $persona = new Personas($request->all());
-                    $result = $this->crearPersona($persona);
+                    $result = $this->crearPersona($request->identificacion,$request->nombres,$request->apellidos);
+                    //dd($result['mensaje']);
                 }
                 //insertar el detalle del producto
-                $detalle = new DetalleProdutos($request->all());
-                $result = $this->crearDetalleProd($detalle, $request->monto, $contrato->id, 'I');
+                //dd($detalle);
+                $result = $this->crearDetalleProd($num_tarjeta, $request->monto, $contrato->id, 'I');
+                $result['estado'] = true;
+                $result['mensaje'] = 'La tarjeta bono ha sido creada';//. $exception->getMessage()
                 \DB::commit();
                 // }
             }
@@ -87,12 +87,14 @@ class TarjetasBonoController extends Controller
         return $result;
     }
     //metodo para insertar la historia de la tarjeta, por cambio de estado: insertar en bd
-    public function crearTarjeta($tarjetas, $name_estado, $servicio_codigo)
+    public function crearTarjeta($num_tarjeta, $name_estado, $servicio_codigo)
     {
         $result = [];
         // \DB::beginTransaction();
         try {
-            $validator = \Validator::make(['numero_tarjeta' => $tarjetas->numero_tarjeta], [
+            $tarjetas = new Tarjetas();
+            $tarjetas->numero_tarjeta = $num_tarjeta;
+            $validator = \Validator::make(['numero_tarjeta' => $num_tarjeta], [
                 'numero_tarjeta' => 'required|unique:tarjetas'
             ]);
             if ($validator->fails()) {
@@ -101,12 +103,13 @@ class TarjetasBonoController extends Controller
             $ultimos = substr($tarjetas->numero_tarjeta, -4);
             //$tarjetas->password = bcrypt($ultimos);
             $tarjetas->password = Encript::encryption($ultimos);
-            $tarjetas->estado = 'C';
+            $tarjetas->estado = $name_estado;
+            //dd($tarjetas);
             $tarjetas->save();
             $result['estado'] = true;
             $result['mensaje'] = 'La tarjeta ha sido creada satisfactoriamente';
-            $result = TarjetasController::crearHtarjetas($tarjetas, 'C', 'B');
-            $result = TarjetasController::crearTarjetaSer($tarjetas, 'I', 'B');
+            $result = TarjetasController::crearHtarjeta($tarjetas, $name_estado, $servicio_codigo);
+            $result = TarjetasController::crearTarjetaSer($tarjetas, 'I', $servicio_codigo);
         } catch (\Exception $exception) {
             $result['estado'] = false;
             $result['mensaje'] = 'No fue posible crear la tarjeta' . $exception->getMessage();//. $exception->getMessage()
@@ -114,11 +117,16 @@ class TarjetasBonoController extends Controller
         }
         return $result;
     }
-    public function crearPersona($persona)
+    public function crearPersona($iden,$nom,$ape)
     {
         $result = [];
         // \DB::beginTransaction();
         try {
+            $persona = new Personas();
+            $persona->identificacion = $iden;
+            $persona->nombres = $nom;
+            $persona->apellidos = $ape;
+           // dd($persona);
             $persona->save();
             $result['estado'] = true;
             $result['mensaje'] = 'La persona ha sido ingresada satisfactoriamente';
@@ -129,15 +137,17 @@ class TarjetasBonoController extends Controller
         }
         return $result;
     }
-    public function crearDetalleProd($detalle,$monto,$contrato_id,$estado)
+    public function crearDetalleProd($num_tarjeta,$monto,$contrato_id,$estado)
     {
         $result = [];
         // \DB::beginTransaction();
         try {
+            $detalle = new DetalleProdutos();
+            $detalle->numero_tarjeta=$num_tarjeta;
             $detalle->fecha_cracion=Carbon::now();
             $detalle->monto_inicial=$monto;
             $detalle->contrato_emprs_id=$contrato_id;
-            $detalle->user_id= Auth::User()->id;
+            $detalle->user_id= \Auth::User()->id;
             $detalle->estado=$estado;
             $detalle->save();
             $result['estado'] = true;
