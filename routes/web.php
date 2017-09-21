@@ -132,7 +132,11 @@ Route::group(['middleware' => 'auth'], function () {
 
 
     /*INICIA CONSULTA TARJETA REGALO*/
-    Route::get('tarjeta/regalo/consulta', 'TarjetasRegaloController@consultaTarjetasRegalo')->name('consultaregalo');
+    Route::get('tarjetas/regalo/consulta', 'TarjetasRegaloController@consultaTarjetasRegalo')->name('consultaregalo');
+    Route::get('tarjetas/regalo/gridconsultatarjetaregalo', 'TarjetasRegaloController@gridConsulaTarjetaRegalo')->name('gridconsultatarjetaregalo');
+    route::get('tarjetas/regalo/editar/{id}','TarjetasRegaloController@viewEditarRegalo')->name('regalo.editar');
+    route::post('tarjetas/regalo/editar/{id}','TarjetasRegaloController@editarRegalo');
+    route::post('tarjetas/regalo/activar','TarjetasRegaloController@activarTarjetaRegalo')->name('tarjeta.regalo.activar');
     /*FINALIZA CONSULTA TARJETA REGALO*/
 
 

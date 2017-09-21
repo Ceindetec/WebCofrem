@@ -11,6 +11,9 @@ class AdminisTarjetas extends Model implements AuditableContract
     //
     use Auditable;
 
+    public static $ESTADO_INACTIVO = "I";
+    public static $ESTADO_ACTIVO = "A";
+
     protected $fillable = ['tarjeta_codigo','porcentaje'];
 
     public function getTipoTarjeta(){

@@ -3,6 +3,7 @@
 namespace creditocofrem;
 
 use Illuminate\Database\Eloquent\Model;
+use creditocofrem\DetalleProdutos;
 
 class Tarjetas extends Model
 {
@@ -25,6 +26,8 @@ class Tarjetas extends Model
     public static $TEXT_SERVICIO_TARJETA_REGALO_SIN_PARAMETRIZACION = "Falta la parametrización del servicio Tarjeta regalo";
     public static $TEXT_SIN_VALOR_PLASTICO = "Falta asignarle un valor al plático de la tarjeta (parametrización)";
 
+    public static $TEXT_DEFAULT_MOTIVO_ACTIVACION_TARJETA = 'Activacion del servicio';
+
     //
     protected $fillable = [
         'numero_tarjeta', 'cambioclave', 'password','persona_id','estado',
@@ -33,5 +36,9 @@ class Tarjetas extends Model
     public function getTarjetaServicios()
     {
         return $this->hasMany('creditocofrem\TarjetaServicios','numero_tarjeta','numero_tarjeta');
+    }
+
+    public function getDetalleProductoRegalo(){
+        return $this->hasMany('creditocofrem\DetalleProdutos','numero_tarjeta','numero_tarjeta')->where('factura','<>',null);
     }
 }

@@ -58,14 +58,14 @@
                             <th>Nit</th>
                             <th>Razon social</th>
                             <th>Representante Legal</th>
-                            <th>Departamento</th>
-                            <th>Municipio</th>
-                            <th>Email</th>
-                            <th>Telefono</th>
-                            <th>Celular</th>
-                            <th>Direccion</th>
-                            <th>Tipo</th>
-                            <th>Acciones</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
                         </tr>
                         </tfoot>
                     </table>
@@ -132,11 +132,13 @@
                 initComplete: function () {
                     this.api().columns().every(function () {
                         var column = this;
-                        var input = document.createElement("input");
-                        $(input).appendTo($(column.footer()).empty())
-                            .on('keyup', function () {
-                                column.search($(this).val(), false, false, true).draw();
-                            });
+                        if(column.footer().innerHTML != ""){
+                            var input = document.createElement("input");
+                            $(input).appendTo($(column.footer()).empty())
+                                .on('keyup', function () {
+                                    column.search($(this).val(), false, false, true).draw();
+                                });
+                        }
                     });
                 },
                 order: [[1, 'asc']]

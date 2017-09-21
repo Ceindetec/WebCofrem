@@ -87,8 +87,8 @@
                             <th>Numero activo</th>
                             <th>Establecimiento</th>
                             <th>Sucursal</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
+                            <th></th>
+                            <th></th>
                         </tr>
                         </tfoot>
                     </table>
@@ -122,10 +122,7 @@
         var table;
         $(function () {
 
-            $('#datatable tfoot th').each(function () {
-                var title = $(this).text();
-                $(this).html('<input type="text" placeholder="Search ' + title + '" />');
-            });
+
 
             table = $('#datatable').DataTable({
                 processing: true,
@@ -159,14 +156,15 @@
                 initComplete: function () {
                     this.api().columns().every(function () {
                         var column = this;
-                        var input = document.createElement("input");
-                        $(input).appendTo($(column.footer()).empty())
-                            .on('keyup', function () {
-                                column.search($(this).val(), false, false, true).draw();
-                            });
+                        if(column.footer().innerHTML != ""){
+                            var input = document.createElement("input");
+                            $(input).appendTo($(column.footer()).empty())
+                                .on('keyup', function () {
+                                    column.search($(this).val(), false, false, true).draw();
+                                });
+                        }
                     });
-                },
-                order: [[1, 'asc']]
+                }
             });
 
 

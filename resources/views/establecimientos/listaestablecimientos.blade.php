@@ -50,8 +50,8 @@
                         <tr>
                             <th>Nit</th>
                             <th>Razon social</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
+                            <th></th>
+                            <th></th>
                         </tr>
                         </tfoot>
                     </table>
@@ -89,10 +89,7 @@
                 "language": {
                     "url": "{!!route('datatable_es')!!}"
                 },
-                ajax: {
-                    url: "{!!route('gridestablecimientos')!!}",
-                    "type": "get"
-                },
+                ajax: "{!!route('gridestablecimientos')!!}",
                 columns: [
                     {data: 'nit', name: 'nit'},
                     {data: 'razon_social', name: 'razon_social'},
@@ -112,11 +109,13 @@
                 initComplete: function () {
                     this.api().columns().every(function () {
                         var column = this;
-                        var input = document.createElement("input");
-                        $(input).appendTo($(column.footer()).empty())
-                            .on('keyup', function () {
-                                column.search($(this).val(), false, false, true).draw();
-                            });
+                        if(column.footer().innerHTML != ""){
+                            var input = document.createElement("input");
+                            $(input).appendTo($(column.footer()).empty())
+                                .on('keyup', function () {
+                                    column.search($(this).val(), false, false, true).draw();
+                                });
+                        }
                     });
                 },
                 order: [[1, 'asc']]
