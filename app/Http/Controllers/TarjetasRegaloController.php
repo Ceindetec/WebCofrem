@@ -2,10 +2,16 @@
 
 namespace creditocofrem\Http\Controllers;
 
+use creditocofrem\AdminisTarjetas;
 use creditocofrem\DetalleProdutos;
+use creditocofrem\DetalleTransaccion;
+use creditocofrem\HEstadoTransaccion;
+use creditocofrem\PagaPlastico;
 use creditocofrem\Tarjetas;
 use creditocofrem\Htarjetas;
 use creditocofrem\TarjetaServicios;
+use creditocofrem\Transaccion;
+use creditocofrem\ValorTarjeta;
 use Facades\creditocofrem\Encript;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -73,6 +79,34 @@ class TarjetasRegaloController extends Controller {
         //quitamos la mascara de pesos al monto
         $monto = str_replace(".", "", $request->monto);
 
+        $banderaPagaPlastico = FALSE;
+        $banderaPagoAdmon = FALSE;
+        $valorPlatico = 0;
+        $valorAdmon = 0;
+
+        $PagaPlstico = $this->validarRegaloPagaPlastico();
+        if ($PagaPlstico["estado"]) {
+
+            if ($PagaPlstico["paga"]) {
+                $banderaPagaPlastico = TRUE;
+                $valorPlatico = $PagaPlstico["valor"];
+            }
+        } else {
+            return $PagaPlstico;
+        }
+
+        $PagaAdmon = $this->validarRegaloPagaAdmon();
+
+        if ($PagaAdmon["estado"]) {
+
+            if ($PagaAdmon["paga"]) {
+                $banderaPagoAdmon = TRUE;
+                $valorAdmon = $PagaAdmon["valor"];
+            }
+        } else {
+            return $PagaAdmon;
+        }
+
         //consultar todos los detalles producto que existan relacionados con esta factura para validar el monto valido
         $detalles_producto = DetalleProdutos::where("factura", $request->numero_factura)->get();
 
@@ -97,7 +131,9 @@ class TarjetasRegaloController extends Controller {
 
 
                 DB::beginTransaction();
-                $data = $this->crearTarjeteDetalleServicio($request->numero_tarjeta, $request->numero_factura, $monto);
+                $data = $this->crearTarjeteDetalleServicio($request->numero_tarjeta, $request->numero_factura, $monto,
+                                                           $banderaPagaPlastico, $valorPlatico,$banderaPagoAdmon,$valorAdmon);
+
                 DB::commit();
 
 
@@ -123,15 +159,42 @@ class TarjetasRegaloController extends Controller {
         //quitamos la mascara de pesos al monto
         $monto = str_replace(".", "", $request->monto);
 
+        $banderaPagaPlastico = FALSE;
+        $banderaPagoAdmon = FALSE;
+        $valorPlatico = 0;
+        $valorAdmon = 0;
+
+        $PagaPlstico = $this->validarRegaloPagaPlastico();
+        if ($PagaPlstico["estado"]) {
+
+            if ($PagaPlstico["paga"]) {
+                $banderaPagaPlastico = TRUE;
+                $valorPlatico = $PagaPlstico["valor"];
+            }
+        } else {
+            return $PagaPlstico;
+        }
+
+        $PagaAdmon = $this->validarRegaloPagaAdmon();
+
+        if ($PagaAdmon["estado"]) {
+
+            if ($PagaAdmon["paga"]) {
+                $banderaPagoAdmon = TRUE;
+                $valorAdmon = $PagaAdmon["valor"];
+            }
+        } else {
+            return $PagaAdmon;
+        }
+
+
+        $data = [];
+
         $numTarjetaInicial = $request->numero_tarjeta_inicial;
 
         $arrayNumTarjetas = [];
         for ($i = $numTarjetaInicial; $i < $numTarjetaInicial + $request->cantidad; $i++) {
-            $num_tarjeta = $i;
-            while (strlen($num_tarjeta) < 6) {
-                $num_tarjeta = "0" . $num_tarjeta;
-            }
-            $arrayNumTarjetas[] = $num_tarjeta;
+            $arrayNumTarjetas[] = $this->completarCeros($i, 6);
         }
 
         //consultar todos los detalles producto que existan relacionados con esta factura para validar el monto valido
@@ -162,18 +225,14 @@ class TarjetasRegaloController extends Controller {
                 DB::beginTransaction();
                 foreach ($arrayNumTarjetas as $numTarjeta) {
 
-                    $data = $this->crearTarjeteDetalleServicio($numTarjeta, $request->numero_factura,
-                                                               $monto);
+                    $data = $this->crearTarjeteDetalleServicio($numTarjeta, $request->numero_factura, $monto,
+                                                               $banderaPagaPlastico, $valorPlatico,$banderaPagoAdmon,$valorAdmon);
+
                     if ($data["estado"] == FALSE) {
                         break;
                     }
                 }
                 DB::commit();
-
-                //                DB::beginTransaction();
-                //                $data = $this->crearTarjeteDetalleServicio($request->numero_tarjeta, $request->numero_factura, $monto);
-                //                DB::commit();
-
 
             } else {
                 $data["estado"] = FALSE;
@@ -185,26 +244,147 @@ class TarjetasRegaloController extends Controller {
                      "mensaje" => Tarjetas::$TEXT_RESULT_MONTO_SUPERADO];
         }
 
-        //        dd($montoTotalBloque);
-
-        //        $collectionTarjetasExitentes = Tarjetas::whereIn("numero_tarjeta", $arrayNumTarjetas)
-        //          ->select("numero_tarjeta")
-        //          ->get();
-        //
-        //        if ($collectionTarjetasExitentes->count() == 0) {
-        //
-        //            $data["estado"] = TRUE;
-        //        } else {
-        //            $data["estado"] = FALSE;
-        //            $data["mensaje"] = (($collectionTarjetasExitentes->count() > 1) ? Tarjetas::$TEXT_BLOQUE_TARJETAS_YA_EXITEN : Tarjetas::$TEXT_BLOQUE_TARJETA_YA_EXISTE) . $collectionTarjetasExitentes->implode('numero_tarjeta',
-        //                                                                                                                                                                                                            ', ');
-        //        }
-
         return $data;
     }
 
+    /**
+     * metodo encargado de colocar ceros la inicia del numero para completar la cantidad de caracteres necesrios
+     *
+     * @param $numero
+     * @param $digitos
+     *
+     * @return string
+     */
+    private function completarCeros($numero, $digitos) {
 
-    protected function crearTarjeteDetalleServicio($numero_tarjeta, $numero_factura, $monto) {
+        $num_tarjeta = $numero;
+        while (strlen($num_tarjeta) < $digitos) {
+            $num_tarjeta = "0" . $num_tarjeta;
+        }
+        return $num_tarjeta;
+    }
+
+    private function validarRegaloPagaPlastico() {
+
+        $pagaPlastico = PagaPlastico::where("servicio_codigo", Tarjetas::$CODIGO_SERVICIO_REGALO)
+          ->orderBy("id", "DESC")
+          ->first();
+
+        if ($pagaPlastico != NULL) {
+
+            if ($pagaPlastico->pagaplastico == 1) {
+
+                $valorTarjeta = ValorTarjeta::orderBy("id", "DESC")->first();
+
+                if ($valorTarjeta != NULL) {
+                    $data["estado"] = TRUE;
+                    $data["paga"] = TRUE;
+                    $data["valor"] = $valorTarjeta->valor;
+                } else {
+                    $data["estado"] = FALSE;
+                    $data["mensaje"] = Tarjetas::$TEXT_SIN_VALOR_PLASTICO;
+                }
+
+            } else {
+                $data["estado"] = TRUE;
+                $data["paga"] = FALSE;
+            }
+
+        } else {
+            $data["estado"] = FALSE;
+            $data["mensaje"] = Tarjetas::$TEXT_SERVICIO_TARJETA_REGALO_SIN_PARAMETRIZACION;
+        }
+        return $data;
+    }
+
+    private function validarRegaloPagaAdmon() {
+
+        $porcentajeAdmon = AdminisTarjetas::where("servicio_codigo", Tarjetas::$CODIGO_SERVICIO_REGALO)
+          ->orderBy("id", "DESC")
+          ->first();
+
+        if ($porcentajeAdmon != NULL) {
+
+            if ($porcentajeAdmon->estado == Tarjetas::$ESTADO_TARJETA_ACTIVA) {
+
+                $data["estado"] = TRUE;
+                $data["paga"] = TRUE;
+                $data["valor"] = $porcentajeAdmon->porcentaje;
+
+            } else {
+                $data["estado"] = TRUE;
+                $data["paga"] = FALSE;
+            }
+
+        } else {
+            $data["estado"] = FALSE;
+            $data["mensaje"] = Tarjetas::$TEXT_SERVICIO_TARJETA_REGALO_SIN_PARAMETRIZACION;
+        }
+        return $data;
+    }
+
+    private function transaccionAdminstrativa($numero_tarjeta, $valor, $destalle_producto_id, $descripcion) {
+        $transaccionAnterior = Transaccion::orderBy("id", "DESC")->first();
+
+        if ($transaccionAnterior != NULL) {
+            $numeroTransaccion = intval($transaccionAnterior->numero_transaccion)+1;
+        } else {
+            $numeroTransaccion = 1;
+        }
+
+
+        try {
+            $transaccion = new Transaccion();
+            $transaccion->numero_transaccion = $this->completarCeros($numeroTransaccion, 10);
+            $transaccion->numero_tarjeta = $numero_tarjeta;
+            $transaccion->tipo = Transaccion::$TIPO_ADMINISTRATIVO;
+            $transaccion->valor = $valor;
+            $transaccion->fecha = Carbon::now();
+
+            $transaccion->save();
+
+            $hEstado = new HEstadoTransaccion();
+            $hEstado->transaccion_id = $transaccion->id;
+            $hEstado->estado = HEstadoTransaccion::$ESTADO_ACTIVO;
+            $hEstado->fecha = Carbon::now();
+
+            $hEstado->save();
+
+            $detalleTransaccion = new DetalleTransaccion();
+            $detalleTransaccion->transaccion_id = $transaccion->id;
+            $detalleTransaccion->detalle_producto_id = $destalle_producto_id;
+            $detalleTransaccion->valor = $valor;
+            $detalleTransaccion->descripcion = $descripcion;
+
+            $detalleTransaccion->save();
+
+            $data['estado'] = TRUE;
+
+
+        } catch (\Exception $e) {
+            $data['estado'] = FALSE;
+            $data['mensaje'] = 'No fue posible crear la Transaccion ' . $e->getMessage();
+            DB::rollBack();
+        }
+
+        return $data;
+
+    }
+
+    /**
+     * @param $numero_tarjeta
+     * @param $numero_factura
+     * @param $monto
+     *
+     * @return array|mixed
+     */
+    protected function crearTarjeteDetalleServicio($numero_tarjeta,
+                                                   $numero_factura,
+                                                   $monto,
+                                                   $pagaPlastico,
+                                                   $valorPlastico,
+                                                   $pagoAdmon,
+                                                   $valorAdmon) {
 
         //buscamos si el munero de tarjeta existe en nuestros registros
         $tarjeta = Tarjetas::where("numero_tarjeta", $numero_tarjeta)->first();
@@ -223,6 +403,10 @@ class TarjetasRegaloController extends Controller {
                                              Tarjetas::$CODIGO_SERVICIO_REGALO);
 
                 $data = $this->crearDetalleProducto($tarjeta->numero_tarjeta, $monto, $numero_factura);
+
+                $num_tarjeta = $tarjeta->numero_tarjeta;
+                $detalle_producto_id = $data['id'];
+
             }
 
         } else {
@@ -238,11 +422,26 @@ class TarjetasRegaloController extends Controller {
 
             $data = $this->crearDetalleProducto($tarjeta->numero_tarjeta, $monto, $numero_factura);
 
+            $num_tarjeta = $tarjeta->numero_tarjeta;
+            $detalle_producto_id = $data['id'];
+
         }
+
+
+        if ($data['estado'] == TRUE){
+            if ($pagaPlastico) {
+                $data = $this->transaccionAdminstrativa($num_tarjeta, $valorPlastico, $detalle_producto_id, DetalleTransaccion::$DESCRIPCION_PLASTICO);
+            }
+            if($pagoAdmon){
+                $valorAdministracion =($monto * $valorAdmon)/100;
+                $data = $this->transaccionAdminstrativa($num_tarjeta, $valorAdministracion, $detalle_producto_id, DetalleTransaccion::$DESCRIPCION_ADMINISTRACION);
+            }
+        }
+
+
 
         return $data;
     }
-
 
     /**
      * Metodo encargado de la creacion de las tarjetas
@@ -372,6 +571,7 @@ class TarjetasRegaloController extends Controller {
             $detalle_producto->save();
 
             $data['estado'] = TRUE;
+            $data['id'] = $detalle_producto->id;
 
         } catch (\Exception $exception) {
             $data['estado'] = FALSE;
@@ -382,7 +582,7 @@ class TarjetasRegaloController extends Controller {
     }
 
 
-    public function consultaTarjetasRegalo(){
+    public function consultaTarjetasRegalo() {
         return view('tarjetas.regalo.consultaregalo');
     }
 }

@@ -29,6 +29,12 @@ Route::group(['middleware' => 'auth'], function () {
         //route::get('tarjetas','TarjetasController@index')->name('tarjetas');
 
         /*FINALIZA TARJETAS*/
+        /* INICIA TARJETAS BONO */
+        route::get('creartarjetasBono','TarjetasBonoController@viewCrearTarjetaIndividual')->name('creartarjetasBono');
+        route::post('bono.crearindividual','TarjetasBonoController@CrearTarjetaIndividual')->name('bono.crearindividual');
+        route::get('autoCompleNumContrato','TarjetasBonoController@autoCompleNumContrato')->name('autoCompleNumContrato');
+        route::get('getNombre','TarjetasBonoController@getNombre')->name('getNombre');
+        /*FINALIZA TARJETAS BONO */
 
     });
     });
