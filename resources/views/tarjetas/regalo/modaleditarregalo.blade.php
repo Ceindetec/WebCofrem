@@ -1,5 +1,5 @@
 <div id="modalcreartarjetas">
-    {{Form::model($detalle,['route'=>['tarjetas.crearp'], 'class'=>'form-horizontal', 'id'=>'creartarjetas'])}}
+    {{Form::model($detalle,['route'=>['regalo.editar',$detalle->id], 'class'=>'form-horizontal', 'id'=>'creartarjetas'])}}
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h4 class="modal-title">Editar tarjeta regalo</h4>
@@ -9,13 +9,13 @@
             <div class="form-group">
                 <label class="col-md-2 control-label">Número de tarjeta</label>
                 <div class="col-md-10">
-                {{Form::text('numero_tarjeta', null ,['class'=>'form-control', "required", "maxlength"=>"7", "data-parsley-type"=>"number", 'id'=>'numero_tarjeta','disabled'])}} <!-- "data-parsley-type"=>"number"] -->
+                {{Form::text('numero_tarjeta', null ,['class'=>'form-control', "required",  "data-parsley-type"=>"number", 'id'=>'numero_tarjeta','disabled'])}} <!-- "data-parsley-type"=>"number"] -->
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-md-2 control-label">Factura</label>
                 <div class="col-md-10">
-                {{Form::text('factura', null ,['class'=>'form-control', "required", "maxlength"=>"7", "data-parsley-type"=>"number", 'id'=>'numero_tarjeta','disabled'])}} <!-- "data-parsley-type"=>"number"] -->
+                {{Form::text('factura', null ,['class'=>'form-control', "required",  "data-parsley-type"=>"number", 'id'=>'numero_tarjeta','disabled'])}} <!-- "data-parsley-type"=>"number"] -->
                 </div>
             </div>
             <div class="form-group">

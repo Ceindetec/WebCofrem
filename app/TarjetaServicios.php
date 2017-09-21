@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class TarjetaServicios extends Model
 {
     //
+    public static $ESTADO_INACTIVO = "I";
+    public static $ESTADO_ACTIVO = "A";
+
     protected $fillable = [
         'numero_tarjeta', 'servicio_codigo', 'estado'
     ];

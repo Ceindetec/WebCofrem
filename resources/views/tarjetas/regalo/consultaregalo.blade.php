@@ -33,6 +33,15 @@
                             <th>Acciones</th>
                         </tr>
                         </thead>
+                        <tfoot>
+                        <tr>
+                            <th>Numero tarjeta</th>
+                            <th>Factura</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -78,7 +87,13 @@
                 columns: [
                     {data: 'numero_tarjeta', name: 'numero_tarjeta'},
                     {data: 'fa', name: 'fa'},
-                    {data: 'monto_inicial', name: 'monto_inicial'},
+                    {
+                        data: 'monto_inicial',
+                        name: 'monto_inicial',
+                        render: function (data) {
+                            return '$ '+enmascarar(data);
+                        }
+                    },
                     {
                         data: 'estado',
                         name: 'estado',
@@ -95,8 +110,87 @@
                         searchable: false
                     },
                     {data: 'action', name: 'action', orderable: false, searchable: false}
-                ]
+                ],
+                initComplete: function () {
+                    this.api().columns().every(function () {
+                        var column = this;
+                        if(column.footer().innerHTML != ""){
+                            var input = document.createElement("input");
+                            $(input).appendTo($(column.footer()).empty())
+                                .on('keyup', function () {
+                                    column.search($(this).val(), false, false, true).draw();
+                                });
+                        }
+                    });
+                },
             });
-        })
+        });
+
+        function activar(id) {
+            swal({
+                    title: '¿Estas seguro?',
+                    text: "¡Desea activar esta tarjeta!",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Si',
+                    cancelButtonText: 'No',
+                    confirmButtonClass: 'btn btn-success',
+                    cancelButtonClass: 'btn btn-danger m-l-10',
+                    buttonsStyling: false
+                },
+                function () {
+                    $.ajax({
+                        url: "{{route('tarjeta.regalo.activar')}}",
+                        data: {'id': id},
+                        type: 'POST',
+                        dataType: 'json',
+                        beforeSend: function () {
+                            cargando();
+                        },
+                        success: function (result) {
+                            if (result.estado) {
+                                swal(
+                                    {
+                                        title: 'Bien!!',
+                                        text: result.mensaje,
+                                        type: 'success',
+                                        confirmButtonColor: '#4fa7f3'
+                                    }
+                                );
+                                table.ajax.reload();
+                            } else if (result.estado == false) {
+                                swal(
+                                    'Error!!',
+                                    result.mensaje,
+                                    'error'
+                                )
+                            } else {
+                                html = '';
+                                for (i = 0; i < result.length; i++) {
+                                    html += result[i] + '\n\r';
+                                }
+                                swal(
+                                    'Error!!',
+                                    html,
+                                    'error'
+                                )
+                            }
+
+                        },
+                        error: function (xhr, status) {
+                            var message = "Error de ejecución: " + xhr.status + " " + xhr.statusText;
+                            swal(
+                                'Error!!',
+                                message,
+                                'error'
+                            )
+                        },
+                        // código a ejecutar sin importar si la petición falló o no
+                        complete: function (xhr, status) {
+                            fincarga();
+                        }
+                    });
+                });
+        }
     </script>
 @endsection
