@@ -22,6 +22,9 @@ class Tarjetas extends Model
     public static $TEXT_BLOQUE_TARJETAS_YA_EXITEN = "Las siguientes tarjetas ya están registradas: ";
     public static $TEXT_BLOQUE_TARJETA_YA_EXISTE = "La siguiente tarjeta ya está registrada: ";
 
+    public static $TEXT_SERVICIO_TARJETA_REGALO_SIN_PARAMETRIZACION = "Falta la parametrización del servicio Tarjeta regalo";
+    public static $TEXT_SIN_VALOR_PLASTICO = "Falta asignarle un valor al plático de la tarjeta (parametrización)";
+
     //
     protected $fillable = [
         'numero_tarjeta', 'cambioclave', 'password','persona_id','estado',
