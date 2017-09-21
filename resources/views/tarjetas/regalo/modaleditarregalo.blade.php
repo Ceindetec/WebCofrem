@@ -1,21 +1,27 @@
 <div id="modalcreartarjetas">
-    {{Form::open(['route'=>['tarjetas.crearp'], 'class'=>'form-horizontal', 'id'=>'creartarjetas'])}}
+    {{Form::model($detalle,['route'=>['tarjetas.crearp'], 'class'=>'form-horizontal', 'id'=>'creartarjetas'])}}
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h4 class="modal-title">Agregar Tarjeta</h4>
+        <h4 class="modal-title">Editar tarjeta regalo</h4>
     </div>
     <div class="modal-body">
         <div class="row">
             <div class="form-group">
                 <label class="col-md-2 control-label">Número de tarjeta</label>
                 <div class="col-md-10">
-                    {{Form::text('numero_tarjeta', null ,['class'=>'form-control', "required", "maxlength"=>"7", "data-parsley-type"=>"number", "tabindex"=>"1",'id'=>'numero_tarjeta'])}} <!-- "data-parsley-type"=>"number"] -->
+                {{Form::text('numero_tarjeta', null ,['class'=>'form-control', "required", "maxlength"=>"7", "data-parsley-type"=>"number", 'id'=>'numero_tarjeta','disabled'])}} <!-- "data-parsley-type"=>"number"] -->
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-2 control-label">Tipo de servicio</label>
+                <label class="col-md-2 control-label">Factura</label>
                 <div class="col-md-10">
-                    {{Form::select("servicio_codigo",$servicios,null,['class'=>'form-control ', "tabindex"=>"2",'id'=>'tarjeta_codigo', "required"])}}
+                {{Form::text('factura', null ,['class'=>'form-control', "required", "maxlength"=>"7", "data-parsley-type"=>"number", 'id'=>'numero_tarjeta','disabled'])}} <!-- "data-parsley-type"=>"number"] -->
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">Monto</label>
+                <div class="col-md-10">
+                {{Form::text('monto_inicial', null ,['class'=>'form-control money', "required", "maxlength"=>"10", "data-parsley-type"=>"number", "tabindex"=>"1",'id'=>'monto', "onkeypress"=>"return justNumbers(event)"])}} <!-- "data-parsley-type"=>"number"] -->
                 </div>
             </div>
 
@@ -29,7 +35,9 @@
 </div>
 
 <script>
+
     $(function () {
+        $('.money').mask('000.000.000.000.000', {reverse: true});
         $("#creartarjetas").parsley();
         $("#creartarjetas").submit(function (e) {
             e.preventDefault();

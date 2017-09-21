@@ -17,6 +17,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Yajra\Datatables\Datatables;
 
 
 class TarjetasRegaloController extends Controller {
@@ -584,5 +585,32 @@ class TarjetasRegaloController extends Controller {
 
     public function consultaTarjetasRegalo() {
         return view('tarjetas.regalo.consultaregalo');
+    }
+
+    public function gridConsulaTarjetaRegalo(){
+        $tarjetas = Tarjetas::join('tarjeta_servicios','tarjetas.numero_tarjeta','tarjeta_servicios.numero_tarjeta')
+            ->join('detalle_produtos','tarjetas.numero_tarjeta','detalle_produtos.numero_tarjeta')
+            ->where('tarjeta_servicios.servicio_codigo', Tarjetas::$CODIGO_SERVICIO_REGALO)
+            ->select(['detalle_produtos.monto_inicial','detalle_produtos.factura as fa','detalle_produtos.id as deta_id','tarjetas.*'])
+            ->get();
+
+        return Datatables::of($tarjetas)
+            ->addColumn('action',function ($tarjetas){
+                $acciones = "";
+                $acciones .='<div class="btn-group">';
+                $acciones .='<a data-modal type="button" class="btn btn-custom btn-xs">Gestionar</a>';
+                $acciones .='<a data-modal href="'.route('regalo.editar', $tarjetas->deta_id).'" type="button" class="btn btn-custom btn-xs">Editar</a>';
+                if($tarjetas->estado == 'C'){
+                    $acciones .='<a data-modal type="button" class="btn btn-custom btn-xs">Activar</a>';
+                }
+                $acciones .='</div>';
+                return $acciones;
+            })
+            ->make(true);
+    }
+
+    public function viewEditarRegalo($id){
+        $detalle = DetalleProdutos::find($id);
+        return view('tarjetas.regalo.modaleditarregalo', compact('detalle'));
     }
 }

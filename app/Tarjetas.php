@@ -3,6 +3,7 @@
 namespace creditocofrem;
 
 use Illuminate\Database\Eloquent\Model;
+use creditocofrem\DetalleProdutos;
 
 class Tarjetas extends Model
 {
@@ -33,5 +34,9 @@ class Tarjetas extends Model
     public function getTarjetaServicios()
     {
         return $this->hasMany('creditocofrem\TarjetaServicios','numero_tarjeta','numero_tarjeta');
+    }
+
+    public function getDetalleProductoRegalo(){
+        return $this->hasMany('creditocofrem\DetalleProdutos','numero_tarjeta','numero_tarjeta')->where('factura','<>',null);
     }
 }

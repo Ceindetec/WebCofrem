@@ -89,10 +89,7 @@
                 "language": {
                     "url": "{!!route('datatable_es')!!}"
                 },
-                ajax: {
-                    url: "{!!route('gridestablecimientos')!!}",
-                    "type": "get"
-                },
+                ajax: "{!!route('gridestablecimientos')!!}",
                 columns: [
                     {data: 'nit', name: 'nit'},
                     {data: 'razon_social', name: 'razon_social'},
