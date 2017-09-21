@@ -621,7 +621,6 @@ class TarjetasRegaloController extends Controller
             ->addColumn('action', function ($tarjetas) {
                 $acciones = "";
                 $acciones .= '<div class="btn-group">';
-                $acciones .= '<a data-modal type="button" class="btn btn-custom btn-xs">Gestionar</a>';
                 $acciones .= '<a data-modal href="' . route('regalo.editar', $tarjetas->deta_id) . '" type="button" class="btn btn-custom btn-xs">Editar</a>';
                 if ($tarjetas->estado == 'C') {
                     $acciones .= '<button type="button" class="btn btn-custom btn-xs" onclick="activar(' . $tarjetas->deta_id . ')">Activar</button>';
@@ -680,6 +679,12 @@ class TarjetasRegaloController extends Controller
         return $result;
     }
 
+
+    /**
+     * metodo que permite activar una tarjeta regalo en el sistema
+     * @param Request $request
+     * @return array
+     */
     public function activarTarjetaRegalo(Request $request)
     {
         $result = [];
