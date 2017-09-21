@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class DetalleTransaccion extends Model
 {
-    //
-    protected $table='detalle_transacciones';
+    public static $DESCRIPCION_ADMINISTRACION = "A";
+    public static $DESCRIPCION_PLASTICO = "P";
+    public static $DESCRIPCION_CONSUMO = "C";
+
+    protected $table = "detalle_transacciones";
 }

@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class HEstadoTransaccion extends Model
 {
-    //
-    protected $table='h_estado_transacciones';
+    public static $ESTADO_ACTIVO = "A";
+    public static $ESTADO_INACTIVO = "I";
+
+
+    protected $table = 'h_estado_transacciones';
 }
