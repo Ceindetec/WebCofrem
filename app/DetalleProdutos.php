@@ -3,9 +3,12 @@
 namespace creditocofrem;
 
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
-class DetalleProdutos extends Model
+class DetalleProdutos extends Model implements AuditableContract
 {
+    use Auditable;
     public static $ESTADO_INACTIVO = "I";
     public static $ESTADO_ACTIVO = "A";
     protected $fillable = [

@@ -17,9 +17,11 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Yajra\Datatables\Datatables;
 
 
-class TarjetasRegaloController extends Controller {
+class TarjetasRegaloController extends Controller
+{
 
     /**
      * metodo encargado de mostrar la vista principal para crear las Tarjetas
@@ -27,7 +29,8 @@ class TarjetasRegaloController extends Controller {
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function crearTarjetaRegalo() {
+    public function crearTarjetaRegalo()
+    {
         return view("tarjetas.regalo.individualmente");
     }
 
@@ -37,7 +40,8 @@ class TarjetasRegaloController extends Controller {
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function crearTarjetaBloque() {
+    public function crearTarjetaBloque()
+    {
         return view("tarjetas.regalo.bloque");
     }
 
@@ -49,7 +53,8 @@ class TarjetasRegaloController extends Controller {
      *
      * @return mixed
      */
-    public function autoCompleNumTarjeta(Request $request) {
+    public function autoCompleNumTarjeta(Request $request)
+    {
 
         $tarjetas = Tarjetas::where("numero_tarjeta", "like", "%" . $request->numero_tarjeta . "%")->get();
         if (count($tarjetas) == 0) {
@@ -59,7 +64,7 @@ class TarjetasRegaloController extends Controller {
             $arrayTarjetas = [];
             foreach ($tarjetas as $producto) {
                 $arrayTarjetas[] = ["value" => $producto->numero_tarjeta,
-                                    "data" => $producto->id,];
+                    "data" => $producto->id,];
             }
             $data["suggestions"] = $arrayTarjetas;
             $data["query"] = "Unit";
@@ -74,7 +79,8 @@ class TarjetasRegaloController extends Controller {
      *
      * @return array
      */
-    public function addTarjetaRegalo(Request $request) {
+    public function addTarjetaRegalo(Request $request)
+    {
 
         //quitamos la mascara de pesos al monto
         $monto = str_replace(".", "", $request->monto);
@@ -132,14 +138,14 @@ class TarjetasRegaloController extends Controller {
 
                 DB::beginTransaction();
                 $data = $this->crearTarjeteDetalleServicio($request->numero_tarjeta, $request->numero_factura, $monto,
-                                                           $banderaPagaPlastico, $valorPlatico,$banderaPagoAdmon,$valorAdmon);
+                    $banderaPagaPlastico, $valorPlatico, $banderaPagoAdmon, $valorAdmon);
 
                 DB::commit();
 
 
             } else {
                 $data = ["estado" => FALSE,
-                         "mensaje" => Tarjetas::$TEXT_RESULT_MONTO_SUPERADO];
+                    "mensaje" => Tarjetas::$TEXT_RESULT_MONTO_SUPERADO];
 
             }
 
@@ -147,14 +153,15 @@ class TarjetasRegaloController extends Controller {
             //            $data["mensaje"] = TRUE;
         } else {
             $data = ["estado" => FALSE,
-                     "mensaje" => Tarjetas::$TEXT_RESULT_FACTURA_Y_NUMTARJETA_EXISTEN];
+                "mensaje" => Tarjetas::$TEXT_RESULT_FACTURA_Y_NUMTARJETA_EXISTEN];
         }
 
         return $data;
     }
 
 
-    public function addTarjetaRegaloBloque(Request $request) {
+    public function addTarjetaRegaloBloque(Request $request)
+    {
 
         //quitamos la mascara de pesos al monto
         $monto = str_replace(".", "", $request->monto);
@@ -216,8 +223,8 @@ class TarjetasRegaloController extends Controller {
 
         if ($montoInicialTotal <= $factura["monto"]) {
             $collectionDetallesProducto = DetalleProdutos::where("factura", $request->numero_factura)
-              ->whereIn("numero_tarjeta", $arrayNumTarjetas)
-              ->get();
+                ->whereIn("numero_tarjeta", $arrayNumTarjetas)
+                ->get();
 
             if ($collectionDetallesProducto->count() == 0) {
 
@@ -226,7 +233,7 @@ class TarjetasRegaloController extends Controller {
                 foreach ($arrayNumTarjetas as $numTarjeta) {
 
                     $data = $this->crearTarjeteDetalleServicio($numTarjeta, $request->numero_factura, $monto,
-                                                               $banderaPagaPlastico, $valorPlatico,$banderaPagoAdmon,$valorAdmon);
+                        $banderaPagaPlastico, $valorPlatico, $banderaPagoAdmon, $valorAdmon);
 
                     if ($data["estado"] == FALSE) {
                         break;
@@ -237,11 +244,11 @@ class TarjetasRegaloController extends Controller {
             } else {
                 $data["estado"] = FALSE;
                 $data["mensaje"] = (($collectionDetallesProducto->count() > 1) ? Tarjetas::$TEXT_RESULT_FACTURA_Y_NUMTARJETA_EXISTENEN_BLOQUE : Tarjetas::$TEXT_RESULT_FACTURA_Y_NUMTARJETA_EXISTENE_BLOQUE) . $collectionDetallesProducto->implode('numero_tarjeta',
-                                                                                                                                                                                                                                                    ', ');
+                        ', ');
             }
         } else {
             $data = ["estado" => FALSE,
-                     "mensaje" => Tarjetas::$TEXT_RESULT_MONTO_SUPERADO];
+                "mensaje" => Tarjetas::$TEXT_RESULT_MONTO_SUPERADO];
         }
 
         return $data;
@@ -255,7 +262,8 @@ class TarjetasRegaloController extends Controller {
      *
      * @return string
      */
-    private function completarCeros($numero, $digitos) {
+    private function completarCeros($numero, $digitos)
+    {
 
         $num_tarjeta = $numero;
         while (strlen($num_tarjeta) < $digitos) {
@@ -264,11 +272,12 @@ class TarjetasRegaloController extends Controller {
         return $num_tarjeta;
     }
 
-    private function validarRegaloPagaPlastico() {
+    private function validarRegaloPagaPlastico()
+    {
 
         $pagaPlastico = PagaPlastico::where("servicio_codigo", Tarjetas::$CODIGO_SERVICIO_REGALO)
-          ->orderBy("id", "DESC")
-          ->first();
+            ->orderBy("id", "DESC")
+            ->first();
 
         if ($pagaPlastico != NULL) {
 
@@ -297,11 +306,12 @@ class TarjetasRegaloController extends Controller {
         return $data;
     }
 
-    private function validarRegaloPagaAdmon() {
+    private function validarRegaloPagaAdmon()
+    {
 
         $porcentajeAdmon = AdminisTarjetas::where("servicio_codigo", Tarjetas::$CODIGO_SERVICIO_REGALO)
-          ->orderBy("id", "DESC")
-          ->first();
+            ->orderBy("id", "DESC")
+            ->first();
 
         if ($porcentajeAdmon != NULL) {
 
@@ -323,11 +333,12 @@ class TarjetasRegaloController extends Controller {
         return $data;
     }
 
-    private function transaccionAdminstrativa($numero_tarjeta, $valor, $destalle_producto_id, $descripcion) {
+    private function transaccionAdminstrativa($numero_tarjeta, $valor, $destalle_producto_id, $descripcion)
+    {
         $transaccionAnterior = Transaccion::orderBy("id", "DESC")->first();
 
         if ($transaccionAnterior != NULL) {
-            $numeroTransaccion = intval($transaccionAnterior->numero_transaccion)+1;
+            $numeroTransaccion = intval($transaccionAnterior->numero_transaccion) + 1;
         } else {
             $numeroTransaccion = 1;
         }
@@ -384,7 +395,8 @@ class TarjetasRegaloController extends Controller {
                                                    $pagaPlastico,
                                                    $valorPlastico,
                                                    $pagoAdmon,
-                                                   $valorAdmon) {
+                                                   $valorAdmon)
+    {
 
         //buscamos si el munero de tarjeta existe en nuestros registros
         $tarjeta = Tarjetas::where("numero_tarjeta", $numero_tarjeta)->first();
@@ -397,10 +409,10 @@ class TarjetasRegaloController extends Controller {
                 $tarjeta = $data['tarjeta'];
 
                 $data = $this->crearTarjetaServicio($tarjeta->numero_tarjeta, Tarjetas::$ESTADO_TARJETA_INACTIVA,
-                                                    Tarjetas::$CODIGO_SERVICIO_REGALO);
+                    Tarjetas::$CODIGO_SERVICIO_REGALO);
 
                 $data = $this->crearHtarjeta($tarjeta->id, Tarjetas::$ESTADO_TARJETA_CREADA,
-                                             Tarjetas::$CODIGO_SERVICIO_REGALO);
+                    Tarjetas::$CODIGO_SERVICIO_REGALO);
 
                 $data = $this->crearDetalleProducto($tarjeta->numero_tarjeta, $monto, $numero_factura);
 
@@ -412,12 +424,12 @@ class TarjetasRegaloController extends Controller {
         } else {
 
             $tarjeta_servicio = TarjetaServicios::where("numero_tarjeta", $tarjeta->numero_tarjeta)
-              ->where("servicio_codigo", Tarjetas::$CODIGO_SERVICIO_REGALO)
-              ->first();
+                ->where("servicio_codigo", Tarjetas::$CODIGO_SERVICIO_REGALO)
+                ->first();
 
             if ($tarjeta_servicio == NULL) {
                 $data = $this->crearTarjetaServicio($tarjeta->numero_tarjeta, Tarjetas::$ESTADO_TARJETA_INACTIVA,
-                                                    Tarjetas::$CODIGO_SERVICIO_REGALO);
+                    Tarjetas::$CODIGO_SERVICIO_REGALO);
             }
 
             $data = $this->crearDetalleProducto($tarjeta->numero_tarjeta, $monto, $numero_factura);
@@ -428,16 +440,15 @@ class TarjetasRegaloController extends Controller {
         }
 
 
-        if ($data['estado'] == TRUE){
+        if ($data['estado'] == TRUE) {
             if ($pagaPlastico) {
                 $data = $this->transaccionAdminstrativa($num_tarjeta, $valorPlastico, $detalle_producto_id, DetalleTransaccion::$DESCRIPCION_PLASTICO);
             }
-            if($pagoAdmon){
-                $valorAdministracion =($monto * $valorAdmon)/100;
+            if ($pagoAdmon) {
+                $valorAdministracion = ($monto * $valorAdmon) / 100;
                 $data = $this->transaccionAdminstrativa($num_tarjeta, $valorAdministracion, $detalle_producto_id, DetalleTransaccion::$DESCRIPCION_ADMINISTRACION);
             }
         }
-
 
 
         return $data;
@@ -450,7 +461,8 @@ class TarjetasRegaloController extends Controller {
      *
      * @return mixed
      */
-    public function crearTarjeta($numero_tarjeta) {
+    public function crearTarjeta($numero_tarjeta)
+    {
 
         try {
             $tarjeta = new Tarjetas();
@@ -489,7 +501,8 @@ class TarjetasRegaloController extends Controller {
      *
      * @return mixed
      */
-    public function crearTarjetaServicio($numero_tarjeta, $name_estado, $servicio_codigo) {
+    public function crearTarjetaServicio($numero_tarjeta, $name_estado, $servicio_codigo)
+    {
 
         try {
             $tarjetaser = new TarjetaServicios();
@@ -518,7 +531,8 @@ class TarjetasRegaloController extends Controller {
      *
      * @return array
      */
-    public function crearHtarjeta($tarjeta_id, $name_estado, $servicio_codigo) {
+    public function crearHtarjeta($tarjeta_id, $name_estado, $servicio_codigo)
+    {
 
         try {
             $htarjetas = new Htarjetas();
@@ -557,7 +571,8 @@ class TarjetasRegaloController extends Controller {
      *
      * @return array
      */
-    public function crearDetalleProducto($numero_tarjeta, $monto, $factura) {
+    public function crearDetalleProducto($numero_tarjeta, $monto, $factura)
+    {
         try {
             $detalle_producto = new DetalleProdutos();
 
@@ -581,8 +596,122 @@ class TarjetasRegaloController extends Controller {
         return $data;
     }
 
-
-    public function consultaTarjetasRegalo() {
+    /**
+     * metodo que trae la vista para la consulta de servicios de tarjeta regalo creadas en el sistema
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function consultaTarjetasRegalo()
+    {
         return view('tarjetas.regalo.consultaregalo');
+    }
+
+    /**
+     * devuelve los datos para mostrar en la grid de los servicios de tarjeta regalo que hay en el sistema
+     * @return mixed
+     */
+    public function gridConsulaTarjetaRegalo()
+    {
+        $tarjetas = Tarjetas::join('tarjeta_servicios', 'tarjetas.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
+            ->join('detalle_produtos', 'tarjetas.numero_tarjeta', 'detalle_produtos.numero_tarjeta')
+            ->where('tarjeta_servicios.servicio_codigo', Tarjetas::$CODIGO_SERVICIO_REGALO)
+            ->select(['detalle_produtos.monto_inicial', 'detalle_produtos.factura as fa', 'detalle_produtos.id as deta_id', 'tarjetas.*'])
+            ->get();
+
+        return Datatables::of($tarjetas)
+            ->addColumn('action', function ($tarjetas) {
+                $acciones = "";
+                $acciones .= '<div class="btn-group">';
+                $acciones .= '<a data-modal type="button" class="btn btn-custom btn-xs">Gestionar</a>';
+                $acciones .= '<a data-modal href="' . route('regalo.editar', $tarjetas->deta_id) . '" type="button" class="btn btn-custom btn-xs">Editar</a>';
+                if ($tarjetas->estado == 'C') {
+                    $acciones .= '<button type="button" class="btn btn-custom btn-xs" onclick="activar(' . $tarjetas->deta_id . ')">Activar</button>';
+                }
+                $acciones .= '</div>';
+                return $acciones;
+            })
+            ->make(true);
+    }
+
+
+    //TODO: ES IMPORTANTE ESTO VA SOLO CON PERSONAS QUE TENGA PERMISO PARA HACERLO
+
+    /**
+     * trae la vista del modal para editar una tarjeta regalo
+     * @param $id id del detalle producto de la tarjeta regalo a editar
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function viewEditarRegalo($id)
+    {
+        $detalle = DetalleProdutos::find($id);
+        return view('tarjetas.regalo.modaleditarregalo', compact('detalle'));
+    }
+
+    /**
+     * metodo que permite editar una tarjeta regalo, aunque solo permite editar su monto
+     * @param Request $request
+     * @param $id
+     * @return array
+     */
+    public function editarRegalo(Request $request, $id)
+    {
+        $result = [];
+        DB::beginTransaction();
+        try {
+            $detalle = DetalleProdutos::find($id);
+            $detalle->monto_inicial = str_replace(".", "", $request->monto_inicial);
+            $detalle->save();
+            $detalle_trasacion = DetalleTransaccion::where('detalle_producto_id', $detalle->id)->where('descripcion', DetalleTransaccion::$DESCRIPCION_ADMINISTRACION)->first();
+            if ($detalle_trasacion != NULL) {
+                $administracion = AdminisTarjetas::where('servicio_codigo', Tarjetas::$CODIGO_SERVICIO_REGALO)
+                    ->where('estado', AdminisTarjetas::$ESTADO_ACTIVO)
+                    ->first();
+                $valorAdministracion = $detalle->monto_inicial * ($administracion->porcentace / 100);
+                $detalle_trasacion->valor = $valorAdministracion;
+                $detalle_trasacion->save();
+            }
+            DB::commit();
+            $result['estado'] = TRUE;
+            $result['mensaje'] = 'Actualizado satisfactoriamente';
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            $result['estado'] = TRUE;
+            $result['mensaje'] = 'No fue posible realizar la actualizacion ' . $exception->getMessage();
+        }
+        return $result;
+    }
+
+    public function activarTarjetaRegalo(Request $request)
+    {
+        $result = [];
+        DB::beginTransaction();
+        try {
+            $detalle = DetalleProdutos::find($request->id);
+            $detalle->fecha_activacion = Carbon::now();
+            $detalle->fecha_vencimiento = Carbon::now()->addYear();
+            $detalle->estado = DetalleProdutos::$ESTADO_ACTIVO;
+            $detalle->save();
+            $tarjeta_servicio = TarjetaServicios::where('numero_tarjeta', $detalle->numero_tarjeta)->first();
+            $tarjeta_servicio->estado = TarjetaServicios::$ESTADO_ACTIVO;
+            $tarjeta_servicio->save();
+            $tarjeta = Tarjetas::where('numero_tarjeta',$detalle->numero_tarjeta)->first();
+            $tarjeta->estado = Tarjetas::$ESTADO_TARJETA_ACTIVA;
+            $tarjeta->save();
+            $htarjetas = new Htarjetas();
+            $htarjetas->motivo = Tarjetas::$TEXT_DEFAULT_MOTIVO_ACTIVACION_TARJETA;
+            $htarjetas->estado = Tarjetas::$ESTADO_TARJETA_ACTIVA;
+            $htarjetas->fecha = Carbon::now();
+            $htarjetas->servicio_codigo = Tarjetas::$CODIGO_SERVICIO_REGALO;
+            $htarjetas->user_id = Auth::User()->id;
+            $htarjetas->tarjetas_id = $tarjeta->id;
+            $htarjetas->save();
+            DB::commit();
+            $result['estado'] = TRUE;
+            $result['mensaje'] = 'La tarjeta ha sido activada satisfactoriamente.';
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            $result['estado'] = FALSE;
+            $result['mensaje'] = 'No fue posible activar la tarjeta '.$exception->getMessage();
+        }
+        return $result;
     }
 }
