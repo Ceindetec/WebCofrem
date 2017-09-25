@@ -14,4 +14,5 @@ class DetalleProdutos extends Model implements AuditableContract
     protected $fillable = [
         'numero_tarjeta', 'fecha_cracion', 'monto_inicial', 'contrato_emprs_id', 'user_id', 'estado',
     ];
+
 }

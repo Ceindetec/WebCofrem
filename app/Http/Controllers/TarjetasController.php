@@ -3,7 +3,9 @@
 namespace creditocofrem\Http\Controllers;
 
 use Carbon\Carbon;
+use creditocofrem\DetalleProdutos;
 use creditocofrem\Htarjetas;
+use creditocofrem\Motivo;
 use creditocofrem\Tarjetas;
 use creditocofrem\Servicios;
 use creditocofrem\TarjetaServicios;
@@ -17,59 +19,59 @@ class TarjetasController extends Controller
     //se listan las tarjetas registradas
     public function index()
     {
-        $totalRegalo = Tarjetas::join('tarjeta_servicios','tarjetas.numero_tarjeta','tarjeta_servicios.numero_tarjeta')
-            ->where('tarjeta_servicios.servicio_codigo','R')
-            ->where('tarjetas.persona_id',null)
+        $totalRegalo = Tarjetas::join('tarjeta_servicios', 'tarjetas.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
+            ->where('tarjeta_servicios.servicio_codigo', 'R')
+            ->where('tarjetas.persona_id', null)
             ->get();
-        $totalRegaloSin = Tarjetas::join('tarjeta_servicios','tarjetas.numero_tarjeta','tarjeta_servicios.numero_tarjeta')
-            ->where('tarjeta_servicios.servicio_codigo','R')
-            ->where('tarjetas.estado','C')
-            ->where('tarjetas.persona_id',null)
+        $totalRegaloSin = Tarjetas::join('tarjeta_servicios', 'tarjetas.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
+            ->where('tarjeta_servicios.servicio_codigo', 'R')
+            ->where('tarjetas.estado', 'C')
+            ->where('tarjetas.persona_id', null)
             ->get();
-        $totalRegaloAsin = Tarjetas::join('tarjeta_servicios','tarjetas.numero_tarjeta','tarjeta_servicios.numero_tarjeta')
-            ->where('tarjeta_servicios.servicio_codigo','R')
-            ->where('tarjetas.estado','<>','C')
-            ->where('tarjetas.persona_id',null)
+        $totalRegaloAsin = Tarjetas::join('tarjeta_servicios', 'tarjetas.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
+            ->where('tarjeta_servicios.servicio_codigo', 'R')
+            ->where('tarjetas.estado', '<>', 'C')
+            ->where('tarjetas.persona_id', null)
             ->get();
-        $totalBono = Tarjetas::join('tarjeta_servicios','tarjetas.numero_tarjeta','tarjeta_servicios.numero_tarjeta')
-            ->leftJoin('personas','tarjetas.persona_id','personas.id')
-            ->where('tarjeta_servicios.servicio_codigo','B')
-            ->where('tarjetas.persona_id',null)
-            ->orWhere('personas.tipo_persona','T')
+        $totalBono = Tarjetas::join('tarjeta_servicios', 'tarjetas.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
+            ->leftJoin('personas', 'tarjetas.persona_id', 'personas.id')
+            ->where('tarjeta_servicios.servicio_codigo', 'B')
+            ->where('tarjetas.persona_id', null)
+            ->orWhere('personas.tipo_persona', 'T')
             ->get();
-        $totalBonoSin = Tarjetas::join('tarjeta_servicios','tarjetas.numero_tarjeta','tarjeta_servicios.numero_tarjeta')
-            ->leftJoin('personas','tarjetas.persona_id','personas.id')
-            ->where('tarjeta_servicios.servicio_codigo','B')
-            ->where('tarjetas.estado','C')
-            ->where('tarjetas.persona_id',null)
-            ->orWhere('personas.tipo_persona','T')
+        $totalBonoSin = Tarjetas::join('tarjeta_servicios', 'tarjetas.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
+            ->leftJoin('personas', 'tarjetas.persona_id', 'personas.id')
+            ->where('tarjeta_servicios.servicio_codigo', 'B')
+            ->where('tarjetas.estado', 'C')
+            ->where('tarjetas.persona_id', null)
+            ->orWhere('personas.tipo_persona', 'T')
             ->get();
-        $totalBonoAsin = Tarjetas::join('tarjeta_servicios','tarjetas.numero_tarjeta','tarjeta_servicios.numero_tarjeta')
-            ->leftJoin('personas','tarjetas.persona_id','personas.id')
-            ->where('tarjeta_servicios.servicio_codigo','B')
-            ->where('tarjetas.estado','<>','C')
-            ->where('tarjetas.persona_id',null)
-            ->orWhere('personas.tipo_persona','T')
+        $totalBonoAsin = Tarjetas::join('tarjeta_servicios', 'tarjetas.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
+            ->leftJoin('personas', 'tarjetas.persona_id', 'personas.id')
+            ->where('tarjeta_servicios.servicio_codigo', 'B')
+            ->where('tarjetas.estado', '<>', 'C')
+            ->where('tarjetas.persona_id', null)
+            ->orWhere('personas.tipo_persona', 'T')
             ->get();
-        $totalCupo = Tarjetas::join('tarjeta_servicios','tarjetas.numero_tarjeta','tarjeta_servicios.numero_tarjeta')
-            ->leftJoin('personas','tarjetas.persona_id','personas.id')
-            ->where('tarjeta_servicios.servicio_codigo','A')
-            ->where('tarjetas.persona_id',null)
-            ->orWhere('personas.tipo_persona','A')
+        $totalCupo = Tarjetas::join('tarjeta_servicios', 'tarjetas.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
+            ->leftJoin('personas', 'tarjetas.persona_id', 'personas.id')
+            ->where('tarjeta_servicios.servicio_codigo', 'A')
+            ->where('tarjetas.persona_id', null)
+            ->orWhere('personas.tipo_persona', 'A')
             ->get();
-        $totalCupoSin = Tarjetas::join('tarjeta_servicios','tarjetas.numero_tarjeta','tarjeta_servicios.numero_tarjeta')
-            ->leftJoin('personas','tarjetas.persona_id','personas.id')
-            ->where('tarjeta_servicios.servicio_codigo','A')
-            ->where('tarjetas.estado','C')
-            ->where('tarjetas.persona_id',null)
-            ->orWhere('personas.tipo_persona','A')
+        $totalCupoSin = Tarjetas::join('tarjeta_servicios', 'tarjetas.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
+            ->leftJoin('personas', 'tarjetas.persona_id', 'personas.id')
+            ->where('tarjeta_servicios.servicio_codigo', 'A')
+            ->where('tarjetas.estado', 'C')
+            ->where('tarjetas.persona_id', null)
+            ->orWhere('personas.tipo_persona', 'A')
             ->get();
-        $totalCupoAsin = Tarjetas::join('tarjeta_servicios','tarjetas.numero_tarjeta','tarjeta_servicios.numero_tarjeta')
-            ->leftJoin('personas','tarjetas.persona_id','personas.id')
-            ->where('tarjeta_servicios.servicio_codigo','A')
-            ->where('tarjetas.estado','<>','C')
-            ->where('tarjetas.persona_id',null)
-            ->orWhere('personas.tipo_persona','A')
+        $totalCupoAsin = Tarjetas::join('tarjeta_servicios', 'tarjetas.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
+            ->leftJoin('personas', 'tarjetas.persona_id', 'personas.id')
+            ->where('tarjeta_servicios.servicio_codigo', 'A')
+            ->where('tarjetas.estado', '<>', 'C')
+            ->where('tarjetas.persona_id', null)
+            ->orWhere('personas.tipo_persona', 'A')
             ->get();
         return view('tarjetas.listatarjetas',
             compact('totalRegalo',
@@ -90,13 +92,12 @@ class TarjetasController extends Controller
         $tarjetas = Tarjetas::all();
 
         return Datatables::of($tarjetas)
-            ->addColumn('servicios',function ($tarjetas){
-                $tar_ser='';
-                foreach ($tarjetas->getTarjetaServicios as $servicio)
-                {
-                    if($tar_ser!="")
-                        $tar_ser.=", ";
-                    $tar_ser.=$servicio->getServicio->descripcion;
+            ->addColumn('servicios', function ($tarjetas) {
+                $tar_ser = '';
+                foreach ($tarjetas->getTarjetaServicios as $servicio) {
+                    if ($tar_ser != "")
+                        $tar_ser .= ", ";
+                    $tar_ser .= $servicio->getServicio->descripcion;
                 }
                 return $tar_ser;
             })
@@ -106,7 +107,6 @@ class TarjetasController extends Controller
                 //  $acciones="--";
                 return $acciones;
             })
-
             ->make(true);
     }
 
@@ -193,7 +193,7 @@ class TarjetasController extends Controller
             $result['mensaje'] = 'No fue posible crear el historial de tarjeta' . $exception->getMessage();//. $exception->getMessage()
             \DB::rollBack();
         }
-         return $result;
+        return $result;
     }
 
     //metodo para insertar la historia de la tarjeta, por cambio de estado: insertar en bd
@@ -223,7 +223,7 @@ class TarjetasController extends Controller
             $result['mensaje'] = 'No fue posible crear el servicio de la tarjeta' . $exception->getMessage();//. $exception->getMessage()
             \DB::rollBack();
         }
-         return $result;
+        return $result;
     }
 
     //metodo para llamar a la vista modal para editar la info de la tarjeta
@@ -258,7 +258,7 @@ class TarjetasController extends Controller
     //metodo para llamar a la vista modal para crear tarjetas en bloque - masivo
     public function viewCrearTarjetaBloque(Request $request)
     {
-       // $tipo_tarjetas = TipoTarjetas::pluck('descripcion', 'codigo');
+        // $tipo_tarjetas = TipoTarjetas::pluck('descripcion', 'codigo');
         //return view('tarjetas.modalcreartarjetabloque', compact(['tipo_tarjetas']));
         $servicios = Servicios::pluck('descripcion', 'codigo');
         return view('tarjetas.modalcreartarjetabloque', compact(['servicios']));
@@ -290,7 +290,7 @@ class TarjetasController extends Controller
                     return $validator->errors()->all();
                 }
                 $tarjetas->estado = 'C';
-               // $tarjetas->tarjeta_codigo = $request->tarjeta_codigo;
+                // $tarjetas->tarjeta_codigo = $request->tarjeta_codigo;
                 $tarjetas->numero_tarjeta = $codigo;
                 $ultimos = substr($codigo, -4);
                 //$tarjetas->password = bcrypt($ultimos);
@@ -316,6 +316,56 @@ class TarjetasController extends Controller
             \DB::rollBack();
         }
         return $result;
+    }
+
+    /**
+     * metodo que trae la vista de gestiononar un detalle producto
+     * @param $id id del detalle producto a gestionar
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function gestionarTarjeta($id)
+    {
+        $detalleproducto = DetalleProdutos::find($id);
+        return view('tarjetas.modalgestionartarjeta', compact('detalleproducto'));
+    }
+
+    /**
+     * metodo que trae la vista para duplicar tarjetas
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function viewDuplicarTarjeta()
+    {
+        return view('tarjetas.duplicadotarjeta');
+    }
+
+    /**
+     * trae la informacion de todas las tarjetas en la grid, para luego duplicar la que se necesite
+     * @return mixed
+     */
+    public function gridTarjetasDuplicar()
+    {
+        $tarjetas = Tarjetas::where('estado', Tarjetas::$ESTADO_TARJETA_ACTIVA)->get();
+        return Datatables::of($tarjetas)
+            ->addColumn('servicios', function ($tarjetas) {
+                $tar_ser = '';
+                foreach ($tarjetas->getTarjetaServicios as $servicio) {
+                    if ($tar_ser != "")
+                        $tar_ser .= ", ";
+                    $tar_ser .= $servicio->getServicio->descripcion;
+                }
+                return $tar_ser;
+            })
+            ->addColumn('action', function ($tarjetas) {
+                return '<a href="' . route('tarjetas.modalduplicar',$tarjetas->id) . '" data-modal class="btn btn-xs btn-custom">Duplicar</a>';
+            })
+            ->make(true);
+    }
+
+    public function viewModalDuplicarTarjeta($id)
+    {
+        $tarjeta = Tarjetas::find($id);
+        $motivos = Motivo::where('tipo', Motivo::$MOTIVO_TIPO_DUPLICADO)->pluck('motivo','codigo');
+        return view('tarjetas.modalduplicartarjeta', compact('tarjeta', 'motivos'));
     }
 
 }
