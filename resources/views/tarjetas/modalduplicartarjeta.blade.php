@@ -1,31 +1,32 @@
-<div id="modaleditartarjetas">
+<div id="modalgestionartarjetas">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h4 class="modal-title">Editar Tarjeta</h4>
+        <h4 class="modal-title">Duplicar tarjeta {{$tarjeta->numero_tarjeta}}</h4>
     </div>
     <div class="modal-body">
         <div class="row">
-            <div class="form-group">
-                <label class="col-md-2 control-label">Número de tarjeta</label>
-                <div class="col-md-10">
-                {{Form::text('numero_tarjeta', null ,['class'=>'form-control',  "id"=>"numero_tarjeta","tabindex"=>"1","required", "maxlength"=>"7", "data-parsley-type"=>"number","readonly", "disabled"])}} <!-- "data-parsley-type"=>"number"] -->
+            <div class="col-md-12">
+                {{Form::open(['route'=>['tarjetas.editarp',$tarjeta->id], 'class'=>'form-horizontal', 'id'=>'editartarjetas'])}}
+                <div class="form-group">
+                    <label for="estado">Numero de la nueva tarjeta</label>
+                    {{Form::text('numero_tarjeta',null,['class'=>'form-control'])}}
                 </div>
-            </div>
-
-            <div class="form-group">
-                <label class="col-md-2 control-label">Tipo</label>
-                <div class="col-md-10">
-                    {{Form::select('tipo', ['A' => 'Afiliado', 'R' => 'Regalo', 'B' => 'Bono'],null, ['class'=>'form-control',"id"=>"tipo", "required", "tabindex"=>"2"])}}
+                <div class="form-group">
+                    <label for="estado">Motivo</label>
+                    {{Form::select('motivo',$motivos,null,['class'=>'form-control'])}}
                 </div>
+                <div class="form-group">
+                    <label for="estado">Nota</label>
+                    {{Form::textarea('nota',null,['class'=>'form-control', "rows"=>"2"])}}
+                </div>
+                {{Form::close()}}
             </div>
-
         </div>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Cerrar</button>
         <button type="submit" class="btn btn-custom waves-effect waves-light">Guardar</button>
     </div>
-    {{Form::close()}}
 </div>
 
 <script>
