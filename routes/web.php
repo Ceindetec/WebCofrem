@@ -134,11 +134,20 @@ Route::group(['middleware' => 'auth'], function () {
     /*INICIA CONSULTA TARJETA REGALO*/
     Route::get('tarjetas/regalo/consulta', 'TarjetasRegaloController@consultaTarjetasRegalo')->name('consultaregalo');
     Route::get('tarjetas/regalo/gridconsultatarjetaregalo', 'TarjetasRegaloController@gridConsulaTarjetaRegalo')->name('gridconsultatarjetaregalo');
-    route::get('tarjetas/regalo/editar/{id}','TarjetasRegaloController@viewEditarRegalo')->name('regalo.editar');
-    route::post('tarjetas/regalo/editar/{id}','TarjetasRegaloController@editarRegalo');
-    route::post('tarjetas/regalo/activar','TarjetasRegaloController@activarTarjetaRegalo')->name('tarjeta.regalo.activar');
+    Route::get('tarjetas/regalo/editar/{id}','TarjetasRegaloController@viewEditarRegalo')->name('regalo.editar');
+    Route::post('tarjetas/regalo/editar/{id}','TarjetasRegaloController@editarRegalo');
+    Route::post('tarjetas/regalo/activar','TarjetasRegaloController@activarTarjetaRegalo')->name('tarjeta.regalo.activar');
     /*FINALIZA CONSULTA TARJETA REGALO*/
 
+    /*INICIA GESTION DE TAARJETA*/
+    Route::get('targetas/gestionar/{id}','TarjetasController@gestionarTarjeta')->name('gestionarTarjeta');
+    /*FINALIZA GESTION DE TARJETA*/
+
+    /*INICIA DUPLICADO DE TARJETAS*/
+    Route::get('tarjetas/duplicar','TarjetasController@viewDuplicarTarjeta')->name('tarjetas.duplicar');
+    Route::get('tarjetas/duplicar/gridtarjetasduplicar','TarjetasController@gridTarjetasDuplicar')->name('gridtarjetasduplicar');
+    Route::get('tarjetas/duplicar/modal/{id}','TarjetasController@viewModalDuplicarTarjeta')->name('tarjetas.modalduplicar');
+    /*FINALIZA DUPLICADO DE TARJETAS*/
 
     /*combobox*/
     Route::get('select/permisos',"HomeController@selectpermisos")->name('selectpermisos');

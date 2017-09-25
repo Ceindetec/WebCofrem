@@ -34,6 +34,7 @@
         <ul class="nav-second-level nav collapse in" aria-expanded="true" style="">
             <li><a href="{{route('tarjetas.parametros')}}">Parametrizacion</a></li>
             <li><a href="{{route('tarjetas')}}">Inventario</a></li>
+            <li><a href="{{route('tarjetas.duplicar')}}">Duplicado</a></li>
             <li><a href="javascript: void(0);" aria-expanded="true">Regalo <span class="fa arrow"></span></a>
                 <ul class="nav-third-level nav collapse" aria-expanded="false">
                     <li><a href="{{route('crearTarjetaRegalo')}}">Individualmente</a></li>
