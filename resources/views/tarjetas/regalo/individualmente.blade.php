@@ -22,7 +22,7 @@
                             <div class="form-group">
                                 <label for="nit" class="col-sm-3 control-label">NIT</label>
                                 <div class="col-sm-7">
-                                    {{Form::text('nit', null ,['class'=>'form-control', "required", "required","placeholder"=>"NIT", "maxlength"=>"15"])}}
+                                    {{Form::text('nit', null ,['class'=>'form-control', "required", "required","placeholder"=>"NIT", "maxlength"=>"15", "onkeypress"=>"return justNumbers(event)"])}}
                                 </div>
                             </div>
                             <div class="form-group">
@@ -35,8 +35,8 @@
                             <div class="form-group">
                                 <label for="numero_tarjeta" class="col-sm-3 control-label">Número Tarjeta</label>
                                 <div class="col-sm-7">
-{{--                                    {{Form::text('numero_tarjeta', null ,['class'=>'form-control','id'=>'numero_tarjeta', "required","placeholder"=>"Número Tarjeta", "maxlength"=>"7", "onkeypress"=>"return justNumbers(event)"])}}--}}
-                                    <input type="text" class="form-control" id="numero_tarjeta" name="numero_tarjeta" placeholder="Número Tarjeta">
+                                    {{Form::text('numero_tarjeta', null ,['class'=>'form-control','id'=>'numero_tarjeta', "required","placeholder"=>"Número Tarjeta", "maxlength"=>"6", "onkeypress"=>"return justNumbers(event)"])}}
+                                    {{--<input type="text" class="form-control" id="numero_tarjeta" name="numero_tarjeta" placeholder="Número Tarjeta">--}}
                                 </div>
                             </div>
                             <div class="form-group">

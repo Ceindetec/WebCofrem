@@ -23,7 +23,7 @@
                                 <div class="form-group">
                                     <label for="nit" class="col-sm-3 control-label">NIT</label>
                                     <div class="col-sm-7">
-                                        {{Form::text('nit', null ,['class'=>'form-control', "required", "required","placeholder"=>"NIT", "maxlength"=>"15"])}}
+                                        {{Form::text('nit', null ,['class'=>'form-control', "required", "required","placeholder"=>"NIT", "maxlength"=>"15", "onkeypress"=>"return justNumbers(event)"])}}
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -36,7 +36,7 @@
                                 <div class="form-group">
                                     <label for="numero_tarjeta_inicial" class="col-sm-3 control-label">Número Tarjeta Inicial</label>
                                     <div class="col-sm-7">
-                                    {{Form::text('numero_tarjeta_inicial', null ,['class'=>'form-control', "required","placeholder"=>"Número de la primera tarjeta", "maxlength"=>"7", "onkeypress"=>"return justNumbers(event)"])}}
+                                    {{Form::text('numero_tarjeta_inicial', null ,['class'=>'form-control', "required","placeholder"=>"Número de la primera tarjeta", "maxlength"=>"6", "onkeypress"=>"return justNumbers(event)"])}}
                                     </div>
                                 </div>
                                 <div class="form-group">
