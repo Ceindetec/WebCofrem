@@ -8,6 +8,7 @@
     <link href="{{asset('plugins/datatables/dataTables.colVis.css')}}" rel="stylesheet" type="text/css"/>
     <link href="{{asset('plugins/datatables/dataTables.bootstrap.min.css')}}" rel="stylesheet" type="text/css"/>
     <link href="{{asset('plugins/datatables/fixedColumns.dataTables.min.css')}}" rel="stylesheet" type="text/css"/>
+    {!!Html::style('plugins/jquery-autocomplete/jquery.autocomplete.css')!!}
 @endsection
 
 @section('contenido')
@@ -68,6 +69,7 @@
     <script src="{{asset('plugins/datatables/dataTables.colVis.js')}}"></script>
     <script src="{{asset('plugins/datatables/dataTables.fixedColumns.min.js')}}"></script>
     <script src="{{asset('plugins/jQuery-Mask-Plugin/dist/jquery.mask.min.js')}}"></script>
+    {!!Html::script('plugins/jquery-autocomplete/jquery.autocomplete.min.js')!!}
 
     <script>
         var table;
@@ -116,72 +118,5 @@
                 },
             });
         });
-
-        function activar(id) {
-            swal({
-                    title: '¿Estas seguro?',
-                    text: "¡Desea activar esta tarjeta!",
-                    type: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Si',
-                    cancelButtonText: 'No',
-                    confirmButtonClass: 'btn btn-success',
-                    cancelButtonClass: 'btn btn-danger m-l-10',
-                    buttonsStyling: false
-                },
-                function () {
-                    $.ajax({
-                        url: "{{route('tarjeta.regalo.activar')}}",
-                        data: {'id': id},
-                        type: 'POST',
-                        dataType: 'json',
-                        beforeSend: function () {
-                            cargando();
-                        },
-                        success: function (result) {
-                            if (result.estado) {
-                                swal(
-                                    {
-                                        title: 'Bien!!',
-                                        text: result.mensaje,
-                                        type: 'success',
-                                        confirmButtonColor: '#4fa7f3'
-                                    }
-                                );
-                                table.ajax.reload();
-                            } else if (result.estado == false) {
-                                swal(
-                                    'Error!!',
-                                    result.mensaje,
-                                    'error'
-                                )
-                            } else {
-                                html = '';
-                                for (i = 0; i < result.length; i++) {
-                                    html += result[i] + '\n\r';
-                                }
-                                swal(
-                                    'Error!!',
-                                    html,
-                                    'error'
-                                )
-                            }
-
-                        },
-                        error: function (xhr, status) {
-                            var message = "Error de ejecución: " + xhr.status + " " + xhr.statusText;
-                            swal(
-                                'Error!!',
-                                message,
-                                'error'
-                            )
-                        },
-                        // código a ejecutar sin importar si la petición falló o no
-                        complete: function (xhr, status) {
-                            fincarga();
-                        }
-                    });
-                });
-        }
     </script>
 @endsection

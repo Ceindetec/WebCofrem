@@ -11,6 +11,7 @@ class Tarjetas extends Model
     public static $ESTADO_TARJETA_CREADA = "C";
     public static $ESTADO_TARJETA_ACTIVA = "A";
     public static $ESTADO_TARJETA_INACTIVA = "I";
+    public static $ESTADO_TARJETA_ANULADA = "N";
     public static $CODIGO_SERVICIO_REGALO = "R";
     public static $CODIGO_SERVICIO_AFILIADO = "A";
     public static $CODIGO_SERVICIO_BONO = "B";
