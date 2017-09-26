@@ -55,7 +55,6 @@ class TarjetasRegaloController extends Controller
      */
     public function autoCompleNumTarjeta(Request $request)
     {
-
         $tarjetas = Tarjetas::where("numero_tarjeta", "like", "%" . $request->numero_tarjeta . "%")->get();
         if (count($tarjetas) == 0) {
             $data["query"] = "Unit";
