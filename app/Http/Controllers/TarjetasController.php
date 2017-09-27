@@ -4,6 +4,7 @@ namespace creditocofrem\Http\Controllers;
 
 use Carbon\Carbon;
 use creditocofrem\DetalleProdutos;
+use creditocofrem\Duplicado;
 use creditocofrem\Htarjetas;
 use creditocofrem\Motivo;
 use creditocofrem\Tarjetas;
@@ -13,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Yajra\Datatables\Datatables;
 use Facades\creditocofrem\Encript;
+use Illuminate\Support\Facades\DB;
 
 class TarjetasController extends Controller
 {
@@ -356,16 +358,122 @@ class TarjetasController extends Controller
                 return $tar_ser;
             })
             ->addColumn('action', function ($tarjetas) {
-                return '<a href="' . route('tarjetas.modalduplicar',$tarjetas->id) . '" data-modal class="btn btn-xs btn-custom">Duplicar</a>';
+                return '<a href="' . route('tarjetas.modalduplicar', $tarjetas->id) . '" data-modal class="btn btn-xs btn-custom">Duplicar</a>';
             })
             ->make(true);
     }
 
+    /**
+     * trae la vista para el modal del formulario para duplicar una tarjeta
+     * @param $id id de la tarjeta que se quiere sacar un duplicado
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function viewModalDuplicarTarjeta($id)
     {
         $tarjeta = Tarjetas::find($id);
-        $motivos = Motivo::where('tipo', Motivo::$MOTIVO_TIPO_DUPLICADO)->pluck('motivo','codigo');
+        $motivos = Motivo::where('tipo', Motivo::$MOTIVO_TIPO_DUPLICADO)->pluck('motivo', 'codigo');
         return view('tarjetas.modalduplicartarjeta', compact('tarjeta', 'motivos'));
+    }
+
+    /**
+     * metodo para el autocomplete del formulario en el campo numero de tarjeta
+     * @param Request $request
+     * @return mixed
+     */
+    public function autoCompleteTarjetaDuplicado(Request $request)
+    {
+
+        $tarjetas = Tarjetas::where("numero_tarjeta", "like", "%" . $request->numero_tarjeta . "%")->where('estado','C')->get();
+        if (count($tarjetas) == 0) {
+            $data["query"] = "Unit";
+            $data["suggestions"] = [];
+        } else {
+            $arrayTarjetas = [];
+            foreach ($tarjetas as $producto) {
+                $arrayTarjetas[] = ["value" => $producto->numero_tarjeta,
+                    "data" => $producto->id,];
+            }
+            $data["suggestions"] = $arrayTarjetas;
+            $data["query"] = "Unit";
+        }
+        return $data;
+    }
+
+    /**
+     * metodo que procesa los datos del formulario para duplicar una tarjeta
+     * @param Request $request datos referente a la nueva tarjeta
+     * @param $id id de la tarjeta que se quire duplicar
+     * @return array
+     */
+    public function duplicarTarjeta(Request $request, $id){
+        $result = [];
+        DB::beginTransaction();
+        $exiteTarjeta = Tarjetas::where('numero_tarjeta',$request->numero_tarjeta)->where('estado',Tarjetas::$ESTADO_TARJETA_CREADA)->first();
+        if(count($exiteTarjeta)==0){
+            $result['estado'] = FALSE;
+            $result['mensaje'] = 'El numero de tarjeta no existe en el inventario';
+            return $result;
+        }
+        try{
+            $oltarjeta = Tarjetas::find($id);
+            $motivo = Motivo::where('codigo',$request->motivo)->first();
+            $duplicado = new Duplicado();
+            $duplicado->oldtarjeta = $oltarjeta->numero_tarjeta;
+            $duplicado->newtarjeta = $request->numero_tarjeta;
+            $duplicado->fecha = Carbon::now();
+            $duplicado->save();
+            $servicios = TarjetaServicios::where('numero_tarjeta',$oltarjeta->numero_tarjeta)->get();
+            foreach ($servicios as $servicio){
+                $servicioNewTarjeta = TarjetaServicios::where('numero_tarjeta',$request->numero_tarjeta)->where('servicio_codigo',$servicio->servicio_codigo)->first();
+                if(count($servicioNewTarjeta)==0){
+                    $newServicio = new TarjetaServicios();
+                    $newServicio->numero_tarjeta = $request->numero_tarjeta;
+                    $newServicio->servicio_codigo = $servicio->servicio_codigo;
+                    $newServicio->estado = $servicio->estado;
+                    $newServicio->save();
+                }else{
+                    $servicioNewTarjeta->estado = $servicio->estado;
+                    $servicioNewTarjeta->save();
+                }
+            }
+            TarjetaServicios::where('numero_tarjeta',$oltarjeta->numero_tarjeta)->update(['estado'=>TarjetaServicios::$ESTADO_ANULADA]);
+            $detallesProductos = DetalleProdutos::where('numero_tarjeta',$oltarjeta->numero_tarjeta)->get();
+            foreach ($detallesProductos as $detallesProducto){
+                $newDetalleProducto = new DetalleProdutos($detallesProducto->toArray());
+                $newDetalleProducto->numero_tarjeta = $request->numero_tarjeta;
+                $newDetalleProducto->save();
+            }
+            DetalleProdutos::where('numero_tarjeta',$oltarjeta->numero_tarjeta)->update(['estado'=>DetalleProdutos::$ESTADO_ANULADO]);
+            $duplicadoTarjeta = Tarjetas::where('numero_tarjeta',$request->numero_tarjeta)->first();
+            $duplicadoTarjeta->estado = $oltarjeta->estado;
+            $duplicadoTarjeta->save();
+            $oltarjeta->estado = Tarjetas::$ESTADO_TARJETA_ANULADA;
+            $oltarjeta->save();
+            $htarjeta = new Htarjetas();
+            $htarjeta->motivo = $motivo->motivo;
+            $htarjeta->tarjetas_id = $oltarjeta->id;
+            $htarjeta->user_id = Auth::user()->id;
+            $htarjeta->nota = $request->nota;
+            $htarjeta->estado = Tarjetas::$ESTADO_TARJETA_ANULADA;
+            $htarjeta->fecha = Carbon::now();
+            $htarjeta->save();
+            $htarjeta = new Htarjetas();
+            $htarjeta->motivo = $motivo->motivo;
+            $htarjeta->tarjetas_id = $oltarjeta->id;
+            $htarjeta->user_id = Auth::user()->id;
+            $htarjeta->nota = $request->nota;
+            $htarjeta->estado = $duplicadoTarjeta->estado;
+            $htarjeta->fecha = Carbon::now();
+            $htarjeta->save();
+            DB::commit();
+            $result['estado'] = TRUE;
+            $result['mensaje'] = 'Duplicado de tarjeta creado satisfactoriamente';
+        }catch (\Exception $exception){
+            DB::rollBack();
+            $result['estado'] = FALSE;
+            $result['mensaje'] = 'Error durante la operacion '.$exception->getMessage();
+        }
+        return $result;
     }
 
 }

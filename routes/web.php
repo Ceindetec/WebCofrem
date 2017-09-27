@@ -147,6 +147,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('tarjetas/duplicar','TarjetasController@viewDuplicarTarjeta')->name('tarjetas.duplicar');
     Route::get('tarjetas/duplicar/gridtarjetasduplicar','TarjetasController@gridTarjetasDuplicar')->name('gridtarjetasduplicar');
     Route::get('tarjetas/duplicar/modal/{id}','TarjetasController@viewModalDuplicarTarjeta')->name('tarjetas.modalduplicar');
+    Route::post('tarjetas/duplicar/modal/{id}','TarjetasController@duplicarTarjeta');
+    Route::get('tarjetas/duplicar/autocomplete','TarjetasController@autoCompleteTarjetaDuplicado')->name('tarjetas.duplicado.autocomplete');
     /*FINALIZA DUPLICADO DE TARJETAS*/
 
     /*combobox*/
