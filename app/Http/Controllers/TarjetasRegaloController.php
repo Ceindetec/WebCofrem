@@ -348,7 +348,7 @@ class TarjetasRegaloController extends Controller
             $transaccion->numero_transaccion = $this->completarCeros($numeroTransaccion, 10);
             $transaccion->numero_tarjeta = $numero_tarjeta;
             $transaccion->tipo = Transaccion::$TIPO_ADMINISTRATIVO;
-            $transaccion->valor = $valor;
+            //$transaccion->valor = $valor; se elimino ese campo de la base de datos
             $transaccion->fecha = Carbon::now();
 
             $transaccion->save();
