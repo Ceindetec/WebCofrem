@@ -58,8 +58,8 @@
                                 <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }} m-b-20">
                                     <div class="col-xs-12">
                                         {{--<a href="{{ route('password.request') }}" class="text-muted pull-right font-14">Forgot your password?</a>--}}
-                                        <label for="password">Cotraseña</label>
-                                        <input class="form-control" name="password" id="password" type="password" required="" id="password" placeholder="Ingresa tu contrasea">
+                                        <label for="password">Contraseña</label>
+                                        <input class="form-control" name="password" id="password" type="password" required="" id="password" placeholder="Ingresa tu contraseña">
                                         @if ($errors->has('password'))
                                             <span class="help-block">
                                         <strong>{{ $errors->first('password') }}</strong>

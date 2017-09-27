@@ -83,8 +83,6 @@
                             result.mensaje,
                             'error'
                         );
-                        resetInfo(result.data);
-
                     } else {
                         html = '';
                         for (i = 0; i < result.length; i++) {
@@ -113,23 +111,7 @@
             });
         });
 
-        $('#editarcheck').change(function () {
-            if ($(this).is(':checked')) {
-                $('#editartarjetas input, #editartarjetas select').attr('disabled', false)
-            } else {
-                $('#editartarjetas input, #editartarjetas select').attr('disabled', true)
-            }
-        })
     });
 
-    function resetInfo(data) {
-        $('#tipo').val(data.tipo);
-        setTimeout(function () {
-            if ($('#editarcheck').is(':checked')) {
-                $('#editarcheck').trigger('click');
-            }
-        }, 200);
-
-    }
 
 </script>
