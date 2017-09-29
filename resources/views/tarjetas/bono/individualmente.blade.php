@@ -27,7 +27,7 @@
             <div class="form-group">
                 <label class="col-sm-3 control-label">Número de tarjeta</label>
                 <div class="col-sm-7">
-                {{Form::text('numero_tarjeta', null ,['class'=>'form-control', "required", "maxlength"=>"7", "data-parsley-type"=>"number", "tabindex"=>"2",'id'=>'numero_tarjeta'])}} <!-- "data-parsley-type"=>"number"] -->
+                {{Form::number('numero_tarjeta', null ,['class'=>'form-control', "required", "maxlength"=>"6", "data-parsley-type"=>"number", "tabindex"=>"2",'id'=>'numero_tarjeta'])}} <!-- "data-parsley-type"=>"number"] -->
                 </div>
             </div>
             <div class="form-group">
@@ -39,19 +39,19 @@
             <div class="form-group">
                 <label class="col-sm-3 control-label">Identificación</label>
                 <div class="col-sm-7">
-                    {{Form::text('identificacion', null ,['class'=>'form-control', "required", "data-parsley-type"=>"number", "tabindex"=>"4",'id'=>'identificacion'])}}
+                    {{Form::number('identificacion', null ,['class'=>'form-control', "required", "data-parsley-type"=>"number", "tabindex"=>"4",'id'=>'identificacion'])}}
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-3 control-label">Nombres</label>
                 <div class="col-sm-7">
-                    {{Form::text('nombres', null ,['class'=>'form-control', "required", "tabindex"=>"5",'id'=>'nombres'])}}
+                    {{Form::text('nombres', null ,['class'=>'form-control', "required", "tabindex"=>"5",'id'=>'nombres',"data-parsley-pattern"=>"/^[A-Z üÜáéíóúÁÉÍÓÚñÑ]{1,50}$/i"])}}
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-3 control-label">Apellidos</label>
                 <div class="col-sm-7">
-                    {{Form::text('apellidos', null ,['class'=>'form-control', "required", "tabindex"=>"6",'id'=>'apellidos'])}}
+                    {{Form::text('apellidos', null ,['class'=>'form-control', "required", "tabindex"=>"6",'id'=>'apellidos',"data-parsley-pattern"=>"/^[A-Z üÜáéíóúÁÉÍÓÚñÑ]{1,50}$/i"])}}
                 </div>
             </div>
             <!--
