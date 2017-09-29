@@ -18,3 +18,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::post('comunicacion','WebApiController@comunicacion');
+Route::post('comunicacion2','WebApiController@comunicacion2');
+Route::post('vaidadterminal','WebApiController@validadTerminal');

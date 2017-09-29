@@ -31,11 +31,11 @@
         </div> <!-- end row -->
 
         <div class="card-box">
-            <h4 class="m-t-0">Informacion establecimiento <span class="pull-right">Editar <input type="checkbox"
+            <h4 class="m-t-0">Informacion establecimiento @can('editar.establecimiento')<span class="pull-right">Editar <input type="checkbox"
                                                                                                  id="editarcheck"
                                                                                                  data-plugin="switchery"
                                                                                                  data-color="#1bb99a"
-                                                                                                 data-size="small"/></span>
+                                                                                                 data-size="small"/></span>@endcan
             </h4>
             {{Form::model($establecimiento,['route'=>['establecimiento.editarp',$establecimiento->id], 'class'=>'form-horizontal', 'id'=>'editarestablecimientos'])}}
 
@@ -90,6 +90,7 @@
             {{Form::close()}}
         </div>
 
+        @can('agre.convenio.esta')
         <div class="row">
             <div class="col-sm-12">
                 <h5>Acciones</h5>
@@ -106,7 +107,7 @@
                 </div>
             </div>
         </div>
-
+        @endcan
         <div class="card-box">
             <h4 class="m-t-0">Lista de convenios</h4>
 
