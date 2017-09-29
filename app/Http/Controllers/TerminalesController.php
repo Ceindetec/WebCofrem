@@ -7,7 +7,9 @@ use creditocofrem\Sucursales;
 use creditocofrem\Terminales;
 use Facades\creditocofrem\Encript;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Yajra\Datatables\Datatables;
+use Caffeinated\Shinobi\Facades\Shinobi;
 
 class TerminalesController extends Controller
 {
@@ -38,10 +40,12 @@ class TerminalesController extends Controller
             ->addColumn('action', function ($terminales) {
                 $acciones = '<div class="btn-group">';
                 $acciones = $acciones . '<a href="' . route("terminal.editar", ["id" => $terminales->id]) . '" data-modal="modal-lg" class="btn btn-xs btn-custom" ><i class="ti-pencil-alt"></i> Edit</a>';
-                if ($terminales->estado == "A")
-                    $acciones = $acciones . '<bottom class="btn btn-xs btn-danger" onclick="cambiarEstado(' . $terminales->id . ')"><i class="mdi mdi-close-circle"></i> Inactivar</bottom>';
-                else
-                    $acciones = $acciones . '<bottom class="btn btn-xs btn-primary" onclick="cambiarEstado(' . $terminales->id . ')"><i class="mdi mdi-checkbox-marked-circle"></i> Activar</bottom>';
+                if (Shinobi::can('estado.terminal')) {
+                    if ($terminales->estado == "A")
+                        $acciones = $acciones . '<bottom class="btn btn-xs btn-danger" onclick="cambiarEstado(' . $terminales->id . ')"><i class="mdi mdi-close-circle"></i> Inactivar</bottom>';
+                    else
+                        $acciones = $acciones . '<bottom class="btn btn-xs btn-primary" onclick="cambiarEstado(' . $terminales->id . ')"><i class="mdi mdi-checkbox-marked-circle"></i> Activar</bottom>';
+                }
                 $acciones = $acciones . '</div>';
                 return $acciones;
             })
@@ -94,7 +98,7 @@ class TerminalesController extends Controller
             $terminal->password = Encript::encryption($request->password);
             $terminal->sucursal_id = $request->getQueryString();
             $sucursal = Sucursales::find($request->getQueryString());
-            if($sucursal->estado == 'I')
+            if ($sucursal->estado == 'I')
                 $terminal->estado = 'I';
             $terminal->save();
             $result['estado'] = true;
@@ -166,14 +170,13 @@ class TerminalesController extends Controller
         try {
             $terminal = Terminales::find($request->id);
 
-            if ($terminal->estado == 'A'){
+            if ($terminal->estado == 'A') {
                 $terminal->estado = 'I';
-            }
-            else{
+            } else {
                 $sucursal = Sucursales::find($terminal->sucursal_id);
-                if($sucursal->estado == 'A'){
+                if ($sucursal->estado == 'A') {
                     $terminal->estado = 'A';
-                }else{
+                } else {
                     $result['estado'] = false;
                     $result['mensaje'] = 'No se puede activar una terminal de una sucursal inactiva';
                     return $result;
@@ -197,25 +200,27 @@ class TerminalesController extends Controller
      * trae la vista de la lista de todas las teminales en el sistema
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function viewListTerminalTraslados(){
-        $establecimientos = Establecimientos::where('estado','A')->get();
-        $sucursales = Sucursales::where('estado','A')->get();
-        $terminalesActivas = Terminales::where('estado','A')->get();
-        $terminalesInactivas = Terminales::where('estado','I')->get();
-        return view('establecimientos.terminales.trasladoterminal', compact(['establecimientos','sucursales','terminalesActivas','terminalesInactivas']));
+    public function viewListTerminalTraslados()
+    {
+        $establecimientos = Establecimientos::where('estado', 'A')->get();
+        $sucursales = Sucursales::where('estado', 'A')->get();
+        $terminalesActivas = Terminales::where('estado', 'A')->get();
+        $terminalesInactivas = Terminales::where('estado', 'I')->get();
+        return view('establecimientos.terminales.trasladoterminal', compact(['establecimientos', 'sucursales', 'terminalesActivas', 'terminalesInactivas']));
     }
 
     /**
      * metodo que carga la grid con todas las terminales de la red cofrem
      * @return mixed
      */
-    public function gridTerminalesTraslado(){
+    public function gridTerminalesTraslado()
+    {
         $terminales = Terminales::all();
-        foreach ($terminales as $terminale){
+        foreach ($terminales as $terminale) {
             $terminale->getSucursal->getEstablecimiento;
         }
-        return Datatables::of($terminales)->addColumn('action',function ($terminales){
-            return '<a href="'.route("viewtrasladoterminal", $terminales->id).'" data-modal="" class="btn btn-custom btn-xs"><i class="fa fa-exchange" aria-hidden="true"></i> Trasladar</a>';
+        return Datatables::of($terminales)->addColumn('action', function ($terminales) {
+            return '<a href="' . route("viewtrasladoterminal", $terminales->id) . '" data-modal="" class="btn btn-custom btn-xs"><i class="fa fa-exchange" aria-hidden="true"></i> Trasladar</a>';
         })->make(true);
     }
 
@@ -224,23 +229,25 @@ class TerminalesController extends Controller
      * @param $id id correspondiente a la terminal que se va a trasladar
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function viewTrasladoTerminal($id){
+    public function viewTrasladoTerminal($id)
+    {
         $terminal = Terminales::find($id);
-        $establecimientos = Establecimientos::where('estado','A')->pluck('razon_social','id');
-        return view('establecimientos.terminales.modaltrasladoterminal',compact(['terminal','establecimientos']));
+        $establecimientos = Establecimientos::where('estado', 'A')->pluck('razon_social', 'id');
+        return view('establecimientos.terminales.modaltrasladoterminal', compact(['terminal', 'establecimientos']));
     }
 
-    public function trasladarTerminal(Request $request){
-        $result=[];
-        try{
+    public function trasladarTerminal(Request $request)
+    {
+        $result = [];
+        try {
             $terminal = Terminales::find($request->getQueryString());
             $terminal->sucursal_id = $request->sucursal_id;
             $terminal->save();
             $result['estado'] = true;
             $result['mensaje'] = 'Se ha trasladado la terminal satisfactoriamente.';
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             $result['estado'] = false;
-            $result['mensaje'] = 'No fue posible trasladar la terminal. '.$exception->getMessage();
+            $result['mensaje'] = 'No fue posible trasladar la terminal. ' . $exception->getMessage();
         }
         return $result;
     }

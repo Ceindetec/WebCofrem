@@ -173,7 +173,11 @@
                     }
                 },
                 error: function (xhr, status) {
-                    var message = "Error de ejecución: " + xhr.status + " " + xhr.statusText;
+                    var message = ''
+                    if(xhr.status !=403)
+                        message = "Error de ejecución: " + xhr.status + " " + xhr.statusText;
+                    else
+                        message = 'No tiene permisos para realizar esta accion'
                     swal(
                         'Error!!',
                         message,
