@@ -20,7 +20,10 @@ class WebApiController extends Controller
             $result['estado'] = false;
             $result['mensaje'] = 'Error de comunicacion';
         }
-        return $result;
+
+        $resultFinal['resultado'] = $result;
+
+        return ($resultFinal);
     }
 
     public function comunicacion2(Request $request)
