@@ -8,14 +8,29 @@ class WebApiController extends Controller
 {
     //
 
-    public function comunicacion(Request $request){
-        if($request->codigo == '02'){
+    public function comunicacion(Request $request)
+    {
+
+        if ($request->codigo == '02') {
             $result['estado'] = true;
             $result['mensaje'] = 'Comunicacion exitosa';
-        }else{
+        } else {
             $result['estado'] = false;
             $result['mensaje'] = 'Error de comunicacion';
         }
         return $result;
+    }
+
+    public function comunicacion2(Request $request)
+    {
+        $result = [];
+        if ($request->codigo == '02') {
+            $result['estado'] = true;
+            $result['mensaje'] = 'Comunicacion exitosa';
+        } else {
+            $result['estado'] = false;
+            $result['mensaje'] = 'Error de comunicacion';
+        }
+        return ['resultado' => $result];
     }
 }
