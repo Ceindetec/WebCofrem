@@ -45,7 +45,13 @@ function handleAjaxModal() {
 
                 case "error":
                     var message = "Error de ejecución: " + xhr.status + " " + xhr.statusText;
-                    if (xhr.status == 403) {$.msgbox(response, {type: 'error'});}
+                    if (xhr.status == 403) {
+                        swal(
+                            'Error!!',
+                            'No tiene permisos para realizar esta acción',
+                            'error'
+                        )
+                    }
                     else {
                         swal(
                             'Error!!',

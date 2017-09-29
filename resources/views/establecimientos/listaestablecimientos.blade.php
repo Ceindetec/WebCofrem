@@ -19,6 +19,7 @@
             </div>
         </div> <!-- end row -->
 
+        @can('crear.establecimiento')
         <div class="row">
             <div class="col-sm-12">
                 <h5>Acciones</h5>
@@ -33,6 +34,7 @@
                 </div>
             </div>
         </div>
+        @endcan
 
         <div class="row">
             <div class="col-sm-12">
