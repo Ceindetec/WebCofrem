@@ -320,7 +320,7 @@ class TarjetasBonoController extends Controller
 
     public function autoCompleNumContrato(Request $request) {
 
-        $contratos = Contratos_empr::where("id", "like", "%" . $request->numero_contrato . "%")->get();
+        $contratos = Contratos_empr::where("n_contrato", "like", "%" . $request->numero_contrato. "%")->get();
         if (count($contratos) == 0) {
             $data["query"] = "Unit";
             $data["suggestions"] = [];
