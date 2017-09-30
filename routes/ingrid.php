@@ -29,14 +29,22 @@ Route::group(['middleware' => 'auth'], function () {
         //route::get('tarjetas','TarjetasController@index')->name('tarjetas');
 
         /*FINALIZA TARJETAS*/
-        /* INICIA TARJETAS BONO */
+        /* INICIA CREACION TARJETAS BONO */
         route::get('creartarjetasBono','TarjetasBonoController@viewCrearTarjetaIndividual')->name('creartarjetasBono');
         route::post('bono.crearindividual','TarjetasBonoController@CrearTarjetaIndividual')->name('bono.crearindividual');
         route::get('autoCompleNumContrato','TarjetasBonoController@autoCompleNumContrato')->name('autoCompleNumContrato');
         route::get('getNombre','TarjetasBonoController@getNombre')->name('getNombre');
         route::get('creartarjetasBonoBloque','TarjetasBonoController@viewCrearTarjetaBloque')->name('creartarjetasBonoBloque');
         route::post('bono.crearbloque','TarjetasBonoController@CrearTarjetaBloque')->name('bono.crearbloque');
-        /*FINALIZA TARJETAS BONO */
+        /*FINALIZA CREACION TARJETAS BONO */
+
+        /*INICIA CONSULTA TARJETA BONO*/
+        Route::get('tarjetas/bono/consulta', 'TarjetasBonoController@consultaTarjetasBono')->name('consultabono');
+        Route::get('tarjetas/bono/gridconsultatarjetabono', 'TarjetasBonoController@gridConsultaTarjetaBono')->name('gridconsultatarjetabono');
+        Route::get('tarjetas/bono/editar/{id}','TarjetasBonoController@viewEditarBono')->name('bono.editar');
+        Route::post('tarjetas/bono/editar/{id}','TarjetasBonoController@editarBono')->name('bono.editarp');;
+        Route::post('tarjetas/bono/activar','TarjetasBonoController@activarTarjetaBono')->name('tarjeta.bono.activar');
+        /*FINALIZA CONSULTA TARJETA BONO*/
 
     });
     });
