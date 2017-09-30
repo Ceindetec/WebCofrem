@@ -49,13 +49,13 @@ class WebApiController extends Controller
                 $establecimiento = $sucursal->getEstablecimiento;
                 $data['nit'] = $establecimiento->nit;
                 $data['razon_social'] = $establecimiento->razon_social;
+                $data['sucursal_id'] = $sucursal->id;
                 $data['nombre_sucursal'] = $sucursal->nombre;
                 $data['ciudad'] = $sucursal->getMunicipio->descripcion;
                 $data['direccion'] = $sucursal->direccion;
                 $data['estado_sucursal'] = $sucursal->estado;
                 $data['estado_terminal'] = $terminal->estado;
-                $data['clave_terminal'] = Encript::decryption($terminal->password);
-                $data['clave_sucursal'] = Encript::decryption($sucursal->password);
+                $data['codigo_terminal'] = $terminal->codigo;
                 $terminal->imei = $request->imei;
                 $terminal->uid = $request->uid;
                 $terminal->mac = $request->mac;
