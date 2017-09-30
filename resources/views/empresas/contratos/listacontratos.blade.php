@@ -8,6 +8,7 @@
     <link href="{{asset('plugins/datatables/dataTables.colVis.css')}}" rel="stylesheet" type="text/css"/>
     <link href="{{asset('plugins/datatables/dataTables.bootstrap.min.css')}}" rel="stylesheet" type="text/css"/>
     <link href="{{asset('plugins/datatables/fixedColumns.dataTables.min.css')}}" rel="stylesheet" type="text/css"/>
+    <link href="{{asset('plugins/bootstrap-datepicker/css/bootstrap-datepicker.min.css')}}" rel="stylesheet">
 @endsection
 
 @section('contenido')
@@ -26,7 +27,7 @@
                     <div class="row">
                         <div class="col-lg-3 col-sm-6">
                             <div class="widget-inline-box">
-                                <!--<a href="/*route('empresa.crear')}}" data-modal class="btn btn-custom waves-effect waves-light" data-toggle="modal" data-target="#modalrol">Agregar Empresa</a> -->
+                               <a href="{{route('contrato.crear')}}" data-modal class="btn btn-custom waves-effect waves-light" data-toggle="modal" data-target="#modalrol">Agregar Contrato</a>
                             </div>
                         </div>
                     </div>
@@ -44,14 +45,7 @@
                             <th>Nit</th>
                             <th>Razón social</th>
                             <th>Valor contrato</th>
-                            <th>Valor impuesto</th>
                             <th>Fecha</th>
-                            <th>N. tarjetas</th>
-                            <th>Forma de pago</th>
-                            <th>Pfd</th>
-                            <th>Consumo mensual</th>
-                            <th>Días de consumo</th>
-                            <th>Costo administración</th>
                             <th>Acciones</th>
                         </tr>
                         </thead>
@@ -60,13 +54,6 @@
                             <th>Número contrato</th>
                             <th>Nit</th>
                             <th>Razón Social</th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
                             <th></th>
                             <th></th>
                             <th></th>
@@ -97,40 +84,29 @@
     <script src="{{asset('plugins/datatables/dataTables.scroller.min.js')}}"></script>
     <script src="{{asset('plugins/datatables/dataTables.colVis.js')}}"></script>
     <script src="{{asset('plugins/datatables/dataTables.fixedColumns.min.js')}}"></script>
+    <script src="{{asset('plugins/moment/moment.js')}}"></script>
+    <script src="{{asset('plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js')}}"></script>
+    <script src="{{asset('plugins/bootstrap-datepicker/locale/bootstrap-datepicker.es.min.js')}}" charset="UTF-8"></script>
 
     <script>
-       /* var table;
+       var table;
         $(function () {
             table = $('#datatable').DataTable({
                 processing: true,
                 serverSide: true,
                 "language": {
-                    "url": "!!route('datatable_es')!!}"
+                    "url": "{!!route('datatable_es')!!}"
                 },
                 ajax: {
-                    url: "!!route('gridempresas')!!}",
+                    url: "{!!route('gridcontratos')!!}",
                     "type": "get"
                 },
                 columns: [
-                    {data: 'nit', name: 'nit'},
-                    {data: 'razon_social', name: 'razon_social'},
-                    {data: 'representante_legal', name: 'representante_legal'},
-                    {data: 'get_municipio.get_departamento.descripcion', name: 'descripcion'},
-                    {data: 'get_municipio.descripcion', name: 'descripcion'},
-                    {data: 'email', name: 'email'},
-                    {data: 'telefono', name: 'telefono'},
-                    {data: 'celular', name: 'celular'},
-                    {data: 'direccion', name: 'direccion'},
-                    {data: 'tipo', name: 'tipo',
-                        render: function (data) {
-                            if(data=='A'){
-                                return 'Afiliado'
-                            }else{
-                                return 'Tercero'
-                            }
-                        }
-                    },//como hacer que no me traiga el codigo sino descripcion
-
+                    {data: 'n_contrato', name: 'n_contrato'},
+                    {data: 'get_empresa.nit', name: 'nit'},
+                    {data: 'get_empresa.razon_social', name: 'razon_social'},
+                    {data: 'valor_contrato', name: 'valor_contrato'},
+                    {data: 'valor_contrato', name: 'valor_contrato'},
                     {data: 'action', name: 'action', orderable: false, searchable: false}
                 ],
                 initComplete: function () {

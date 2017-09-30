@@ -29,6 +29,10 @@ Route::group(['middleware' => 'auth'], function () {
 
         /*INICIO CONTRATOS*/
         route::get('contratos','ContratosController@index')->name('contratos');
+        route::get('contratos/gridcontratos','ContratosController@gridContratos')->name('gridcontratos');
+        route::get('contratos/crear','ContratosController@viewCrearContrato')->name('contrato.crear');
+        route::post('contratos/crearcontra','ContratosController@crearContrato')->name('contrato.crearp');
+
 
 
         /*FINALIZA CONTRATOS*/

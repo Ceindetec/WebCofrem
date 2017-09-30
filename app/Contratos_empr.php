@@ -10,6 +10,16 @@ class Contratos_empr extends Model
     protected $table = 'contratos_emprs';
 
     protected $fillable = [
-        'nit', 'n_contrato', 'valor_contrato', 'valor_impuesto', 'fecha', 'empresa_id','n_tarjetas','forma de pago','pdf', 'cons_mensual', 'dias_consumo', ''
+        'n_contrato', 'valor_contrato', 'valor_impuesto', 'fecha', 'empresa_id','n_tarjetas','forma de pago','pdf', 'cons_mensual', 'dias_consumo', 'adminis_tarjeta_id',
     ];
+
+    public function getAdministracion()
+    {
+        return $this->belongsTo('creditocofrem\administarjetas','adminis_tarjeta_id','id');
+    }
+
+    public function getEmpresa()
+    {
+        return $this->belongsTo('creditocofrem\empresas','empresa_id','id');
+    }
 }
