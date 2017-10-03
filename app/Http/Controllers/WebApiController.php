@@ -26,18 +26,6 @@ class WebApiController extends Controller
         return ($resultFinal);
     }
 
-    public function comunicacion2(Request $request)
-    {
-        $result = [];
-        if ($request->codigo == '02') {
-            $result['estado'] = true;
-            $result['mensaje'] = 'Comunicacion exitosa';
-        } else {
-            $result['estado'] = false;
-            $result['mensaje'] = 'Error de comunicacion';
-        }
-        return ['resultado' => $result];
-    }
 
 
     public function validadTerminal(Request $request){
