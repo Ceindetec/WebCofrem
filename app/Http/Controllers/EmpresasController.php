@@ -44,7 +44,7 @@ class EmpresasController extends Controller
     }
 
     /**
-     * retorna la vista del modal que permite crear nuevos establecimientos
+     * retorna la vista del modal que permite crear nuevas empresas
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function viewCrearEmpresa()

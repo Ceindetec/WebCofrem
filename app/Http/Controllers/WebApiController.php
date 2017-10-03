@@ -27,7 +27,7 @@ class WebApiController extends Controller
     }
 
 
-    public function validadTerminal(Request $request)
+    public function validarTerminal(Request $request)
     {
         $result = [];
         try {
@@ -44,16 +44,16 @@ class WebApiController extends Controller
                 $data['estado_sucursal'] = $sucursal->estado;
                 $data['estado_terminal'] = $terminal->estado;
                 $data['codigo_terminal'] = $terminal->codigo;
-                $terminal->imei = $request->imei;
-                $terminal->uid = $request->uid;
-                $terminal->mac = $request->mac;
-                $request->save();
+//                $terminal->imei = $request->imei;
+//                $terminal->uid = $request->uuid;
+//                $terminal->mac = $request->mac;
+//                $request->save();
                 $result['estado'] = TRUE;
                 $result['mensaje'] = 'Validacion exitosa';
                 $result['data'] = $data;
             } else {
                 $result['estado'] = FALSE;
-                $result['mensaje'] = 'verifique el codigo de la terminal';
+                $result['mensaje'] = 'Terminal no Existe';
             }
         } catch (\Exception $exception) {
             $result['estado'] = FALSE;
@@ -63,7 +63,7 @@ class WebApiController extends Controller
     }
 
 
-    public function validadclaveTerminal(Request $request)
+    public function validarClaveTerminal(Request $request)
     {
         $result = [];
         try {
@@ -88,7 +88,7 @@ class WebApiController extends Controller
         return ['resultado'=>$result];
     }
 
-    public function validadclavesucursal(Request $request)
+    public function validarClaveSucursal(Request $request)
     {
         $result = [];
         try {

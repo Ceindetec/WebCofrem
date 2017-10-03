@@ -11,6 +11,7 @@
             <li><a href="{{route('permisos')}}">Permisos</a></li>
         </ul>
     </li>
+    @endrole
     <li>
         <a href="javascript: void(0);" aria-expanded="true"><i class="ti-layout"></i> Establecimientos <span
                     class="fa arrow"></span></a>
@@ -22,7 +23,14 @@
         </ul>
     </li>
     {{--<li>--}}
-    <li><a href="{{route('empresas')}}"><i class="fa fa-university" aria-hidden="true"></i> Empresas </a></li>
+    <li>
+        <a href="javascript: void(0);"  aria-expanded="true"><i class="fa fa-university" aria-hidden="true"></i> Empresas <span class="fa arrow"></span></a>
+         <ul class="nav-second-level nav collapse" aria-expanded="true" style="">
+             <li><a href="{{route('empresas')}}"> Crear Empresas </a></li>
+             <li><a href="{{route('contratos')}}"> Crear Contratos </a></li>
+
+        </ul>
+    </li>
     {{--<span class="fa arrow"></span></a>--}}
     {{--<ul class="nav-second-level nav" aria-expanded="true">--}}
     {{--<li><a href="{{route('usuarios')}}">Usuarios</a></li>--}}
@@ -60,7 +68,7 @@
         </ul>
     </li>
     <!-- <li><a href="{ {route('tarjetasregalo')}}"><i class="ti-layout"></i> Tarjetas Regalo</a></li> -->
-    @endrole
+    
 
     <!--<li><a href="index.html"><i class="ti-home"></i> Dashboard </a></li>
 

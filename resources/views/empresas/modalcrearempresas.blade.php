@@ -14,7 +14,7 @@
             </div>
 
             <div class="form-group">
-                <label class="col-md-2 control-label">Razon social</label>
+                <label class="col-md-2 control-label">Razón social</label>
                 <div class="col-md-10">
                     {{Form::text('razon_social', null ,['class'=>'form-control', "required", "maxlength"=>"40", "data-parsley-pattern"=>"^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]+(\s*[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]*)*[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]+$"])}}
                 </div>
