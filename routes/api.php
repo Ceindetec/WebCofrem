@@ -18,7 +18,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::post('comunicacion','WebApiController@comunicacion');
-Route::post('vaidadterminal','WebApiController@validadTerminal');
-Route::post('validadclaveterminal','WebApiController@validadclaveTerminal');
-Route::post('validadclavesucursal','WebApiController@validadclaveSucursal');
+Route::post('terminal','WebApiController@validarTerminal');
+Route::post('clavesucursal','WebApiController@validarClaveSucursal');
+Route::post('claveterminal','WebApiController@validarClaveTerminal');
 
