@@ -1,5 +1,5 @@
 <div id="modalcrearcontratos">
-    {{Form::open(['route'=>['contrato.crear'], 'class'=>'form-horizontal', 'id'=>'crearcontratos'])}}
+    {{Form::open(['route'=>['contrato.crear'], 'files'=>'true' ,'class'=>'form-horizontal', 'id'=>'crearcontratos', 'target'=>"_blank", 'role'=>'form', 'method'=>'POST'])}}
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h4 class="modal-title">Agregar contrato</h4>
@@ -38,7 +38,7 @@
             <div class="form-group">
                 <label class="col-md-2 control-label">Empresa</label>
                 <div class="col-md-10">
-                    {{Form::text('nit', null, ['class'=>'form-control', "required", "tabindex"=>"4", "maxlength"=>"10", "data-parsley-type"=>"number", 'id'=>'nit'])}}
+                    {{Form::text('nit', null, ['class'=>'form-control', "required", "tabindex"=>"5", "maxlength"=>"10", "data-parsley-type"=>"number", 'id'=>'nit'])}}
                 </div>
             </div>
 
@@ -46,7 +46,7 @@
             <div class="form-group">
                 <label class="col-md-2 control-label">Número de tarjetas</label>
                 <div class="col-md-10">
-                    {{Form::text('n_tarjetas', null ,['class'=>'form-control', "required", "data-parsley-type"=>"number", "maxlength"=>"3", "tabindex"=>"5", 'id'=>'n_tarjetas'])}}
+                    {{Form::text('n_tarjetas', null ,['class'=>'form-control', "required", "data-parsley-type"=>"number", "maxlength"=>"3", "tabindex"=>"6", 'id'=>'n_tarjetas'])}}
                 </div>
             </div>
 
@@ -54,14 +54,14 @@
             <div class="form-group">
                 <label class="col-md-2 control-label">Forma de pago</label>
                 <div class="col-md-10">
-                    {{Form::select('forma_pago', ['E' => 'Efectivo', 'C' => 'Consumo'], 'E',['class'=>'form-control', "tabindex"=>"6", "required", 'id'=>'forma_pago'])}}
+                    {{Form::select('forma_pago', ['E' => 'Efectivo', 'C' => 'Consumo'], 'E',['class'=>'form-control', "tabindex"=>"7", "required", 'id'=>'forma_pago'])}}
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="col-md-2 control-label">Documentos</label>
                 <div class="col-md-10">
-                    {{Form::text('pdf', null ,['class'=>'form-control', "required", "maxlength"=>"10", "tabindex"=>"7", 'id'=>'pdf'])}}
+                    {{Form::file('pdf', ['class'=>'form-control', "required"=>"true", "tabindex"=>"8", 'id'=>'pdf'])}}
                 </div>
             </div>
 
@@ -87,14 +87,14 @@
             <div class="form-group">
                 <label class="col-md-2 control-label">Días Consumo</label>
                 <div class="col-md-10">
-                    {{Form::text('dias_consumo', null ,['class'=>'form-control', "required", "data-parsley-type"=>"number", "tabindex"=>"8", "maxlength"=>"3", 'id'=>'dias_consumo'])}}
+                    {{Form::text('dias_consumo', null ,['class'=>'form-control', "data-parsley-type"=>"number", "tabindex"=>"9", "maxlength"=>"3", 'id'=>'dias_consumo'])}}
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="col-md-2 control-label">Porcentaje Administracion</label>
                 <div class="col-md-4">
-                    {{Form::select("adminis_tarjeta_id",$administracion,null,['class'=>'form-control', "tabindex"=>"9", 'id'=>'administracion'])}}
+                    {{Form::select("adminis_tarjeta_id",$administracion,null,['class'=>'form-control', "tabindex"=>"10", 'id'=>'administracion'])}}
                 </div>
             </div>
 
@@ -111,6 +111,21 @@
 <script>
 
     $(function () {
+
+        var valini = $('input[type=radio]').val();
+        if(valini==1){
+            $('#dias_consumo').attr('disabled',true);
+        }else {
+            $('#dias_consumo').removeAttr('disabled');
+        }
+       $('input[type=radio]').change(function () {
+         if($(this).val()==1){
+           $('#dias_consumo').attr('disabled',true);
+        }else {
+          $('#dias_consumo').removeAttr('disabled');
+          }
+        });
+
         $('#fecha').datepicker({
             autoclose: true,
             startDate: moment().format(),
@@ -123,11 +138,16 @@
             e.preventDefault();
             var form = $(this);
 
+            var formData = new FormData(form[0]);
+            formData.append( 'pdf', $( '#pdf' )[0].files[0] );
+
             $.ajax({
-                url: form.attr('action'),
-                data: form.serialize(),
-                type: 'POST',
-                dataType: 'json',
+                type: "POST",
+                context: document.body,
+                url: '{{route("contrato.crear")}}',
+                processData: false,
+                contentType: false,
+                data: formData,
                 beforeSend: function () {
                     cargando();
                 },
