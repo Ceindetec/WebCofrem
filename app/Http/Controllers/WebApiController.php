@@ -27,7 +27,7 @@ class WebApiController extends Controller
     }
 
 
-    public function validadTerminal(Request $request)
+    public function validarTerminal(Request $request)
     {
         $result = [];
         try {
@@ -63,7 +63,7 @@ class WebApiController extends Controller
     }
 
 
-    public function validadclaveTerminal(Request $request)
+    public function validarClaveTerminal(Request $request)
     {
         $result = [];
         try {
@@ -88,7 +88,7 @@ class WebApiController extends Controller
         return ['resultado'=>$result];
     }
 
-    public function validadclavesucursal(Request $request)
+    public function validarClaveSucursal(Request $request)
     {
         $result = [];
         try {
