@@ -8,6 +8,7 @@
     <link href="{{asset('plugins/datatables/dataTables.colVis.css')}}" rel="stylesheet" type="text/css"/>
     <link href="{{asset('plugins/datatables/dataTables.bootstrap.min.css')}}" rel="stylesheet" type="text/css"/>
     <link href="{{asset('plugins/datatables/fixedColumns.dataTables.min.css')}}" rel="stylesheet" type="text/css"/>
+    <link href="{{asset('plugins/bootstrap-datepicker/css/bootstrap-datepicker.min.css')}}" rel="stylesheet">
 @endsection
 
 @section('contenido')
@@ -15,62 +16,10 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-12">
-                <h4 class="header-title m-t-0 m-b-20">Gestionar terminales de {{$sucursal->nombre}}
-                    <span class="pull-right"><a href="{{route('listsucursales',[$sucursal->getEstablecimiento->id])}}"
-                                                class="btn btn-custom" style="position: relative; top: -7px"><i
-                                    class="ti-arrow-left"></i> Volver</a> </span></h4>
-            </div>
-        </div> <!-- end row -->
-
-        <div class="card-box">
-            <h4>Informacion del establecimiento</h4>
-            <p>&nbsp;</p>
-            <div class="row">
-                <div class="col-sm-12">
-                    <label class="col-sm-2">Nit:</label>
-                    <div class="col-sm-10">
-                        {{$sucursal->getEstablecimiento->nit}}
-                    </div>
-                </div>
-                <div class="col-sm-12">
-                    <label class="col-sm-2">Rozon social:</label>
-                    <div class="col-sm-10">
-                        {{$sucursal->getEstablecimiento->razon_social}}
-                    </div>
-                </div>
-                <div class="col-sm-12">
-                    <label class="col-sm-2">Sucursal:</label>
-                    <div class="col-sm-10">
-                        {{$sucursal->nombre}}
-                    </div>
-                </div>
-                <div class="col-sm-12">
-                    <label class="col-sm-2">Estado:</label>
-                    <div class="col-sm-10">
-                        {{$sucursal->estado=='A'?'Activa':'Inactiva'}}
-                    </div>
-                </div>
+                <h4 class="header-title m-t-0 m-b-20">Consulta tarjetas bono</h4>
             </div>
         </div>
 
-        @can('agregar.terminal')
-        <div class="row">
-            <div class="col-sm-12">
-                <h5>Acciones</h5>
-                <div class="card-box widget-inline">
-                    <div class="row">
-                        <div class="col-lg-3 col-sm-6">
-                            <div class="widget-inline-box">
-                                <a href="{{route('terminal.crear',["id"=>$sucursal->id])}}" data-modal
-                                   class="btn btn-custom waves-effect waves-light" data-toggle="modal"
-                                   data-target="#modalrol">Agregar terminal</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        @endcan
 
         <div class="row">
             <div class="col-sm-12">
@@ -78,24 +27,18 @@
                     <table id="datatable" class="table table-striped table-bordered" width="100%">
                         <thead>
                         <tr>
-                            <th>Codigo</th>
-                            <th>uid</th>
-                            <th>mac</th>
-                            <th>Imei</th>
-                            <th>Celular</th>
-                            <th>Numero activo</th>
+                            <th>Numero tarjeta</th>
+                            <th>Contrato empresa</th>
+                            <th>Monto</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                         </thead>
                         <tfoot>
                         <tr>
-                            <th>Codigo</th>
-                            <th>uid</th>
-                            <th>mac</th>
-                            <th>Imei</th>
-                            <th>Celular</th>
-                            <th>Numero activo</th>
+                            <th>Numero tarjeta</th>
+                            <th>Contrato empresa</th>
+                            <th></th>
                             <th></th>
                             <th></th>
                         </tr>
@@ -104,12 +47,14 @@
                 </div>
             </div>
         </div>
-
     </div>
+
+
 
 @endsection
 
 @section('scripts')
+
     <script src="{{asset('plugins/datatables/jquery.dataTables.min.js')}}"></script>
     <script src="{{asset('plugins/datatables/dataTables.bootstrap.js')}}"></script>
     <script src="{{asset('plugins/datatables/dataTables.buttons.min.js')}}"></script>
@@ -125,6 +70,10 @@
     <script src="{{asset('plugins/datatables/dataTables.scroller.min.js')}}"></script>
     <script src="{{asset('plugins/datatables/dataTables.colVis.js')}}"></script>
     <script src="{{asset('plugins/datatables/dataTables.fixedColumns.min.js')}}"></script>
+    <script src="{{asset('plugins/jQuery-Mask-Plugin/dist/jquery.mask.min.js')}}"></script>
+    <script src="{{asset('plugins/moment/moment.js')}}"></script>
+    <script src="{{asset('plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js')}}"></script>
+    <script src="{{asset('plugins/bootstrap-datepicker/locale/bootstrap-datepicker.es.min.js')}}" charset="UTF-8"></script>
 
     <script>
         var table;
@@ -136,56 +85,33 @@
                     "url": "{!!route('datatable_es')!!}"
                 },
                 ajax: {
-                    url: "{!!route('gridterminales',['id'=>$sucursal->id])!!}",
+                    url: "{!!route('gridconsultatarjetabono')!!}",
                     "type": "get"
                 },
                 columns: [
-                    {data: 'codigo', name: 'codigo'},
+                    {data: 'numero_tarjeta', name: 'numero_tarjeta'},
+                    {data: 'idcontrato', name: 'idcontrato'},
                     {
-                        data: 'uid',
-                        name: 'uid',
+                        data: 'monto_inicial',
+                        name: 'monto_inicial',
                         render: function (data) {
-                            if (data == "") {
-                                return 'Sin asignar';
-                            } else {
-                                return data;
-                            }
+                            return '$ '+enmascarar(data);
                         }
                     },
-                    {
-                        data: 'mac',
-                        name: 'mac',
-                        render: function (data) {
-                            if (data == "") {
-                                return 'Sin asignar';
-                            } else {
-                                return data;
-                            }
-                        }
-                    },
-                    {
-                        data: 'imei',
-                        name: 'imei',
-                        render: function (data) {
-                            if (data == "") {
-                                return 'Sin asignar';
-                            } else {
-                                return data;
-                            }
-                        }
-                    },
-                    {data: 'celular', name: 'celular'},
-                    {data: 'numero_activo', name: 'numero_activo'},
                     {
                         data: 'estado',
                         name: 'estado',
                         render: function (data) {
-                            if (data == "A") {
-                                return 'Activa';
-                            } else {
-                                return 'Inactiva';
+                            if (data == 'A') {
+                                return 'Activo';
                             }
-                        }
+                            else if (data == 'I') {
+                                return 'Inactivo';
+                            } else {
+                                return 'Pendiente'
+                            }
+                        },
+                        searchable: false
                     },
                     {data: 'action', name: 'action', orderable: false, searchable: false}
                 ],
@@ -201,14 +127,13 @@
                         }
                     });
                 },
-                order: [[1, 'asc']]
             });
         });
 
-        function cambiarEstado(id) {
+        function activar(id) {
             swal({
                     title: '¿Estas seguro?',
-                    text: "¡¡Desea cambiar estado esta terminal!!",
+                    text: "¡Desea activar esta tarjeta!",
                     type: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Si',
@@ -219,8 +144,8 @@
                 },
                 function () {
                     $.ajax({
-                        url: '{{route('terminal.cambiarestado')}}',
-                        data: {id: id},
+                        url: "{{route('tarjeta.bono.activar')}}",
+                        data: {'id': id},
                         type: 'POST',
                         dataType: 'json',
                         beforeSend: function () {
@@ -235,8 +160,8 @@
                                         type: 'success',
                                         confirmButtonColor: '#4fa7f3'
                                     }
-                                )
-                                modalBs.modal('hide');
+                                );
+                                table.ajax.reload();
                             } else if (result.estado == false) {
                                 swal(
                                     'Error!!',
@@ -254,7 +179,7 @@
                                     'error'
                                 )
                             }
-                            table.ajax.reload();
+
                         },
                         error: function (xhr, status) {
                             var message = "Error de ejecución: " + xhr.status + " " + xhr.statusText;

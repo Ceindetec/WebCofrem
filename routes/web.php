@@ -63,10 +63,10 @@ Route::group(['middleware' => 'auth'], function () {
 
     route::get('establecimientos','EstablecimientosController@index')->name('establecimientos');
     route::get('establecimientos/gridestablecimientos','EstablecimientosController@gridEstablecimientos')->name('gridestablecimientos');
-    route::get('establecimientos/crear','EstablecimientosController@viewCrearEstablecimiento')->name('establecimiento.crear');
-    route::post('establecimientos/crear','EstablecimientosController@crearEstablecimiento')->name('establecimiento.crearp');
+    route::get('establecimientos/crear','EstablecimientosController@viewCrearEstablecimiento')->name('establecimiento.crear')->middleware('permissionshinobi:crear.establecimiento');
+    route::post('establecimientos/crear','EstablecimientosController@crearEstablecimiento')->name('establecimiento.crearp')->middleware('permissionshinobi:crear.establecimiento');;
     route::get('establecimientos/editar/{id}','EstablecimientosController@viewEditarEstablecimiento')->name('establecimiento.editar');
-    route::post('establecimientos/editar','EstablecimientosController@editarEstablecimiento')->name('establecimiento.editarp');
+    route::post('establecimientos/editar','EstablecimientosController@editarEstablecimiento')->name('establecimiento.editarp')->middleware('permissionshinobi:editar.establecimiento');
 
     /*FINALIZA ESTABLECIMIENTOS*/
 
@@ -74,11 +74,11 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('listsucursales/{id}','SucursalesController@index')->name('listsucursales');
     Route::get('gridsuscursales','SucursalesController@gridSuscursales')->name('gridsuscursales');
-    Route::get('sucursal/crear','SucursalesController@viewCrearSucursal')->name('sucursal.crear');
-    Route::post('sucursal/crear','SucursalesController@crearSucursal')->name('sucursal.crearp');
+    Route::get('sucursal/crear','SucursalesController@viewCrearSucursal')->name('sucursal.crear')->middleware('permissionshinobi:agregar.sucursal');
+    Route::post('sucursal/crear','SucursalesController@crearSucursal')->name('sucursal.crearp')->middleware('permissionshinobi:agregar.sucursal');
     Route::get('marketsucursales','SucursalesController@getMarketSucursales')->name('marketsucursales');
     Route::get('sucursal/editar','SucursalesController@viewEditarSucursal')->name('sucursal.editar');
-    Route::post('sucursal/editar','SucursalesController@editarSucursal')->name('sucursal.editarp');
+    Route::post('sucursal/editar','SucursalesController@editarSucursal')->name('sucursal.editarp')->middleware('permissionshinobi:editar.sucursal');
 
     /*FINALIZA SUCURSALES ESTABLECIMIENTOS*/
 
@@ -86,15 +86,18 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('listterminales/{id}','TerminalesController@index')->name('listterminales');
     Route::get('gridterminales','TerminalesController@gridTerminales')->name('gridterminales');
-    Route::get('terminal/crear','TerminalesController@viewCrearTerminal')->name('terminal.crear');
-    Route::post('terminal/crear','TerminalesController@crearTerminal')->name('terminal.crearp');
-    Route::get('terminal/editar','TerminalesController@viewEditarTerminal')->name('terminal.editar');
-    Route::post('terminal/editar','TerminalesController@editarTerminal')->name('terminal.editarp');
-    Route::post('terminal/cambiarestado','TerminalesController@cambiarEstadoTerminal')->name('terminal.cambiarestado');
-    Route::get('terminal/traslados','TerminalesController@viewListTerminalTraslados')->name('traladoterminal');
-    Route::get('terminal/gridterminalestraslado','TerminalesController@gridTerminalesTraslado')->name('gridterminalestraslado');
-    Route::get('terminal/viewtrasladoterminal/{id}','TerminalesController@viewTrasladoTerminal')->name('viewtrasladoterminal');
-    Route::post('terminal/trasladarp','TerminalesController@trasladarTerminal')->name('terminal.trasladarp');
+    Route::get('terminal/crear','TerminalesController@viewCrearTerminal')->name('terminal.crear')->middleware('permissionshinobi:agregar.terminal');
+    Route::post('terminal/crear','TerminalesController@crearTerminal')->name('terminal.crearp')->middleware('permissionshinobi:agregar.terminal');
+    Route::get('terminal/editar','TerminalesController@viewEditarTerminal')->name('terminal.editar')->middleware('permissionshinobi:editar.terminal');
+    Route::post('terminal/editar','TerminalesController@editarTerminal')->name('terminal.editarp')->middleware('permissionshinobi:editar.terminal');
+    Route::post('terminal/cambiarestado','TerminalesController@cambiarEstadoTerminal')->name('terminal.cambiarestado')->middleware('permissionshinobi:estado.terminal');
+
+    Route::group(['middleware' => 'permissionshinobi:trasladar.terminal'], function () {
+        Route::get('terminal/traslados', 'TerminalesController@viewListTerminalTraslados')->name('traladoterminal');
+        Route::get('terminal/gridterminalestraslado', 'TerminalesController@gridTerminalesTraslado')->name('gridterminalestraslado');
+        Route::get('terminal/viewtrasladoterminal/{id}', 'TerminalesController@viewTrasladoTerminal')->name('viewtrasladoterminal');
+        Route::post('terminal/trasladarp', 'TerminalesController@trasladarTerminal')->name('terminal.trasladarp');
+    });
 
     /*FINALIZA TERMINALES*/
 
@@ -116,17 +119,19 @@ Route::group(['middleware' => 'auth'], function () {
     /*FINALIZA CONVENIOS ESTABLECIMIENTOS*/
 
     /*INICIA PARAMETRIZACION TARJETAS*/
-    Route::get('tarjetas/parametrizacion','ParametrizacionTarjetasController@viewParametrosTarjetas')->name('tarjetas.parametros');
-    Route::post('tarjeta/parametrovalor/crear','ParametrizacionTarjetasController@tarjetaCrearParametroValor')->name('tarjeta.parametro.valor');
-    Route::post('tarjeta/parametroadministracion/crear/{codigo}','ParametrizacionTarjetasController@tarjetaCrearParametroAdministracion')->name('tarjeta.parametro.administracion');
-    Route::get('gridadministraciontarjetas/{codigo}','ParametrizacionTarjetasController@gridAdministracionTarjetas')->name('gridadministraciontarjetas');
-    Route::post('tarjeta/parametro/administracion/eliminar','ParametrizacionTarjetasController@tarjetaEliminarParametroAdministracion')->name('tarjeta.parametro.administracion.eliminar');
-    Route::get('tarjeta/parametrizacion/servicio','ParametrizacionTarjetasController@getViewParametrizarServicio')->name('viewparametrizarservicio');
-    Route::get('tarjeta/parametrizacion/gridvalorplatico','ParametrizacionTarjetasController@gridValorPlastico')->name('gridvalorplatico');
-    Route::post('tarjeta/parametro/pagaplastico/{codigo}','ParametrizacionTarjetasController@tarjetaCrearParametroPagaplastico')->name('tarjeta.parametro.pagaplastico');
-    Route::get('tarjeta/parametro/pagaplastico/gridpagaplastico/{codigo}','ParametrizacionTarjetasController@gridServicioPagaPlastico')->name('gridpagaplastico');
-    Route::post('tarjeta/parametro/cuentacontablerb/crear/{codigo}','ParametrizacionTarjetasController@tarjetaCrearParametroCuentaRB')->name('tarjeta.parametro.cuentaRB');
-    Route::get('tarjeta/parametro/gridcuentascontables/{codigo}','ParametrizacionTarjetasController@gridParametrosCuentasContables')->name('gridcuentascontables');
+    Route::group(['middleware' => 'permissionshinobi:parametrizar.producto'], function () {
+        Route::get('tarjetas/parametrizacion', 'ParametrizacionTarjetasController@viewParametrosTarjetas')->name('tarjetas.parametros');
+        Route::post('tarjeta/parametrovalor/crear', 'ParametrizacionTarjetasController@tarjetaCrearParametroValor')->name('tarjeta.parametro.valor');
+        Route::post('tarjeta/parametroadministracion/crear/{codigo}', 'ParametrizacionTarjetasController@tarjetaCrearParametroAdministracion')->name('tarjeta.parametro.administracion');
+        Route::get('gridadministraciontarjetas/{codigo}', 'ParametrizacionTarjetasController@gridAdministracionTarjetas')->name('gridadministraciontarjetas');
+        Route::post('tarjeta/parametro/administracion/eliminar', 'ParametrizacionTarjetasController@tarjetaEliminarParametroAdministracion')->name('tarjeta.parametro.administracion.eliminar');
+        Route::get('tarjeta/parametrizacion/servicio', 'ParametrizacionTarjetasController@getViewParametrizarServicio')->name('viewparametrizarservicio');
+        Route::get('tarjeta/parametrizacion/gridvalorplatico', 'ParametrizacionTarjetasController@gridValorPlastico')->name('gridvalorplatico');
+        Route::post('tarjeta/parametro/pagaplastico/{codigo}', 'ParametrizacionTarjetasController@tarjetaCrearParametroPagaplastico')->name('tarjeta.parametro.pagaplastico');
+        Route::get('tarjeta/parametro/pagaplastico/gridpagaplastico/{codigo}', 'ParametrizacionTarjetasController@gridServicioPagaPlastico')->name('gridpagaplastico');
+        Route::post('tarjeta/parametro/cuentacontablerb/crear/{codigo}', 'ParametrizacionTarjetasController@tarjetaCrearParametroCuentaRB')->name('tarjeta.parametro.cuentaRB');
+        Route::get('tarjeta/parametro/gridcuentascontables/{codigo}', 'ParametrizacionTarjetasController@gridParametrosCuentasContables')->name('gridcuentascontables');
+    });
 
     /*FINALIZA PARAMETRIZACION TARJETAS*/
 
@@ -134,8 +139,8 @@ Route::group(['middleware' => 'auth'], function () {
     /*INICIA CONSULTA TARJETA REGALO*/
     Route::get('tarjetas/regalo/consulta', 'TarjetasRegaloController@consultaTarjetasRegalo')->name('consultaregalo');
     Route::get('tarjetas/regalo/gridconsultatarjetaregalo', 'TarjetasRegaloController@gridConsulaTarjetaRegalo')->name('gridconsultatarjetaregalo');
-    Route::get('tarjetas/regalo/editar/{id}','TarjetasRegaloController@viewEditarRegalo')->name('regalo.editar');
-    Route::post('tarjetas/regalo/editar/{id}','TarjetasRegaloController@editarRegalo');
+    Route::get('tarjetas/regalo/editar/{id}','TarjetasRegaloController@viewEditarRegalo')->name('regalo.editar')->middleware('permissionshinobi:editar.monto.regalo');
+    Route::post('tarjetas/regalo/editar/{id}','TarjetasRegaloController@editarRegalo')->middleware('permissionshinobi:editar.monto.regalo');;
     Route::post('tarjetas/regalo/activar','TarjetasRegaloController@activarTarjetaRegalo')->name('tarjeta.regalo.activar');
     /*FINALIZA CONSULTA TARJETA REGALO*/
 
@@ -144,11 +149,13 @@ Route::group(['middleware' => 'auth'], function () {
     /*FINALIZA GESTION DE TARJETA*/
 
     /*INICIA DUPLICADO DE TARJETAS*/
-    Route::get('tarjetas/duplicar','TarjetasController@viewDuplicarTarjeta')->name('tarjetas.duplicar');
-    Route::get('tarjetas/duplicar/gridtarjetasduplicar','TarjetasController@gridTarjetasDuplicar')->name('gridtarjetasduplicar');
-    Route::get('tarjetas/duplicar/modal/{id}','TarjetasController@viewModalDuplicarTarjeta')->name('tarjetas.modalduplicar');
-    Route::post('tarjetas/duplicar/modal/{id}','TarjetasController@duplicarTarjeta');
-    Route::get('tarjetas/duplicar/autocomplete','TarjetasController@autoCompleteTarjetaDuplicado')->name('tarjetas.duplicado.autocomplete');
+    Route::group(['middleware' => 'permissionshinobi:duplicar.tarjeta'], function () {
+        Route::get('tarjetas/duplicar', 'TarjetasController@viewDuplicarTarjeta')->name('tarjetas.duplicar');
+        Route::get('tarjetas/duplicar/gridtarjetasduplicar', 'TarjetasController@gridTarjetasDuplicar')->name('gridtarjetasduplicar');
+        Route::get('tarjetas/duplicar/modal/{id}', 'TarjetasController@viewModalDuplicarTarjeta')->name('tarjetas.modalduplicar');
+        Route::post('tarjetas/duplicar/modal/{id}', 'TarjetasController@duplicarTarjeta');
+        Route::get('tarjetas/duplicar/autocomplete', 'TarjetasController@autoCompleteTarjetaDuplicado')->name('tarjetas.duplicado.autocomplete');
+    });
     /*FINALIZA DUPLICADO DE TARJETAS*/
 
     /*combobox*/
@@ -173,4 +180,8 @@ Route::get('datatable_es', 'IdiomaDataTableController@espanol')->name('datatable
 
 Route::get('/', function () {
     return redirect('/login');
+});
+
+Route::get('jsonpermisos', function (){
+   return \DB::table('permissions')->select('name','slug','description')->get();
 });

@@ -2,6 +2,7 @@
 
 namespace creditocofrem\Http\Controllers;
 
+use Caffeinated\Shinobi\Facades\Shinobi;
 use creditocofrem\AdminisTarjetas;
 use creditocofrem\DetalleProdutos;
 use creditocofrem\DetalleTransaccion;
@@ -622,7 +623,9 @@ class TarjetasRegaloController extends Controller
                 $acciones = "";
                 $acciones .= '<div class="btn-group">';
                 $acciones .= '<a data-modal href="'.route('gestionarTarjeta',$tarjetas->deta_id).'" type="button" class="btn btn-custom btn-xs">Gestionar</a>';
-                $acciones .= '<a data-modal href="' . route('regalo.editar', $tarjetas->deta_id) . '" type="button" class="btn btn-custom btn-xs">Editar</a>';
+                if(Shinobi::can('editar.monto.regalo')){
+                    $acciones .= '<a data-modal href="' . route('regalo.editar', $tarjetas->deta_id) . '" type="button" class="btn btn-custom btn-xs">Editar</a>';
+                }
                 if ($tarjetas->estado == 'C') {
                     $acciones .= '<button type="button" class="btn btn-custom btn-xs" onclick="activar(' . $tarjetas->deta_id . ')">Activar</button>';
                 }
