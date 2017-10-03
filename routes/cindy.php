@@ -31,7 +31,7 @@ Route::group(['middleware' => 'auth'], function () {
         route::get('contratos','ContratosController@index')->name('contratos');
         route::get('contratos/gridcontratos','ContratosController@gridContratos')->name('gridcontratos');
         route::get('contratos/crear','ContratosController@viewCrearContrato')->name('contrato.crear');
-        route::post('contratos/crearcontra','ContratosController@crearContrato')->name('contrato.crearp');
+        route::post('contratos/crear','ContratosController@crearContrato');
 
 
 

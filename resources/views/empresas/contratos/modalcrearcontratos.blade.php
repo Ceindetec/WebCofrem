@@ -1,5 +1,5 @@
 <div id="modalcrearcontratos">
-    {{Form::open(['route'=>['contrato.crearp'], 'class'=>'form-horizontal', 'id'=>'crearcontratos'])}}
+    {{Form::open(['route'=>['contrato.crear'], 'class'=>'form-horizontal', 'id'=>'crearcontratos'])}}
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h4 class="modal-title">Agregar contrato</h4>
@@ -7,7 +7,7 @@
     <div class="modal-body">
         <div class="row">
             <div class="form-group">
-                <label class="col-md-2 control-label">Número de  contrato</label>
+                <label class="col-md-2 control-label">Número de contrato</label>
                 <div class="col-md-10">
                     {{Form::text('n_contrato', null ,['class'=>'form-control', "required", "tabindex"=>"1", 'id'=>'n_contrato'])}}
                 </div>
@@ -38,7 +38,7 @@
             <div class="form-group">
                 <label class="col-md-2 control-label">Empresa</label>
                 <div class="col-md-10">
-                    {{Form::text('empresa_id', null, ['class'=>'form-control', "required", "tabindex"=>"4", "maxlength"=>"10", "data-parsley-type"=>"number", 'id'=>'empresa_id'])}}
+                    {{Form::text('nit', null, ['class'=>'form-control', "required", "tabindex"=>"4", "maxlength"=>"10", "data-parsley-type"=>"number", 'id'=>'nit'])}}
                 </div>
             </div>
 
@@ -54,7 +54,7 @@
             <div class="form-group">
                 <label class="col-md-2 control-label">Forma de pago</label>
                 <div class="col-md-10">
-                    {{Form::select('forma_pago', ['E' => 'Efectivo', 'C' => 'Consumo'], 'E',['class'=>'form-control', "tabindex"=>"6", "required", 'id'=>'pago'])}}
+                    {{Form::select('forma_pago', ['E' => 'Efectivo', 'C' => 'Consumo'], 'E',['class'=>'form-control', "tabindex"=>"6", "required", 'id'=>'forma_pago'])}}
                 </div>
             </div>
 
@@ -65,11 +65,29 @@
                 </div>
             </div>
 
+            <div class="form-group">
+                <label class="control-label col-md-2">Consumo</label>
+                <br>
+                <div class="col-md-10">
+                    <div class="radio radio-custom form-check form-check-inline" style="display: inline">
+
+                        {{Form::radio('consumo', '1', true)}}
+                        <label class="form-check-label">Mensual</label>
+                    </div>
+
+
+                    <div class="radio radio-custom form-check form-check-inline" style="display: inline">
+
+                        <input type="radio" name="consumo" id="radio03" value="0">
+                        <label class="form-check-label">Días de consumo</label>
+                    </div>
+                </div>
+            </div>
 
             <div class="form-group">
                 <label class="col-md-2 control-label">Días Consumo</label>
                 <div class="col-md-10">
-                    {{Form::text('dias_consumo', null ,['class'=>'form-control', "required", "data-parsley-type"=>"number", "tabindex"=>"8", "maxlength"=>"3", 'id'=>'dias'])}}
+                    {{Form::text('dias_consumo', null ,['class'=>'form-control', "required", "data-parsley-type"=>"number", "tabindex"=>"8", "maxlength"=>"3", 'id'=>'dias_consumo'])}}
                 </div>
             </div>
 
@@ -84,7 +102,7 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Cerrar</button>
-        <button type="submit" class="btn btn-custom waves-effect waves-light" >Guardar</button>
+        <button type="submit" class="btn btn-custom waves-effect waves-light">Guardar</button>
     </div>
     {{Form::close()}}
 </div>
@@ -94,19 +112,19 @@
 
     $(function () {
         $('#fecha').datepicker({
-            autoclose:true,
-            startDate:moment().format(),
+            autoclose: true,
+            startDate: moment().format(),
             format: 'dd/mm/yyyy',
             language: 'es'
         });
 
-        $("#modalcrearcontratos").parsley();
-        $("#modalcrearcontratos").submit(function (e) {
+        $("#crearcontratos").parsley();
+        $("#crearcontratos").submit(function (e) {
             e.preventDefault();
             var form = $(this);
 
             $.ajax({
-                url: "{{route('contrato.crearp')}}",
+                url: form.attr('action'),
                 data: form.serialize(),
                 type: 'POST',
                 dataType: 'json',
@@ -160,8 +178,6 @@
 
 
     });
-
-
 
 
 </script>

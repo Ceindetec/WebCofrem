@@ -56,26 +56,29 @@ class ContratosController extends Controller
 
     public function crearContrato(Request $request)
     {
-        dd('hjgjhg');
 
         \DB::beginTransaction();
         $result = [];
         try {
             $validator = \Validator::make($request->all(), [
-                'n_contratos' => 'required|unique:contratos_emprs|max:11',
+                'n_contrato' => 'required|unique:contratos_emprs|max:11',
             ]);
 
             if ($validator->fails()) {
                 return $validator->errors()->all();
             }
 
-            $contrato = Empresas::where("nit", $request->empresa_id)->first();//revisar los parametros de formulario, como saber si el dato ingresado es uno ya creado
-            //dd($contrato);
-            if($contrato != null) {
+            $empresa = Empresas::where("nit", $request->nit)->first();
+            //dd($request->nit);
+            //dd($empresa);
+            if($empresa != null) {
                 $contrato = new Contratos_empr($request->all());
-                //var_dump($empresa); revisar que parametros necesita para la creacion de la empresa
-                $contrato->n_contrato = strtoupper($contrato->n_contrato);
-                $contrato->save();
+                //  $contrato->n_contrato = strtoupper($contrato->n_contrato);
+                $contrato->empresa_id=$empresa->id;
+                $contrato->cons_mensual=$request->consumo;
+             
+                // dd($contrato);
+                 $contrato->save();
                 //si es correcta la transaccion:
                 $result['estado'] = true;
                 $result['mensaje'] = 'El contrato fue creado';//. $exception->getMessage()
@@ -89,6 +92,8 @@ class ContratosController extends Controller
         return $result;
 
     }
+
+
 
 
 }
