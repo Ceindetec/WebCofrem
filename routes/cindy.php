@@ -25,9 +25,17 @@ Route::group(['middleware' => 'auth'], function () {
         route::post('empresas/crear','EmpresasController@crearEmpresa')->name('empresa.crearp');
         route::get('empresas/editar/{id}','EmpresasController@viewEditarEmpresa')->name('empresa.editar');
         route::post('emmpresas/editar','EmpresasController@editarEmpresa')->name('empresa.editarp');
-
-
         /*FINALIZA EMPRESAS*/
+
+        /*INICIO CONTRATOS*/
+        route::get('contratos','ContratosController@index')->name('contratos');
+        route::get('contratos/gridcontratos','ContratosController@gridContratos')->name('gridcontratos');
+        route::get('contratos/crear','ContratosController@viewCrearContrato')->name('contrato.crear');
+        route::post('contratos/crear','ContratosController@crearContrato');
+
+
+
+        /*FINALIZA CONTRATOS*/
 
     });
 });
