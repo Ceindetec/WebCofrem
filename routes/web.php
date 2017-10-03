@@ -140,7 +140,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('tarjetas/regalo/consulta', 'TarjetasRegaloController@consultaTarjetasRegalo')->name('consultaregalo');
     Route::get('tarjetas/regalo/gridconsultatarjetaregalo', 'TarjetasRegaloController@gridConsulaTarjetaRegalo')->name('gridconsultatarjetaregalo');
     Route::get('tarjetas/regalo/editar/{id}','TarjetasRegaloController@viewEditarRegalo')->name('regalo.editar')->middleware('permissionshinobi:editar.monto.regalo');
-    Route::post('tarjetas/regalo/editar/{id}','TarjetasRegaloController@editarRegalo')->middleware('permissionshinobi:editar.monto.regalo');;
+    Route::post('tarjetas/regalo/editar/{id}','TarjetasRegaloController@editarRegalo')->middleware('permissionshinobi:editar.monto.regalo');
     Route::post('tarjetas/regalo/activar','TarjetasRegaloController@activarTarjetaRegalo')->name('tarjeta.regalo.activar');
     /*FINALIZA CONSULTA TARJETA REGALO*/
 
