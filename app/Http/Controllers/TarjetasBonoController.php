@@ -525,10 +525,20 @@ class TarjetasBonoController extends Controller
             ->join('detalle_produtos', 'tarjetas.numero_tarjeta', 'detalle_produtos.numero_tarjeta')
             ->where('tarjeta_servicios.servicio_codigo', Tarjetas::$CODIGO_SERVICIO_BONO)
             ->where('tarjeta_servicios.estado','<>',TarjetaServicios::$ESTADO_ANULADA)
-            ->select(['detalle_produtos.monto_inicial', 'detalle_produtos.contrato_emprs_id as idcontrato', 'detalle_produtos.id as deta_id', 'tarjetas.*'])
+            ->select(['detalle_produtos.monto_inicial', 'detalle_produtos.contrato_emprs_id as idcontrato', 'detalle_produtos.id as deta_id', 'tarjetas.*', 'detalle_produtos.fecha_vencimiento as vencimiento'])
             ->get();
+        //dd($tarjetas);
+
+        //dd($contrato->n_contrato);
 
         return Datatables::of($tarjetas)
+            ->addColumn('numcontrato', function ($tarjetas) {
+                $contrato = Contratos_empr::where("id", $tarjetas->idcontrato)
+                    ->first();
+               // dd($contrato);
+                return $contrato->n_contrato;
+              // return $tarjetas->id;
+            })
             ->addColumn('action', function ($tarjetas) {
                 $acciones = "";
                 $acciones .= '<div class="btn-group">';
@@ -642,5 +652,60 @@ class TarjetasBonoController extends Controller
             $result['mensaje'] = 'No fue posible activar la tarjeta '.$exception->getMessage();
         }
         return $result;
+    }
+    /**
+     *   * metodo que trae la vista para la consulta de tarjeta bono por numero de contrato
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function viewConsultaxContrato()
+    {
+        return view('tarjetas.bono.consultabono_xcontrato');
+    }
+    public function viewConsultaxEmpresa()
+    {
+        return view('tarjetas.bono.consultabono_xempresa');
+    }
+    public function ConsultaxContrato()
+    {
+        //return view('tarjetas.bono.consultabono_xcontrato');
+        return "hola";
+    }
+    public function ConsultaxEmpresa()
+    {
+        //return view('tarjetas.bono.consultabono_xempresa');
+        return "hola";
+    }
+    public function gridConsultaxContrato()
+    {
+        $tarjetas = Tarjetas::join('tarjeta_servicios', 'tarjetas.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
+            ->join('detalle_produtos', 'tarjetas.numero_tarjeta', 'detalle_produtos.numero_tarjeta')
+            ->where('tarjeta_servicios.servicio_codigo', Tarjetas::$CODIGO_SERVICIO_BONO)
+            ->where('tarjeta_servicios.estado','<>',TarjetaServicios::$ESTADO_ANULADA)
+            ->select(['detalle_produtos.monto_inicial', 'detalle_produtos.contrato_emprs_id as idcontrato', 'detalle_produtos.id as deta_id', 'tarjetas.*', 'detalle_produtos.fecha_vencimiento as vencimiento'])
+            ->get();
+        //dd($tarjetas);
+
+        //dd($contrato->n_contrato);
+
+        return Datatables::of($tarjetas)
+            ->addColumn('numcontrato', function ($tarjetas) {
+                $contrato = Contratos_empr::where("id", $tarjetas->idcontrato)
+                    ->first();
+                // dd($contrato);
+                return $contrato->n_contrato;
+                // return $tarjetas->id;
+            })
+            ->addColumn('action', function ($tarjetas) {
+                $acciones = "";
+                $acciones .= '<div class="btn-group">';
+                $acciones .= '<a data-modal href="'.route('gestionarTarjeta',$tarjetas->deta_id).'" type="button" class="btn btn-custom btn-xs">Gestionar</a>';
+                $acciones .= '<a data-modal href="' . route('bono.editar', $tarjetas->deta_id) . '" type="button" class="btn btn-custom btn-xs">Editar</a>';
+                if ($tarjetas->estado == Tarjetas::$ESTADO_TARJETA_CREADA) {
+                    $acciones .= '<button type="button" class="btn btn-custom btn-xs" onclick="activar(' . $tarjetas->deta_id . ')">Activar</button>';
+                }
+                $acciones .= '</div>';
+                return $acciones;
+            })
+            ->make(true);
     }
 }
