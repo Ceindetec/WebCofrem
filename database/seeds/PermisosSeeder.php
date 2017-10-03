@@ -26,7 +26,7 @@ class PermisosSeeder extends Seeder
             ["name" => "Parametrizar productos", "slug" => "parametrizar.producto", "description" => "Permite al usuario parametrizar lo referente a los servicios de tarjeta regalo bono y cupo rotativo"],
             ["name" => "Duplicar tarjetas", "slug" => "duplicar.tarjeta", "description" => "Permite al usuario duplicar una tarjeta"],
             ["name" => "Editar monto regalo", "slug" => "editar.monto.regalo", "description" => "Permite editar el monto de una tarjeta regalo"],
-            ["name" => "Editar monto regalo", "slug" => "editar.monto.regalo", "description" => "Permite editar el monto de una tarjeta regalo"]
+            ["name" => "Editar fecha bono", "slug" => "editar.fecha.bono", "description" => "Permite editar la fecha de vencimiento de un bono empresarial"]
         ]);
     }
 }
