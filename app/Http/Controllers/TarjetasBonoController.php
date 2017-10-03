@@ -2,6 +2,7 @@
 
 namespace creditocofrem\Http\Controllers;
 
+use Caffeinated\Shinobi\Facades\Shinobi;
 use creditocofrem\Contratos_empr;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -501,7 +502,6 @@ class TarjetasBonoController extends Controller
         }catch (\Exception $exception) {
             $result['estado'] = false;
             $result['mensaje'] = 'No fue posible crear la tarjeta bono ' . $exception->getMessage();//. $exception->getMessage()
-            dd($exception->getMessage());
             \DB::rollBack();
         }
         return $result;
@@ -533,7 +533,9 @@ class TarjetasBonoController extends Controller
                 $acciones = "";
                 $acciones .= '<div class="btn-group">';
                 $acciones .= '<a data-modal href="'.route('gestionarTarjeta',$tarjetas->deta_id).'" type="button" class="btn btn-custom btn-xs">Gestionar</a>';
-                $acciones .= '<a data-modal href="' . route('bono.editar', $tarjetas->deta_id) . '" type="button" class="btn btn-custom btn-xs">Editar</a>';
+                if(Shinobi::can('editar.fecha.bono')){
+                    $acciones .= '<a data-modal href="' . route('bono.editar', $tarjetas->deta_id) . '" type="button" class="btn btn-custom btn-xs">Editar</a>';
+                }
                 if ($tarjetas->estado == Tarjetas::$ESTADO_TARJETA_CREADA) {
                     $acciones .= '<button type="button" class="btn btn-custom btn-xs" onclick="activar(' . $tarjetas->deta_id . ')">Activar</button>';
                 }
