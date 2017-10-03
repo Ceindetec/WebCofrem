@@ -24,7 +24,8 @@ class PermisosSeeder extends Seeder
             ["name" => "Trasladar terminales", "slug" => "trasladar.terminal", "description" => "Permite trasladar una terminal"],
             ["name" => "Agregar terminal", "slug" => "agregar.terminal", "description" => "Permite agregar una nueva terminal a un establecimiento"],
             ["name" => "Parametrizar productos", "slug" => "parametrizar.producto", "description" => "Permite al usuario parametrizar lo referente a los servicios de tarjeta regalo bono y cupo rotativo"],
-            ["name" => "Duplicar tarjetas", "slug" => "duplicar.tarjeta", "description" => "Permite al usuario duplicar una tarjeta"]
+            ["name" => "Duplicar tarjetas", "slug" => "duplicar.tarjeta", "description" => "Permite al usuario duplicar una tarjeta"],
+            ["name"=>"Editar monto regalo","slug"=>"editar.monto.regalo","description"=>"Permite editar el monto de una tarjeta regalo"]
         ]);
     }
 }
