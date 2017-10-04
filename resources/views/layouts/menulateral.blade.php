@@ -22,7 +22,7 @@
             @endcan
         </ul>
     </li>
-    {{--<li>--}}
+
     <li>
         <a href="javascript: void(0);"  aria-expanded="true"><i class="fa fa-university" aria-hidden="true"></i> Empresas <span class="fa arrow"></span></a>
          <ul class="nav-second-level nav collapse" aria-expanded="true" style="">
@@ -31,14 +31,6 @@
 
         </ul>
     </li>
-    {{--<span class="fa arrow"></span></a>--}}
-    {{--<ul class="nav-second-level nav" aria-expanded="true">--}}
-    {{--<li><a href="{{route('usuarios')}}">Usuarios</a></li>--}}
-    {{--<li><a href="{{route('roles')}}">Roles</a></li>--}}
-    {{--<li><a href="{{route('permisos')}}">Permisos</a></li>--}}
-    {{--</ul>--}}
-    {{--<a href="{{route('tarjetas')}}"><i class="ti-credit-card"></i> Inventario </a>--}}
-    {{--</li>--}}
 
     <li>
         <a href="javascript: void(0);" aria-expanded="true"><i class="ti-credit-card"></i> Servicios <span
@@ -65,6 +57,13 @@
                     <li><a href="{{route('consultabono')}}">Consulta</a></li>
                 </ul>
             </li>
+        </ul>
+    </li>
+    <li>
+        <a href="javascript: void(0);"  aria-expanded="true"><i class="fa fa-line-chart" aria-hidden="true"></i> Reportes <span class="fa arrow"></span></a>
+        <ul class="nav-second-level nav collapse" aria-expanded="true" style="">
+            <li><a href="{{route('rprimeravez')}}"> Tarjetas usadas por primera vez </a></li>
+            <li><a href="{{route('contratos')}}"> Crear Contratos </a></li>
         </ul>
     </li>
     <!-- <li><a href="{ {route('tarjetasregalo')}}"><i class="ti-layout"></i> Tarjetas Regalo</a></li> -->
