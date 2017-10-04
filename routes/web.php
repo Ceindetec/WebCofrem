@@ -158,6 +158,10 @@ Route::group(['middleware' => 'auth'], function () {
     });
     /*FINALIZA DUPLICADO DE TARJETAS*/
 
+    /*INICIA MODULO REPORTES*/
+    Route::get('reportes/rprimeravez','ReportesController@viewReportePrimeraVez')->name('rprimeravez');
+    Route::post('reportes/resultadoprimeravez','ReportesController@resultadoPrimeravez')->name('resultadoprimeravez');
+
     /*combobox*/
     Route::get('select/permisos',"HomeController@selectpermisos")->name('selectpermisos');
 
