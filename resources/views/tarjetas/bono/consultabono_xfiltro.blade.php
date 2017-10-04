@@ -16,41 +16,47 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-12">
-                <h4 class="header-title m-t-0 m-b-20">Consulta tarjetas bono</h4>
+                <div style="width:80%"> <h4 class="header-title m-t-0 m-b-20">
+                        {{Form::radio('filtro', '1',true,['onclick'=>'mostrar(this)', 'value'=>'1'])}} Por Contrato
+                 {{Form::radio('filtro', '2', false, ['onclick'=>'mostrar(this)','value'=>'2'])}} Por Empresa </h4></div>
             </div>
         </div>
-
-
         <div class="row">
             <div class="col-sm-12">
-                <div class="table-responsive m-b-20">
-                    <table id="datatable" class="table table-striped table-bordered" width="100%">
-                        <thead>
-                        <tr>
-                            <th>Numero tarjeta</th>
-                            <th>Monto</th>
-                            <th>Estado</th>
-                            <th>Fecha Vencimiento</th>
-                            <th>Número Contrato</th>
-                            <th>Acciones</th>
-                        </tr>
-                        </thead>
-                        <tfoot>
-                        <tr>
-                            <th>Numero tarjeta</th>
-                            <th>Contrato empresa</th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                        </tr>
-                        </tfoot>
-                    </table>
-                </div>
+                <h4 class="header-title m-t-0 m-b-20">Consulta tarjetas bono por contrato</h4>
             </div>
         </div>
+
+        <div id="ocultocontrato" class="row" style="display:block">
+            {{Form::open(['class'=>'form-horizontal', 'id'=>'consultarxcontrato', 'target'=>"_blank",'role'=>'form','method'=>'POST'])}}  <!-- 'route'=>['bono.consultaxcontratop'],-->
+            <div  class="form-group">
+                <label class="col-sm-3 control-label">Número de contrato</label>
+                <div class="col-sm-7">
+                {{Form::text('numero_contrato', null ,['class'=>'form-control', "required", "tabindex"=>"1",'id'=>'numero_contrato'])}}
+                </div><button type="button" id="CrearB" class="btn btn-custom waves-effect waves-light" onclick="consultarc()">Buscar</button>
+
+            </div>
+            {{Form::close()}}
+        </div>
+        <div id="ocultoempresa" class="row" style="display:none">
+            {{Form::open(['class'=>'form-horizontal', 'id'=>'consultarxempresa', 'target'=>"_blank",'role'=>'form','method'=>'POST'])}}
+            <div  class="form-group">
+                <label class="col-sm-3 control-label">Nit</label>
+                <div class="col-sm-7">
+                    {{Form::text('nit', null ,['class'=>'form-control', "required", "tabindex"=>"1",'id'=>'nit'])}}
+                </div><button type="button" id="CrearB" class="btn btn-custom waves-effect waves-light" onclick="consultare()">Buscar</button>
+
+            </div>
+            {{Form::close()}}
+        </div>
+        <div id="tablaoculta" name="tablaoculta" style="display: none;">
+        <div class="row">
+            <div class="col-sm-12">
+
+            </div>
+        </div>
+        </div>
     </div>
-
-
 
 @endsection
 
@@ -78,15 +84,34 @@
 
     <script>
         var table;
-        $(function () {
+        function mostrar(elemento) {
+            //alert("el valor es "+elemento.value);
+            if(elemento.value=="1") {
+                document.getElementById("ocultoempresa").style.display = "none";
+                document.getElementById("ocultocontrato").style.display = "block";
+                document.getElementById("tablaoculta").style.display = "none";
+                //alert("valor1");
+            }
+            else {
+                document.getElementById("ocultoempresa").style.display = "block";
+                document.getElementById("ocultocontrato").style.display = "none";
+                document.getElementById("tablaoculta").style.display = "none";
+                //alert("valor2");
+            }
+        }
+        function consultarc() {
+            document.getElementById("tablaoculta").style.display = "block";
+            var numcontrato=$('#numero_contrato').val();
+            $('#tablaoculta').load('{{route('bono.consultaxcontratop')}}',{numcontrato:numcontrato});
+            /*
             table = $('#datatable').DataTable({
                 processing: true,
                 serverSide: true,
                 "language": {
-                    "url": "{!!route('datatable_es')!!}"
+                    "url": " { !!route('datatable_es')!!}"
                 },
                 ajax: {
-                    url: "{!!route('gridconsultatarjetabono')!!}",
+                    url: "{ !!route('bono.gridconsultaxcontrato')!!}",
                     "type": "get"
                 },
                 columns: [
@@ -130,8 +155,8 @@
                     });
                 },
             });
-        });
-
+            */
+        }
         function activar(id) {
             swal({
                     title: '¿Estas seguro?',

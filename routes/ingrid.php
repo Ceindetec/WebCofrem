@@ -46,11 +46,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('tarjetas/bono/editar/{id}', 'TarjetasBonoController@viewEditarBono')->name('bono.editar')->middleware('permissionshinobi:editar.fecha.bono');
     Route::post('tarjetas/bono/editar/{id}', 'TarjetasBonoController@editarBono')->name('bono.editarp')->middleware('permissionshinobi:editar.fecha.bono');
     Route::post('tarjetas/bono/activar', 'TarjetasBonoController@activarTarjetaBono')->name('tarjeta.bono.activar');
-        Route::get('tarjetas/bono/consultaporcontrato','TarjetasBonoController@viewConsultaxContrato')->name('bono.consultaxcontrato');
-        Route::get('tarjetas/bono/consultaporempresa','TarjetasBonoController@viewConsultaxEmpresa')->name('bono.consultaxempresa');
-        Route::get('tarjetas/bono/consultarporcontrato','TarjetasBonoController@ConsultaxContrato')->name('bono.consultaxcontratop');
-        Route::get('tarjetas/bono/consultarporempresa','TarjetasBonoController@ConsultaxEmpresa')->name('bono.consultaxempresap');
-        Route::get('tarjetas/bono/gridconsultaxcontrato', 'TarjetasBonoController@gridConsultaxContrato')->name('bono.gridconsultaxcontrato');
+    Route::get('tarjetas/bono/consultainteligente','TarjetasBonoController@viewConsultaxContrato')->name('bono.consultaxcontrato');
+    Route::post('tarjetas/bono/consultarporcontrato','TarjetasBonoController@ConsultaxContrato')->name('bono.consultaxcontratop');
+    Route::post('tarjetas/bono/consultarporempresa','TarjetasBonoController@ConsultaxEmpresa')->name('bono.consultaxempresap');
+        //Route::get('tarjetas/bono/gridconsultaxcontrato', 'TarjetasBonoController@gridConsultaxContrato')->name('bono.resultadoxcontrato');
     /*FINALIZA CONSULTA TARJETA BONO*/
 
 

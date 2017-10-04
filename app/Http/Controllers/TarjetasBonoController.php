@@ -659,16 +659,24 @@ class TarjetasBonoController extends Controller
      */
     public function viewConsultaxContrato()
     {
-        return view('tarjetas.bono.consultabono_xcontrato');
+        return view('tarjetas.bono.consultabono_xfiltro');
     }
-    public function viewConsultaxEmpresa()
-    {
-        return view('tarjetas.bono.consultabono_xempresa');
-    }
-    public function ConsultaxContrato()
+    public function ConsultaxContrato(Request $request)
     {
         //return view('tarjetas.bono.consultabono_xcontrato');
-        return "hola";
+        //return "hola";
+        //dd($request->numcontrato);
+        $contrato = Contratos_empr::where("n_contrato", $request->numcontrato)->first();
+        //dd($contrato->id);
+        $tarjetas = Tarjetas::join('tarjeta_servicios', 'tarjetas.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
+            ->join('detalle_produtos', 'tarjetas.numero_tarjeta', 'detalle_produtos.numero_tarjeta')
+            ->where('tarjeta_servicios.servicio_codigo', Tarjetas::$CODIGO_SERVICIO_BONO)
+            ->where('tarjeta_servicios.estado','<>',TarjetaServicios::$ESTADO_ANULADA)
+            ->where('detalle_produtos.contrato_emprs_id',$contrato->id)
+            ->select(['detalle_produtos.monto_inicial as monto_tar', 'detalle_produtos.contrato_emprs_id as idcontrato', 'detalle_produtos.id as deta_id', 'tarjetas.*', 'detalle_produtos.fecha_vencimiento as vencimiento','tarjeta_servicios.estado as estado_tar'])
+            ->get();
+        //dd($tarjetas);
+        return view('tarjetas.bono.parcialconsultaxcontrato',compact('tarjetas','contrato'));
     }
     public function ConsultaxEmpresa()
     {
