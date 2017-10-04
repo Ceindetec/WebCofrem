@@ -4,6 +4,7 @@ namespace creditocofrem\Http\Controllers;
 
 use Caffeinated\Shinobi\Facades\Shinobi;
 use creditocofrem\Contratos_empr;
+use creditocofrem\Empresas;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use creditocofrem\Htarjetas;
@@ -533,8 +534,7 @@ class TarjetasBonoController extends Controller
 
         return Datatables::of($tarjetas)
             ->addColumn('numcontrato', function ($tarjetas) {
-                $contrato = Contratos_empr::where("id", $tarjetas->idcontrato)
-                    ->first();
+                $contrato = Contratos_empr::where("id", $tarjetas->idcontrato)->first();
                // dd($contrato);
                 return $contrato->n_contrato;
               // return $tarjetas->id;
@@ -654,66 +654,91 @@ class TarjetasBonoController extends Controller
         return $result;
     }
     /**
-     *   * metodo que trae la vista para la consulta de tarjeta bono por numero de contrato
+     *   * metodo que trae la vista para la consulta inteligente de tarjeta bono: filtro por numero de contrato o nit de la empresa,
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function viewConsultaxContrato()
     {
         return view('tarjetas.bono.consultabono_xfiltro');
     }
+    /**
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * Funcion consulta por contrato, busca las tarjetas bono, que corresponden a un numero de contrato
+     */
     public function ConsultaxContrato(Request $request)
     {
-        //return view('tarjetas.bono.consultabono_xcontrato');
-        //return "hola";
-        //dd($request->numcontrato);
         $contrato = Contratos_empr::where("n_contrato", $request->numcontrato)->first();
-        //dd($contrato->id);
-        $tarjetas = Tarjetas::join('tarjeta_servicios', 'tarjetas.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
-            ->join('detalle_produtos', 'tarjetas.numero_tarjeta', 'detalle_produtos.numero_tarjeta')
-            ->where('tarjeta_servicios.servicio_codigo', Tarjetas::$CODIGO_SERVICIO_BONO)
-            ->where('tarjeta_servicios.estado','<>',TarjetaServicios::$ESTADO_ANULADA)
-            ->where('detalle_produtos.contrato_emprs_id',$contrato->id)
-            ->select(['detalle_produtos.monto_inicial as monto_tar', 'detalle_produtos.contrato_emprs_id as idcontrato', 'detalle_produtos.id as deta_id', 'tarjetas.*', 'detalle_produtos.fecha_vencimiento as vencimiento','tarjeta_servicios.estado as estado_tar'])
-            ->get();
-        //dd($tarjetas);
-        return view('tarjetas.bono.parcialconsultaxcontrato',compact('tarjetas','contrato'));
-    }
-    public function ConsultaxEmpresa()
-    {
-        //return view('tarjetas.bono.consultabono_xempresa');
-        return "hola";
-    }
-    public function gridConsultaxContrato()
-    {
-        $tarjetas = Tarjetas::join('tarjeta_servicios', 'tarjetas.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
-            ->join('detalle_produtos', 'tarjetas.numero_tarjeta', 'detalle_produtos.numero_tarjeta')
-            ->where('tarjeta_servicios.servicio_codigo', Tarjetas::$CODIGO_SERVICIO_BONO)
-            ->where('tarjeta_servicios.estado','<>',TarjetaServicios::$ESTADO_ANULADA)
-            ->select(['detalle_produtos.monto_inicial', 'detalle_produtos.contrato_emprs_id as idcontrato', 'detalle_produtos.id as deta_id', 'tarjetas.*', 'detalle_produtos.fecha_vencimiento as vencimiento'])
-            ->get();
-        //dd($tarjetas);
+        if($contrato!=null) {
+            $tarjetas = Tarjetas::join('tarjeta_servicios', 'tarjetas.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
+                ->join('detalle_produtos', 'tarjetas.numero_tarjeta', 'detalle_produtos.numero_tarjeta')
+                ->where('tarjeta_servicios.servicio_codigo', Tarjetas::$CODIGO_SERVICIO_BONO)
+                ->where('tarjeta_servicios.estado','<>',TarjetaServicios::$ESTADO_ANULADA)
+                ->where('detalle_produtos.contrato_emprs_id',$contrato->id)
+                ->select(['detalle_produtos.monto_inicial as monto_tar', 'detalle_produtos.contrato_emprs_id as idcontrato', 'detalle_produtos.id as deta_id', 'tarjetas.*', 'detalle_produtos.fecha_vencimiento as vencimiento','tarjeta_servicios.estado as estado_tar'])
+                ->get();
+            return view('tarjetas.bono.parcialconsultaxcontrato', compact('tarjetas', 'contrato'));
+        }
+        else{
+            return "<p align='center'>No se encontraron resultados</p>";
+        }
 
-        //dd($contrato->n_contrato);
-
-        return Datatables::of($tarjetas)
-            ->addColumn('numcontrato', function ($tarjetas) {
-                $contrato = Contratos_empr::where("id", $tarjetas->idcontrato)
-                    ->first();
-                // dd($contrato);
-                return $contrato->n_contrato;
-                // return $tarjetas->id;
-            })
-            ->addColumn('action', function ($tarjetas) {
-                $acciones = "";
-                $acciones .= '<div class="btn-group">';
-                $acciones .= '<a data-modal href="'.route('gestionarTarjeta',$tarjetas->deta_id).'" type="button" class="btn btn-custom btn-xs">Gestionar</a>';
-                $acciones .= '<a data-modal href="' . route('bono.editar', $tarjetas->deta_id) . '" type="button" class="btn btn-custom btn-xs">Editar</a>';
-                if ($tarjetas->estado == Tarjetas::$ESTADO_TARJETA_CREADA) {
-                    $acciones .= '<button type="button" class="btn btn-custom btn-xs" onclick="activar(' . $tarjetas->deta_id . ')">Activar</button>';
-                }
-                $acciones .= '</div>';
-                return $acciones;
-            })
-            ->make(true);
     }
+    /**
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * Funcion consulta por contrato, busca los contratos correspondientes a una empresa (busca por nit)
+     */
+    public function ConsultaxEmpresa(Request $request)
+    {
+        $empresa = Empresas::where("nit", $request->nit)->first();
+        //dd($contratos);
+        if($empresa!=null) {
+            $contratos = Contratos_empr::where("empresa_id", $empresa->id)->get();
+            return view('tarjetas.bono.parcialconsultaxempresa',compact('contratos'));
+        }
+        else{
+            return "<p align='center'>No se encontraron resultados</p>";
+        }
+    }
+    /**
+     * FUNCION ACTIVAR TARJETAS BONO MASIVAMENTE: por el numero de contrato
+     *  *TABLAS INVOLUCRADAS:
+     * tarjetas
+     * htarjetas
+     * tarjeta_servicios
+     * detalle_produtos
+     */
+    public function ActivarxContrato(Request $request)
+    {
+        $result = [];
+        \DB::beginTransaction();
+        try {
+        $contrato = Contratos_empr::where("n_contrato",  $request->ncontrato)->first();
+        if($contrato!=null) {
+            /*$tarjetas = Tarjetas::join('tarjeta_servicios', 'tarjetas.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
+                ->join('detalle_produtos', 'tarjetas.numero_tarjeta', 'detalle_produtos.numero_tarjeta')
+                ->where('tarjeta_servicios.servicio_codigo', Tarjetas::$CODIGO_SERVICIO_BONO)
+                ->where('tarjeta_servicios.estado','<>',TarjetaServicios::$ESTADO_ANULADA)
+                ->where('detalle_produtos.contrato_emprs_id',$contrato->id)
+                ->select(['detalle_produtos.monto_inicial as monto_tar', 'detalle_produtos.contrato_emprs_id as idcontrato', 'detalle_produtos.id as deta_id', 'tarjetas.*', 'detalle_produtos.fecha_vencimiento as vencimiento','tarjeta_servicios.estado as estado_tar'])
+                ->get();
+            return view('tarjetas.bono.parcialconsultaxcontrato', compact('tarjetas', 'contrato'));*/
+            $tarjetas=Tarjetas::where('id', 1)
+                ->update(['options->enabled' => true]);
+            $result['estado'] = true;
+            $result['mensaje'] = 'La tarjeta ha sido activada';
+            $result = TarjetasController::crearHtarjeta($tarjetas, Tarjetas::$ESTADO_TARJETA_ACTIVA, Tarjetas::$CODIGO_SERVICIO_BONO);
+        }
+        else{
+            return "<p align='center'>No se encontraron resultados</p>";
+        }
+        }catch (\Exception $exception) {
+            $result['estado'] = false;
+            $result['mensaje'] = 'No fue posible crear la tarjeta bono ' . $exception->getMessage();//. $exception->getMessage()
+            \DB::rollBack();
+        }
+        return $result;
+    }
+
 }

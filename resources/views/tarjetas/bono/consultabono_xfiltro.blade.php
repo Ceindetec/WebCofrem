@@ -23,7 +23,7 @@
         </div>
         <div class="row">
             <div class="col-sm-12">
-                <h4 class="header-title m-t-0 m-b-20">Consulta tarjetas bono por contrato</h4>
+                <h4 class="header-title m-t-0 m-b-20">Consulta personalizada de tarjetas bono</h4>
             </div>
         </div>
 
@@ -84,6 +84,18 @@
 
     <script>
         var table;
+        $(function () {
+            $("#ocultocontrato").submit(function (e) {
+                e.preventDefault();
+                consultarc();
+                //llamar funcion
+            });
+            $("#ocultoempresa").submit(function (e) {
+                e.preventDefault();
+                consultare();
+                //llamar funcion
+            });
+        });
         function mostrar(elemento) {
             //alert("el valor es "+elemento.value);
             if(elemento.value=="1") {
@@ -100,62 +112,16 @@
             }
         }
         function consultarc() {
-            document.getElementById("tablaoculta").style.display = "block";
             var numcontrato=$('#numero_contrato').val();
             $('#tablaoculta').load('{{route('bono.consultaxcontratop')}}',{numcontrato:numcontrato});
-            /*
-            table = $('#datatable').DataTable({
-                processing: true,
-                serverSide: true,
-                "language": {
-                    "url": " { !!route('datatable_es')!!}"
-                },
-                ajax: {
-                    url: "{ !!route('bono.gridconsultaxcontrato')!!}",
-                    "type": "get"
-                },
-                columns: [
-                    {data: 'numero_tarjeta', name: 'numero_tarjeta'},
-                    {
-                        data: 'monto_inicial',
-                        name: 'monto_inicial',
-                        render: function (data) {
-                            return '$ '+enmascarar(data);
-                        }
-                    },
-                    {
-                        data: 'estado',
-                        name: 'estado',
-                        render: function (data) {
-                            if (data == 'A') {
-                                return 'Activo';
-                            }
-                            else if (data == 'I') {
-                                return 'Inactivo';
-                            } else {
-                                return 'Pendiente'
-                            }
-                        },
-                        searchable: false
-                    },
-                    {data: 'vencimiento', name: 'vencimiento'},
-                    {data: 'numcontrato', name: 'numcontrato'},
-                    {data: 'action', name: 'action', orderable: false, searchable: false}
-                ],
-                initComplete: function () {
-                    this.api().columns().every(function () {
-                        var column = this;
-                        if(column.footer().innerHTML != ""){
-                            var input = document.createElement("input");
-                            $(input).appendTo($(column.footer()).empty())
-                                .on('keyup', function () {
-                                    column.search($(this).val(), false, false, true).draw();
-                                });
-                        }
-                    });
-                },
-            });
-            */
+            document.getElementById("tablaoculta").style.display = "block";
+
+        }
+        function consultare() {
+            var nit=$('#nit').val();
+            $('#tablaoculta').load('{{route('bono.consultaxempresap')}}',{nit:nit});
+            document.getElementById("tablaoculta").style.display = "block";
+
         }
         function activar(id) {
             swal({

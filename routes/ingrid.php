@@ -49,7 +49,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('tarjetas/bono/consultainteligente','TarjetasBonoController@viewConsultaxContrato')->name('bono.consultaxcontrato');
     Route::post('tarjetas/bono/consultarporcontrato','TarjetasBonoController@ConsultaxContrato')->name('bono.consultaxcontratop');
     Route::post('tarjetas/bono/consultarporempresa','TarjetasBonoController@ConsultaxEmpresa')->name('bono.consultaxempresap');
-        //Route::get('tarjetas/bono/gridconsultaxcontrato', 'TarjetasBonoController@gridConsultaxContrato')->name('bono.resultadoxcontrato');
+    Route::post('tarjetas/bono/activarporcontrato','TarjetasBonoController@ActivarxContrato')->name('bono.activarxcontrato');
     /*FINALIZA CONSULTA TARJETA BONO*/
 
 
