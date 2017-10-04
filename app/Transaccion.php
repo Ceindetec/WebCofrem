@@ -11,4 +11,12 @@ class Transaccion extends Model
 
     protected $table = 'transacciones';
 
+    public function getSucursal(){
+       return $this->belongsTo('creditocofrem\Sucursales','sucursal_id','id');
+    }
+
+    public function valorTransacion(){
+        return $this->hasMany('creditocofrem\DetalleTransaccion','transaccion_id','id')->select([\DB::raw('SUM(valor) as total')]);
+    }
+
 }
