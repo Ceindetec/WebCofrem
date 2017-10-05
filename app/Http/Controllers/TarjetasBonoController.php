@@ -24,6 +24,7 @@ use creditocofrem\DetalleTransaccion;
 use creditocofrem\AdminisTarjetas;
 use creditocofrem\ValorTarjeta;
 use creditocofrem\PagaPlastico;
+use Illuminate\Support\Facades\Auth;
 
 class TarjetasBonoController extends Controller
 {
@@ -704,38 +705,51 @@ class TarjetasBonoController extends Controller
     /**
      * FUNCION ACTIVAR TARJETAS BONO MASIVAMENTE: por el numero de contrato
      *  *TABLAS INVOLUCRADAS:
-     * tarjetas
-     * htarjetas
-     * tarjeta_servicios
-     * detalle_produtos
+     * tarjetas (update)
+     * htarjetas (insert)
+     * tarjeta_servicios (update)
+     * detalle_produtos (update)
      */
     public function ActivarxContrato(Request $request)
     {
         $result = [];
         \DB::beginTransaction();
         try {
-        $contrato = Contratos_empr::where("n_contrato",  $request->ncontrato)->first();
-        if($contrato!=null) {
-            /*$tarjetas = Tarjetas::join('tarjeta_servicios', 'tarjetas.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
-                ->join('detalle_produtos', 'tarjetas.numero_tarjeta', 'detalle_produtos.numero_tarjeta')
-                ->where('tarjeta_servicios.servicio_codigo', Tarjetas::$CODIGO_SERVICIO_BONO)
-                ->where('tarjeta_servicios.estado','<>',TarjetaServicios::$ESTADO_ANULADA)
-                ->where('detalle_produtos.contrato_emprs_id',$contrato->id)
-                ->select(['detalle_produtos.monto_inicial as monto_tar', 'detalle_produtos.contrato_emprs_id as idcontrato', 'detalle_produtos.id as deta_id', 'tarjetas.*', 'detalle_produtos.fecha_vencimiento as vencimiento','tarjeta_servicios.estado as estado_tar'])
-                ->get();
-            return view('tarjetas.bono.parcialconsultaxcontrato', compact('tarjetas', 'contrato'));*/
-            $tarjetas=Tarjetas::where('id', 1)
-                ->update(['options->enabled' => true]);
-            $result['estado'] = true;
-            $result['mensaje'] = 'La tarjeta ha sido activada';
-            $result = TarjetasController::crearHtarjeta($tarjetas, Tarjetas::$ESTADO_TARJETA_ACTIVA, Tarjetas::$CODIGO_SERVICIO_BONO);
-        }
-        else{
-            return "<p align='center'>No se encontraron resultados</p>";
-        }
-        }catch (\Exception $exception) {
-            $result['estado'] = false;
-            $result['mensaje'] = 'No fue posible crear la tarjeta bono ' . $exception->getMessage();//. $exception->getMessage()
+            $contrato = Contratos_empr::where("n_contrato", $request->ncontrato)->first();
+            if ($contrato != null) {
+                $detalles = DetalleProdutos::where('contrato_emprs_id', $contrato->id)->get();
+                $fecha_activacion = Carbon::now();
+                $fecha_vencimiento = $fecha_activacion->addYear();
+                DB::table('detalle_produtos')->where('contrato_emprs_id', $contrato->id)->update(['estado' => DetalleProdutos::$ESTADO_ACTIVO, 'fecha_activacion' => $fecha_activacion, 'fecha_vencimiento' => $fecha_vencimiento]);
+                foreach ($detalles as $detalle) {
+                    DB::table('tarjeta_servicios')->where('numero_tarjeta', $detalle->numero_tarjeta)->where('servicio_codigo', Tarjetas::$CODIGO_SERVICIO_BONO)->update(['estado' => TarjetaServicios::$ESTADO_ACTIVO]);
+                    $result['estado'] = TRUE;
+                    DB::table('tarjetas')->where('numero_tarjeta', $detalle->numero_tarjeta)->update(['estado' => Tarjetas::$ESTADO_TARJETA_ACTIVA]);
+                    $result['estado'] = TRUE;
+                    $tarjeta = Tarjetas::where("numero_tarjeta", $detalle->numero_tarjeta)->first();
+                    $htarjetas = new Htarjetas();
+                    $htarjetas->motivo = Tarjetas::$MOTIVO_TARJETA_ACTIVA;
+                    $htarjetas->estado = Tarjetas::$ESTADO_TARJETA_ACTIVA;
+                    $htarjetas->fecha = $fecha_activacion;
+                    $htarjetas->tarjetas_id = $tarjeta->id;
+                    $htarjetas->user_id = Auth::User()->id;
+                    $htarjetas->servicio_codigo = Tarjetas::$CODIGO_SERVICIO_BONO;
+                    $htarjetas->save();
+                    $result['estado'] = TRUE;
+                }
+                $result['estado'] = TRUE;
+                $result['mensaje'] = 'La tarjeta ha sido activada';
+                \DB::commit();
+                //si lo anterior sale bien, hacer commit
+            } else {
+                return "<p align='center'>No se encontraron resultados</p>";
+                $result['estado'] = false;
+                $result['mensaje'] = 'No hay tarjetas para activar';
+                \DB::rollBack();
+            }
+        } catch (\Exception $exception) {
+            $result['estado'] = FALSE;
+            $result['mensaje'] = 'No fue posible activar las tarjetas bono ' . $exception->getMessage();//. $exception->getMessage()
             \DB::rollBack();
         }
         return $result;

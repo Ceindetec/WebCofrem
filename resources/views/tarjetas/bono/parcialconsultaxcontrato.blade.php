@@ -55,7 +55,7 @@
                                     confirmButtonColor: '#4fa7f3'
                                 }
                             );
-                            table.ajax.reload();
+                            //table.ajax.reload();
                         } else if (result.estado == false) {
                             swal(
                                 'Error!!',
