@@ -22,4 +22,5 @@ Route::post('terminal','WebApiController@validarTerminal');
 Route::post('clavesucursal','WebApiController@validarClaveSucursal');
 Route::post('claveterminal','WebApiController@validarClaveTerminal');
 Route::post('asignaID','WebApiController@asignaID');
+Route::post('getservicios','WebApiController@getServicios');
 
