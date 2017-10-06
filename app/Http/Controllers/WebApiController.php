@@ -2,6 +2,8 @@
 
 namespace creditocofrem\Http\Controllers;
 
+use creditocofrem\Tarjetas;
+use creditocofrem\TarjetaServicios;
 use creditocofrem\Terminales;
 use Facades\creditocofrem\Encript;
 use Illuminate\Http\Request;
@@ -141,6 +143,35 @@ class WebApiController extends Controller
         } catch (\Exception $exception) {
             $result['estado'] = FALSE;
             $result['mensaje'] = 'Error de ejecucion '.$exception->getMessage();
+        }
+        return ['resultado'=>$result];
+    }
+
+    public function getServicios(Request $request){
+        $result = [];
+        try{
+            $terminal = Terminales::where('codigo', $request->codigo)->first();
+            if(count($terminal)>0){
+                $tarjeta = Tarjetas::where('numero_tarjeta',$request->numero_tarjeta)->where('estado',Tarjetas::$ESTADO_TARJETA_ACTIVA)->first();
+                if(count($tarjeta)>0){
+                    $servicios = TarjetaServicios::where('numero_tarjeta',$tarjeta->numero_tarjeta)
+                        ->where('estado',TarjetaServicios::$ESTADO_ACTIVO)
+                        ->select('servicio_codigo')
+                        ->get();
+                    $result['estado']=TRUE;
+                    $result['mensaje'] = 'Retornando servicios';
+                    $result['data'] = $servicios;
+                }else{
+                    $result['estado']=FALSE;
+                    $result['mensaje'] = 'Tarjeta no validad';
+                }
+            }else{
+                $result['estado']=FALSE;
+                $result['mensaje'] = 'codigo de terminal invalido';
+            }
+        }catch (\Exception $exception){
+            $result['estado']=FALSE;
+            $result['mensaje'] = 'Error de ejecucion';
         }
         return ['resultado'=>$result];
     }
