@@ -5,6 +5,7 @@ namespace creditocofrem\Http\Controllers;
 use creditocofrem\Terminales;
 use Facades\creditocofrem\Encript;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class WebApiController extends Controller
 {
@@ -44,6 +45,7 @@ class WebApiController extends Controller
                 $data['estado_sucursal'] = $sucursal->estado;
                 $data['estado_terminal'] = $terminal->estado;
                 $data['codigo_terminal'] = $terminal->codigo;
+                $data['ip1'] = "192.168.1.52";
 //                $terminal->imei = $request->imei;
 //                $terminal->uid = $request->uuid;
 //                $terminal->mac = $request->mac;
@@ -58,6 +60,33 @@ class WebApiController extends Controller
         } catch (\Exception $exception) {
             $result['estado'] = FALSE;
             $result['mensaje'] = 'Error de operacion';
+        }
+        return ['resultado' => $result];
+    }
+
+    public function asignaID(Request $request) {
+
+        $result = [];
+        DB::beginTransaction();
+        try {
+            $terminal = Terminales::where('codigo', $request->codigo)->first();
+            if (count($terminal) > 0) {
+                $terminal->imei = $request->imei;
+                $terminal->uid = $request->uuid;
+                $terminal->mac = $request->mac;
+                $terminal->save();
+                $result['estado'] = TRUE;
+                $result['mensaje'] = 'Validacion exitosa';
+                DB::commit();
+            } else {
+                $result['estado'] = FALSE;
+                $result['mensaje'] = 'Terminal no Existe';
+                DB::rollBack();
+            }
+        } catch (\Exception $exception) {
+            $result['estado'] = FALSE;
+            $result['mensaje'] = 'Error de operacion';
+            DB::rollBack();
         }
         return ['resultado' => $result];
     }
@@ -87,6 +116,8 @@ class WebApiController extends Controller
         }
         return ['resultado'=>$result];
     }
+
+
 
     public function validarClaveSucursal(Request $request)
     {
