@@ -174,8 +174,11 @@ class TarjetasController extends Controller
             //dd($tarjetas);
             // $tarjetas->create($request->all());
             $valor_motivo = '';
-            if ($name_estado == 'C')
-                $valor_motivo = 'Creación de la tarjeta - ingreso al inventario';
+            if ($name_estado == Tarjetas::$ESTADO_TARJETA_CREADA)
+                $valor_motivo = Tarjetas::$MOTIVO_TARJETA_CREADA;
+            if ($name_estado == Tarjetas::$ESTADO_TARJETA_ACTIVA)
+                $valor_motivo = Tarjetas::$MOTIVO_TARJETA_ACTIVA;
+
             $htarjetas->motivo = $valor_motivo;
             $htarjetas->estado = $name_estado;
             $htarjetas->fecha = Carbon::now();

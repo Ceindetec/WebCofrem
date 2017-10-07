@@ -55,6 +55,7 @@
                     <li><a href="{{route('creartarjetasBono')}}">Individualmente</a></li>
                     <li><a href="{{route('creartarjetasBonoBloque')}}">En Bloque</a></li>
                     <li><a href="{{route('consultabono')}}">Consulta</a></li>
+                    <li><a href="{{route('bono.consultaxcontrato')}}">Consulta inteligente</a></li>
                 </ul>
             </li>
         </ul>
