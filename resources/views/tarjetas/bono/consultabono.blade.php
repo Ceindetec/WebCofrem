@@ -28,9 +28,10 @@
                         <thead>
                         <tr>
                             <th>Numero tarjeta</th>
-                            <th>Contrato empresa</th>
                             <th>Monto</th>
                             <th>Estado</th>
+                            <th>Fecha Vencimiento</th>
+                            <th>Número Contrato</th>
                             <th>Acciones</th>
                         </tr>
                         </thead>
@@ -90,7 +91,6 @@
                 },
                 columns: [
                     {data: 'numero_tarjeta', name: 'numero_tarjeta'},
-                    {data: 'idcontrato', name: 'idcontrato'},
                     {
                         data: 'monto_inicial',
                         name: 'monto_inicial',
@@ -113,6 +113,8 @@
                         },
                         searchable: false
                     },
+                    {data: 'vencimiento', name: 'vencimiento'},
+                    {data: 'numcontrato', name: 'numcontrato'},
                     {data: 'action', name: 'action', orderable: false, searchable: false}
                 ],
                 initComplete: function () {

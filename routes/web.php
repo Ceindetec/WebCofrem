@@ -161,6 +161,8 @@ Route::group(['middleware' => 'auth'], function () {
     /*INICIA MODULO REPORTES*/
     Route::get('reportes/rprimeravez','ReportesController@viewReportePrimeraVez')->name('rprimeravez');
     Route::post('reportes/resultadoprimeravez','ReportesController@resultadoPrimeravez')->name('resultadoprimeravez');
+    Route::get('reportes/exportarpdfprimeravez','ReportesController@exportarPdfPrimeravez')->name('exportarpdfprimeravez');
+    Route::get('reportes/exportarexcelprimeravez','ReportesController@exportarExcelPrimeravez')->name('exportarexcelprimeravez');
 
     /*combobox*/
     Route::get('select/permisos',"HomeController@selectpermisos")->name('selectpermisos');
