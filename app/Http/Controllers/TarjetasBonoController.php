@@ -31,13 +31,11 @@ class TarjetasBonoController extends Controller
     //Abre el formulario para la creacion individual de tarjetas bono
     public function viewCrearTarjetaIndividual()
     {
-       // $servicios = Servicios::pluck('descripcion', 'codigo');
         return view('tarjetas.bono.individualmente');
     }
     //Abre el formulario para la creacion en bloque de tarjetas bono
     public function viewCrearTarjetaBloque()
     {
-        // $servicios = Servicios::pluck('descripcion', 'codigo');
         return view('tarjetas.bono.crearbloque');
     }
     //funcion crear tarjeta de bono empresarial Individual
@@ -63,8 +61,6 @@ class TarjetasBonoController extends Controller
             $contrato = Contratos_empr::where("n_contrato", $request->numero_contrato)->first();
             //dd($contrato);
             if($contrato != null) {
-                //if ($contrato->n_contrato == $request->numero_contrato) //solo si existe el contrato con una empresa
-                //{
                 $num_tarjeta = $request->numero_tarjeta;
                 while (strlen($num_tarjeta) < 6) {
                     $num_tarjeta = "0" . $num_tarjeta;
@@ -79,18 +75,15 @@ class TarjetasBonoController extends Controller
                 if($persona==null) //no existe la persona
                 {
                     $result = $this->crearPersona($request->identificacion,$request->nombres,$request->apellidos);
-                    //dd($result['mensaje']);
                 }
                 $monto=str_replace(".","",$request->monto);
                 //insertar el detalle del producto
-                //dd($detalle);
                 $result = $this->crearDetalleProd($num_tarjeta, $monto, $contrato->id, Tarjetas::$ESTADO_TARJETA_INACTIVA);
                 if($result['estado']==true) {
                     //insertar la transaccion
                     $detalle_id=$result['detalle_id'];
                     $result = $this->transacciones($num_tarjeta, Tarjetas::$CODIGO_SERVICIO_BONO, $detalle_id,$monto);// num_tarjeta,servicio_codigo=B,detalle_id,monto
                     //si es correcta la transaccion:
-
                     //validar si la suma del monto y cantidad de tarjetas, es igual o menor a la estipulada en el contrato, sino hacer rollback
                     $valor_contrato_original=$contrato->valor_contrato-$contrato->valor_impuesto;
                     $cantidadt_contrato_original=$contrato->n_tarjetas;
@@ -102,7 +95,6 @@ class TarjetasBonoController extends Controller
                     {
                         $valor_contrato_nuevo+=$det->monto_inicial;
                     }
-                    //  dd("cantidad orgi/nuevo: ".$cantidadt_contrato_original."/".$cantidadt_contrato_nuevo." y monto nuevo: ".$valor_contrato_original."/".$valor_contrato_nuevo);
                     if($cantidadt_contrato_original<$cantidadt_contrato_nuevo && $valor_contrato_original<$valor_contrato_nuevo) {
                         $result['estado'] = false;
                         $result['mensaje'] = 'Las tarjetas superan la cantidad y/o el monto que fue contratado inicialmente';//. $exception->getMessage()
@@ -118,7 +110,6 @@ class TarjetasBonoController extends Controller
                         \DB::rollBack();
                     }
                 }
-                // }
             }
             else
                 {
@@ -144,11 +135,9 @@ class TarjetasBonoController extends Controller
               $paga = PagaPlastico::where("pagaplastico", '1')->where("estado", 'A')->where("servicio_codigo", $tipo_servicio)->first();
               if ($paga!=null) {//si paga plastico
                   $vtarjeta = ValorTarjeta::where("estado", 'A')->first();
-                  //$vtarjeta->valor;
                   //crear transaccion
                   $transaccion = new Transaccion();
                   $transaccion_ant = Transaccion::max('numero_transaccion'); //consulta maximo valor de transaccion
-                  //dd($transaccion_ant);
                   if($transaccion_ant==null)//no hay transacciones
                   {
                       $next="0000000001";
@@ -159,30 +148,24 @@ class TarjetasBonoController extends Controller
                           $next = "0" . $next;
                       }
                   }
-                 // dd($next);
                   $transaccion->numero_transaccion=$next;
                   $transaccion->numero_tarjeta = $num_tarjeta;
                   $transaccion->tipo=Transaccion::$TIPO_ADMINISTRATIVO;
                   $transaccion->fecha=Carbon::now();
-                 // dd($transaccion);
                   $transaccion->save();
                   $id_transaccion=$transaccion->id;
-
                   //crear htransaccion
                   $htransaccion = new HEstadoTransaccion();
                   $htransaccion->transaccion_id= $transaccion->id;
                   $htransaccion->estado=HEstadoTransaccion::$ESTADO_ACTIVO;
                   $htransaccion->fecha=Carbon::now();
-                  //dd($htransaccion);
                   $htransaccion->save();
-
                   //crear detalle_transaccion
                   $detallet= new DetalleTransaccion();
                   $detallet->transaccion_id=$transaccion->id;
                   $detallet->detalle_producto_id=$detalle_id;
                   $detallet->valor=$vtarjeta->valor;
                   $detallet->descripcion=DetalleTransaccion::$DESCRIPCION_PLASTICO;
-
                   $detallet->save();
 
               }
@@ -218,7 +201,6 @@ class TarjetasBonoController extends Controller
                       $htransaccion->fecha=Carbon::now();
                       $htransaccion->save();
                   }
-
                   //crear detalle_transaccion
                   $detallet= new DetalleTransaccion();
                   $detallet->transaccion_id=$id_transaccion;
@@ -253,10 +235,8 @@ class TarjetasBonoController extends Controller
                 return $validator->errors()->all();
             }
             $ultimos = substr($tarjetas->numero_tarjeta, -4);
-            //$tarjetas->password = bcrypt($ultimos);
             $tarjetas->password = Encript::encryption($ultimos);
             $tarjetas->estado = $name_estado;
-            //dd($tarjetas);
             $tarjetas->save();
             $result['estado'] = true;
             $result['mensaje'] = 'La tarjeta ha sido creada satisfactoriamente';
@@ -272,13 +252,11 @@ class TarjetasBonoController extends Controller
     public function crearPersona($iden,$nom,$ape)
     {
         $result = [];
-        // \DB::beginTransaction();
         try {
             $persona = new Personas();
             $persona->identificacion = $iden;
             $persona->nombres = $nom;
             $persona->apellidos = $ape;
-           // dd($persona);
             $persona->save();
             $result['estado'] = true;
             $result['mensaje'] = 'La persona ha sido ingresada satisfactoriamente';
@@ -292,7 +270,6 @@ class TarjetasBonoController extends Controller
     public function crearDetalleProd($num_tarjeta,$monto,$contrato_id,$estado)
     {
         $result = [];
-        // \DB::beginTransaction();
         try {
             $detalle = DetalleProdutos::where("numero_tarjeta", $num_tarjeta)->where("contrato_emprs_id", $contrato_id)->first();
             if ($detalle!=null) {
@@ -368,10 +345,7 @@ class TarjetasBonoController extends Controller
         $result = [];
         \DB::beginTransaction();
         try {
-            //dd($request->all());
-            //dd("funcion crear en bloque");
             $contrato = Contratos_empr::where("n_contrato", $request->numero_contrato)->first();
-            //dd($contrato);
             if($contrato != null) {
                 $primer_num = $request->numero_tarjeta_inicial;
                 $num_contrato=$request->numero_contrato;
@@ -394,14 +368,12 @@ class TarjetasBonoController extends Controller
                         if($anterior==1)
                         {
                         $contents[] = $line . PHP_EOL;
-                        //$lineas.=$line." -- ";
                         $campos = explode(";", $line);
                         $identificacion = trim($campos[0]);
                         $nombres = trim($campos[1]);
                         $apellidos = trim($campos[2]);
                         $monto = trim($campos[3]);
                         //validar los campos
-
                         if (is_numeric($identificacion) && (strlen($identificacion) > 2 && strlen($identificacion) < 11)) {
                             $permitidos = '/^[A-Z üÜáéíóúÁÉÍÓÚñÑ]{1,50}$/i';
                             if (preg_match($permitidos, utf8_encode($nombres)) && preg_match($permitidos, utf8_encode($apellidos))) {
@@ -411,7 +383,6 @@ class TarjetasBonoController extends Controller
                                     while (strlen($num_tarjeta) < 6) {
                                         $num_tarjeta = "0" . $num_tarjeta;
                                     }
-
                                     $tarjeta = Tarjetas::where("numero_tarjeta", $num_tarjeta)->first();
                                     if ($tarjeta == null) //no existe la tarjeta
                                     {
@@ -422,7 +393,6 @@ class TarjetasBonoController extends Controller
                                     if ($persona == null) //no existe la persona
                                     {
                                         $result = $this->crearPersona($identificacion, $nombres, $apellidos);
-                                        //dd($result['mensaje']);
                                     }
                                     $monto = str_replace(".", "", $monto);
                                     //insertar el detalle del producto
@@ -442,29 +412,24 @@ class TarjetasBonoController extends Controller
                                     $result['estado'] = false;
                                     $result['mensaje'] = 'El valor del monto debe ser numérico ' . $monto;
                                     $lineas .= " Incorrecta la linea: " . ($total_tarjetas + 1) . " --- ";
-                                 //   dd(" error en monto " . $monto);
                                     $anterior=0;
                                 }
                             } else {
                                 $result['estado'] = false;
                                 $result['mensaje'] = 'Los nombres y apellidos deben ser alfabeticos ' . $nombres . " " . $apellidos;
                                 $lineas .= " Incorrecta la linea: " . ($total_tarjetas + 1) . " --- ";
-                                //dd(preg_match($permitidos,$apellidos));
-                               // dd(" error en nombres " . utf8_encode($nombres) . " " . utf8_encode($apellidos));
                                 $anterior=0;
                             }
                         } else {
                             $result['estado'] = false;
                             $result['mensaje'] = 'El valor de identificacion debe ser numérico con 3 a 10 digitos ' . $identificacion;
                             $lineas .= " Incorrecta la linea: " . ($total_tarjetas + 1) . " --- ";
-                           // dd(" error en identificacion " . $identificacion);
                             $anterior=0;
                         }
                         $total_tarjetas++;
                         $total_monto += $monto;
                         }
                     }
-                   // dd($lineas);
                     //validar si la suma del monto y cantidad de tarjetas, es igual o menor a la estipulada en el contrato, sino hacer rollback
                     $valor_contrato_original=$contrato->valor_contrato-$contrato->valor_impuesto;
                     $cantidadt_contrato_original=$contrato->n_tarjetas;
@@ -476,7 +441,6 @@ class TarjetasBonoController extends Controller
                     {
                         $valor_contrato_nuevo+=$det->monto_inicial;
                     }
-                    //  dd("cantidad orgi/nuevo: ".$cantidadt_contrato_original."/".$cantidadt_contrato_nuevo." y monto nuevo: ".$valor_contrato_original."/".$valor_contrato_nuevo);
                     if($cantidadt_contrato_original<$cantidadt_contrato_nuevo && $valor_contrato_original<$valor_contrato_nuevo) {
                         $result['estado'] = false;
                         $result['mensaje'] = 'Las tarjetas superan la cantidad y/o el monto que fue contratado inicialmente';//. $exception->getMessage()
@@ -500,7 +464,6 @@ class TarjetasBonoController extends Controller
                 $result['mensaje'] = 'No es posible crear la tarjeta bono, el contrato No Existe';//. $exception->getMessage()
                 \DB::rollBack();
             }
-
         }catch (\Exception $exception) {
             $result['estado'] = false;
             $result['mensaje'] = 'No fue posible crear la tarjeta bono ' . $exception->getMessage();//. $exception->getMessage()
@@ -516,7 +479,6 @@ class TarjetasBonoController extends Controller
     {
         return view('tarjetas.bono.consultabono');
     }
-
     /**
      * devuelve los datos para mostrar en la grid de los servicios de tarjeta bono que hay en el sistema
      * @return mixed
@@ -529,16 +491,11 @@ class TarjetasBonoController extends Controller
             ->where('tarjeta_servicios.estado','<>',TarjetaServicios::$ESTADO_ANULADA)
             ->select(['detalle_produtos.monto_inicial', 'detalle_produtos.contrato_emprs_id as idcontrato', 'detalle_produtos.id as deta_id', 'tarjetas.*', 'detalle_produtos.fecha_vencimiento as vencimiento'])
             ->get();
-        //dd($tarjetas);
-
-        //dd($contrato->n_contrato);
 
         return Datatables::of($tarjetas)
             ->addColumn('numcontrato', function ($tarjetas) {
                 $contrato = Contratos_empr::where("id", $tarjetas->idcontrato)->first();
-               // dd($contrato);
                 return $contrato->n_contrato;
-              // return $tarjetas->id;
             })
             ->addColumn('action', function ($tarjetas) {
                 $acciones = "";
@@ -555,10 +512,7 @@ class TarjetasBonoController extends Controller
             })
             ->make(true);
     }
-
-
     //TODO: ES IMPORTANTE ESTO VA SOLO CON PERSONAS QUE TENGA PERMISO PARA HACERLO
-
     /**
      * trae la vista del modal para editar una tarjeta bono
      * @param $id id del detalle producto de la tarjeta bono a editar
@@ -567,14 +521,8 @@ class TarjetasBonoController extends Controller
     public function viewEditarBono($id)
     {
         $detalle = DetalleProdutos::find($id);
-        //list($dia,$mes,$ano) = explode("/",$detalle->fecha_vencimiento);
-        //$detalle->fecha_vencimiento==$ano."-".$mes."-".$dia;
-        //$detalle->fecha_vencimiento=date($detalle->fecha_vencimiento);
-       // if($detalle->fecha_vencimiento!=null)
-         //   $detalle->fecha_vencimiento=parse($detalle->fecha_vencimiento)->format('D/M/Y');
         return view('tarjetas.bono.modaleditarbono', compact('detalle'));
     }
-
     /**
      * metodo que permite editar una tarjeta bono, aunque solo permite editar su fecha de vencimiento
      * @param Request $request
@@ -591,7 +539,6 @@ class TarjetasBonoController extends Controller
             $fechav=$request->fecha_vencimiento;
             list($dia,$mes,$ano) = explode("/",$fechav);
             $fechav=$ano."/".$mes."/".$dia;
-            //dd("la fecha ".$request->fecha_vencimiento." ahora: ".$fechav);
             $detalle->fecha_vencimiento=$fechav;
             $detalle->save();
             $detalle_trasacion = DetalleTransaccion::where('detalle_producto_id', $detalle->id)->where('descripcion', DetalleTransaccion::$DESCRIPCION_ADMINISTRACION)->first();
@@ -613,8 +560,6 @@ class TarjetasBonoController extends Controller
         }
         return $result;
     }
-
-
     /**
      * metodo que permite activar una tarjeta bono en el sistema
      * @param Request $request
@@ -665,25 +610,18 @@ class TarjetasBonoController extends Controller
     /**
      * @param Request $request
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     * Funcion consulta por contrato, busca las tarjetas bono, que corresponden a un numero de contrato
+     * Funcion consulta por contrato, busca las tarjetas bono (detalles del producto), que corresponden a un numero de contrato
      */
     public function ConsultaxContrato(Request $request)
     {
         $contrato = Contratos_empr::where("n_contrato", $request->numcontrato)->first();
         if($contrato!=null) {
-            $tarjetas = Tarjetas::join('tarjeta_servicios', 'tarjetas.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
-                ->join('detalle_produtos', 'tarjetas.numero_tarjeta', 'detalle_produtos.numero_tarjeta')
-                ->where('tarjeta_servicios.servicio_codigo', Tarjetas::$CODIGO_SERVICIO_BONO)
-                ->where('tarjeta_servicios.estado','<>',TarjetaServicios::$ESTADO_ANULADA)
-                ->where('detalle_produtos.contrato_emprs_id',$contrato->id)
-                ->select(['detalle_produtos.monto_inicial as monto_tar', 'detalle_produtos.contrato_emprs_id as idcontrato', 'detalle_produtos.id as deta_id', 'tarjetas.*', 'detalle_produtos.fecha_vencimiento as vencimiento','tarjeta_servicios.estado as estado_tar'])
-                ->get();
-            return view('tarjetas.bono.parcialconsultaxcontrato', compact('tarjetas', 'contrato'));
+            $detalles=DetalleProdutos::where("contrato_emprs_id",$contrato->id)->get();
+            return view('tarjetas.bono.parcialconsultaxcontrato', compact('detalles', 'contrato'));
         }
         else{
             return "<p align='center'>No se encontraron resultados</p>";
         }
-
     }
     /**
      * @param Request $request
@@ -705,10 +643,10 @@ class TarjetasBonoController extends Controller
     /**
      * FUNCION ACTIVAR TARJETAS BONO MASIVAMENTE: por el numero de contrato
      *  *TABLAS INVOLUCRADAS:
-     * tarjetas (update)
-     * htarjetas (insert)
-     * tarjeta_servicios (update)
-     * detalle_produtos (update)
+     * tarjetas: si el estado no es activo, lo actualiza
+     * htarjetas: si el detalle_producto no estaba activo, registra la novedad
+     * tarjeta_servicios: si el estado no es activo, lo actualiza
+     * detalle_produtos: si el estado no es activo, lo actualiza
      */
     public function ActivarxContrato(Request $request)
     {
@@ -716,31 +654,53 @@ class TarjetasBonoController extends Controller
         \DB::beginTransaction();
         try {
             $contrato = Contratos_empr::where("n_contrato", $request->ncontrato)->first();
-            if ($contrato != null) {
+            if ($contrato != null)
+            {
                 $detalles = DetalleProdutos::where('contrato_emprs_id', $contrato->id)->get();
                 $fecha_activacion = Carbon::now();
                 $fecha_vencimiento = $fecha_activacion->addYear();
-                DB::table('detalle_produtos')->where('contrato_emprs_id', $contrato->id)->update(['estado' => DetalleProdutos::$ESTADO_ACTIVO, 'fecha_activacion' => $fecha_activacion, 'fecha_vencimiento' => $fecha_vencimiento]);
-                foreach ($detalles as $detalle) {
-                    DB::table('tarjeta_servicios')->where('numero_tarjeta', $detalle->numero_tarjeta)->where('servicio_codigo', Tarjetas::$CODIGO_SERVICIO_BONO)->update(['estado' => TarjetaServicios::$ESTADO_ACTIVO]);
-                    $result['estado'] = TRUE;
-                    DB::table('tarjetas')->where('numero_tarjeta', $detalle->numero_tarjeta)->update(['estado' => Tarjetas::$ESTADO_TARJETA_ACTIVA]);
-                    $result['estado'] = TRUE;
-                    $tarjeta = Tarjetas::where("numero_tarjeta", $detalle->numero_tarjeta)->first();
-                    $htarjetas = new Htarjetas();
-                    $htarjetas->motivo = Tarjetas::$MOTIVO_TARJETA_ACTIVA;
-                    $htarjetas->estado = Tarjetas::$ESTADO_TARJETA_ACTIVA;
-                    $htarjetas->fecha = $fecha_activacion;
-                    $htarjetas->tarjetas_id = $tarjeta->id;
-                    $htarjetas->user_id = Auth::User()->id;
-                    $htarjetas->servicio_codigo = Tarjetas::$CODIGO_SERVICIO_BONO;
-                    $htarjetas->save();
-                    $result['estado'] = TRUE;
+                $actual_inactivas=0;
+                foreach ($detalles as $detalle)
+                {
+                    if($detalle->estado!=DetalleProdutos::$ESTADO_ACTIVO)
+                    {
+                        $actual_inactivas++;
+                        DB::table('detalle_produtos')->where('id', $detalle->id)->update(['estado' => DetalleProdutos::$ESTADO_ACTIVO, 'fecha_activacion' => $fecha_activacion, 'fecha_vencimiento' => $fecha_vencimiento,'UPDATED_AT'=>$fecha_activacion]);
+                        $tarjeta = Tarjetas::where("numero_tarjeta", $detalle->numero_tarjeta)->first();
+                        if($tarjeta->estado!=Tarjetas::$ESTADO_TARJETA_ACTIVA)
+                        {
+                            DB::table('tarjetas')->where('numero_tarjeta', $detalle->numero_tarjeta)->update(['estado' => Tarjetas::$ESTADO_TARJETA_ACTIVA,'UPDATED_AT'=>$fecha_activacion]);
+                            $result['estado'] = TRUE;
+                        }
+                        $servicio = TarjetaServicios::where("numero_tarjeta", $detalle->numero_tarjeta)->where("servicio_codigo",Tarjetas::$CODIGO_SERVICIO_BONO)->first();
+                        if($servicio->estado!=Tarjetas::$ESTADO_TARJETA_ACTIVA)
+                        {
+                            DB::table('tarjeta_servicios')->where('numero_tarjeta', $detalle->numero_tarjeta)->where('servicio_codigo', Tarjetas::$CODIGO_SERVICIO_BONO)->update(['estado' => TarjetaServicios::$ESTADO_ACTIVO,'UPDATED_AT'=>$fecha_activacion]);
+                            $result['estado'] = TRUE;
+                        }
+                        $htarjetas = new Htarjetas();
+                        $htarjetas->motivo = Tarjetas::$MOTIVO_TARJETA_ACTIVA;
+                        $htarjetas->estado = Tarjetas::$ESTADO_TARJETA_ACTIVA;
+                        $htarjetas->fecha = $fecha_activacion;
+                        $htarjetas->tarjetas_id = $tarjeta->id;
+                        $htarjetas->user_id = Auth::User()->id;
+                        $htarjetas->servicio_codigo = Tarjetas::$CODIGO_SERVICIO_BONO;
+                        $htarjetas->detalle_producto_id=$detalle->id;
+                        $htarjetas->save();
+                        $result['estado'] = TRUE;
+                    }
                 }
-                $result['estado'] = TRUE;
-                $result['mensaje'] = 'La tarjeta ha sido activada';
-                \DB::commit();
-                //si lo anterior sale bien, hacer commit
+                if($actual_inactivas==0)
+                {
+                    $result['estado'] = FALSE;
+                    $result['mensaje'] = 'Los productos ya se encuentran activos';
+                    \DB::rollBack();
+                }
+                else {
+                    $result['estado'] = TRUE;
+                    $result['mensaje'] = 'Las tarjetas han sido activadas';
+                    \DB::commit();
+                }
             } else {
                 return "<p align='center'>No se encontraron resultados</p>";
                 $result['estado'] = false;
@@ -754,5 +714,4 @@ class TarjetasBonoController extends Controller
         }
         return $result;
     }
-
 }

@@ -1,5 +1,14 @@
+<div class="card-box widget-inline">
+    <div class="row">
+        <div class="col-lg-3 col-sm-6">
+            <div class="widget-inline-box">
+                <button type="button" id="activar" class="btn btn-custom waves-effect waves-light" onclick="activar({{$contrato->n_contrato}})">Activar todas</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="table-responsive m-b-20">
-    <button type="button" id="activar" class="btn btn-custom waves-effect waves-light" onclick="activar({{$contrato->n_contrato}})">Activar todas</button>
+    <br>
     <table id="datatable" class="table table-striped table-bordered" width="100%">
         <thead>
         <tr>
@@ -10,12 +19,12 @@
         </tr>
         </thead>
         <tbody>
-          @foreach($tarjetas as $tarjeta)
+          @foreach($detalles as $detalle)
             <tr>
-                <td>{{$tarjeta->numero_tarjeta}}</td>
+                <td>{{$detalle->numero_tarjeta}}</td>
                 <td>{{$contrato->n_contrato}}</td>
-                <td>{{$tarjeta->monto_tar}}</td>
-                <td>{{$tarjeta->estado_tar}}</td>
+                <td>{{$detalle->monto_inicial}}</td>
+                <td>{{$detalle->estado}}</td>
             </tr>
             @endforeach
         </tbody>
@@ -23,7 +32,11 @@
 </div>
 
 <script>
-    $('#datatable').DataTable();
+    $('#datatable').DataTable({
+        "language": {
+            "url": "{!!route('datatable_es')!!}"
+        },
+    });
     function activar(ncontrato) {
         swal({
                 title: '¿Estas seguro?',
@@ -55,7 +68,7 @@
                                     confirmButtonColor: '#4fa7f3'
                                 }
                             );
-                            //table.ajax.reload();
+                            $('#tablaoculta').load('{{route('bono.consultaxcontratop')}}',{numcontrato:"{{$contrato->n_contrato}}"});
                         } else if (result.estado == false) {
                             swal(
                                 'Error!!',

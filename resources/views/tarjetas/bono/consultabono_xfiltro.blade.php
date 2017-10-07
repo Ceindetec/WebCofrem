@@ -32,10 +32,10 @@
             <div  class="form-group">
                 <label class="col-sm-3 control-label">Número de contrato</label>
                 <div class="col-sm-7">
-                {{Form::text('numero_contrato', null ,['class'=>'form-control', "required", "tabindex"=>"1",'id'=>'numero_contrato'])}}
-                </div><button type="button" id="CrearB" class="btn btn-custom waves-effect waves-light" onclick="consultarc()">Buscar</button>
-
+                {{Form::text('numcontrato', null ,['class'=>'form-control', "required", "tabindex"=>"1",'id'=>'numcontrato'])}}
+                </div>
             </div>
+            <p align="center"><button type="button" id="CrearB" class="btn btn-custom waves-effect waves-light" onclick="consultarc()">Buscar</button></p>
             {{Form::close()}}
         </div>
         <div id="ocultoempresa" class="row" style="display:none">
@@ -44,9 +44,9 @@
                 <label class="col-sm-3 control-label">Nit</label>
                 <div class="col-sm-7">
                     {{Form::text('nit', null ,['class'=>'form-control', "required", "tabindex"=>"1",'id'=>'nit'])}}
-                </div><button type="button" id="CrearB" class="btn btn-custom waves-effect waves-light" onclick="consultare()">Buscar</button>
-
+                </div>
             </div>
+            <p align="center"><button type="button" id="CrearB" class="btn btn-custom waves-effect waves-light" onclick="consultare()">Buscar</button></p>
             {{Form::close()}}
         </div>
         <div id="tablaoculta" name="tablaoculta" style="display: none;">
@@ -88,40 +88,33 @@
             $("#ocultocontrato").submit(function (e) {
                 e.preventDefault();
                 consultarc();
-                //llamar funcion
             });
             $("#ocultoempresa").submit(function (e) {
                 e.preventDefault();
                 consultare();
-                //llamar funcion
             });
         });
         function mostrar(elemento) {
-            //alert("el valor es "+elemento.value);
             if(elemento.value=="1") {
                 document.getElementById("ocultoempresa").style.display = "none";
                 document.getElementById("ocultocontrato").style.display = "block";
                 document.getElementById("tablaoculta").style.display = "none";
-                //alert("valor1");
             }
             else {
                 document.getElementById("ocultoempresa").style.display = "block";
                 document.getElementById("ocultocontrato").style.display = "none";
                 document.getElementById("tablaoculta").style.display = "none";
-                //alert("valor2");
             }
         }
         function consultarc() {
-            var numcontrato=$('#numero_contrato').val();
+            var numcontrato=$('#numcontrato').val();
             $('#tablaoculta').load('{{route('bono.consultaxcontratop')}}',{numcontrato:numcontrato});
             document.getElementById("tablaoculta").style.display = "block";
-
         }
         function consultare() {
             var nit=$('#nit').val();
             $('#tablaoculta').load('{{route('bono.consultaxempresap')}}',{nit:nit});
             document.getElementById("tablaoculta").style.display = "block";
-
         }
     </script>
 @endsection
