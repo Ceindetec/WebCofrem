@@ -1,3 +1,9 @@
+
+<style>
+    
+</style>
+
+
 <table id="datatable" class="table table-striped table-bordered" width="100%">
     <thead>
     <tr>

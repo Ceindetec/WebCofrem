@@ -2,6 +2,7 @@
 
 namespace creditocofrem\Http\Controllers;
 
+use creditocofrem\Personas;
 use creditocofrem\Tarjetas;
 use creditocofrem\TarjetaServicios;
 use creditocofrem\Terminales;
@@ -66,7 +67,8 @@ class WebApiController extends Controller
         return ['resultado' => $result];
     }
 
-    public function asignaID(Request $request) {
+    public function asignaID(Request $request)
+    {
 
         $result = [];
         DB::beginTransaction();
@@ -98,81 +100,99 @@ class WebApiController extends Controller
     {
         $result = [];
         try {
-            $teminal = Terminales::where('codigo',$request->codigo)->first();
-            if(count($teminal)>0){
+            $teminal = Terminales::where('codigo', $request->codigo)->first();
+            if (count($teminal) > 0) {
                 $contrasena = Encript::decryption($teminal->password);
-                if($request->password == $contrasena){
+                if ($request->password == $contrasena) {
                     $result['estado'] = TRUE;
                     $result['mensaje'] = 'contraseña validad';
-                }else{
+                } else {
                     $result['estado'] = FALSE;
                     $result['mensaje'] = 'Contraseña invalidad';
                 }
-            }else{
+            } else {
                 $result['estado'] = FALSE;
                 $result['mensaje'] = 'Codigo de terminal invalido';
             }
         } catch (\Exception $exception) {
             $result['estado'] = FALSE;
-            $result['mensaje'] = 'Error de ejecucion '.$exception->getMessage();
+            $result['mensaje'] = 'Error de ejecucion ' . $exception->getMessage();
         }
-        return ['resultado'=>$result];
+        return ['resultado' => $result];
     }
-
 
 
     public function validarClaveSucursal(Request $request)
     {
         $result = [];
         try {
-            $teminal = Terminales::where('codigo',$request->codigo)->first();
-            if(count($teminal)>0){
+            $teminal = Terminales::where('codigo', $request->codigo)->first();
+            if (count($teminal) > 0) {
                 $sucursal = $teminal->getSucursal;
                 $contrasena = Encript::decryption($sucursal->password);
-                if($request->password == $contrasena){
+                if ($request->password == $contrasena) {
                     $result['estado'] = TRUE;
                     $result['mensaje'] = 'contraseña validad';
-                }else{
+                } else {
                     $result['estado'] = FALSE;
                     $result['mensaje'] = 'Contraseña invalidad';
                 }
-            }else{
+            } else {
                 $result['estado'] = FALSE;
                 $result['mensaje'] = 'Codigo de terminal invalido';
             }
         } catch (\Exception $exception) {
             $result['estado'] = FALSE;
-            $result['mensaje'] = 'Error de ejecucion '.$exception->getMessage();
+            $result['mensaje'] = 'Error de ejecucion ' . $exception->getMessage();
         }
-        return ['resultado'=>$result];
+        return ['resultado' => $result];
     }
 
-    public function getServicios(Request $request){
+    public function getServicios(Request $request)
+    {
         $result = [];
-        try{
+        try {
             $terminal = Terminales::where('codigo', $request->codigo)->first();
-            if(count($terminal)>0){
-                $tarjeta = Tarjetas::where('numero_tarjeta',$request->numero_tarjeta)->where('estado',Tarjetas::$ESTADO_TARJETA_ACTIVA)->first();
-                if(count($tarjeta)>0){
-                    $servicios = TarjetaServicios::where('numero_tarjeta',$tarjeta->numero_tarjeta)
-                        ->where('estado',TarjetaServicios::$ESTADO_ACTIVO)
-                        ->select('servicio_codigo')
-                        ->get();
-                    $result['estado']=TRUE;
-                    $result['mensaje'] = 'Retornando servicios';
-                    $result['data'] = $servicios;
-                }else{
-                    $result['estado']=FALSE;
+            if (count($terminal) > 0) {
+                $tarjeta = Tarjetas::where('numero_tarjeta', $request->numero_tarjeta)->where('estado', Tarjetas::$ESTADO_TARJETA_ACTIVA)->first();
+                if (count($tarjeta) > 0) {
+                    if ($tarjeta->persona_id != NULL) {
+                        $persona = Personas::where('identificacion', $request->identificacion)->first();
+                        if (count($persona) > 0) {
+                            $result = $this->retornaServicios($tarjeta, $request);
+                        } else {
+                            $result['estado'] = FALSE;
+                            $result['mensaje'] = 'El numero de identificacion no corresponde a la tarjeta';
+                        }
+                    } else {
+                        $result = $this->retornaServicios($tarjeta, $request);
+                    }
+                } else {
+                    $result['estado'] = FALSE;
                     $result['mensaje'] = 'Tarjeta no validad';
                 }
-            }else{
-                $result['estado']=FALSE;
+            } else {
+                $result['estado'] = FALSE;
                 $result['mensaje'] = 'codigo de terminal invalido';
             }
-        }catch (\Exception $exception){
-            $result['estado']=FALSE;
+        } catch (\Exception $exception) {
+            $result['estado'] = FALSE;
             $result['mensaje'] = 'Error de ejecucion';
         }
-        return ['resultado'=>$result];
+        return ['resultado' => $result];
+    }
+
+
+    public function retornaServicios($tarjeta, $request)
+    {
+        $result = [];
+        $servicios = TarjetaServicios::where('numero_tarjeta', $tarjeta->numero_tarjeta)
+            ->where('estado', TarjetaServicios::$ESTADO_ACTIVO)
+            ->select('servicio_codigo')
+            ->get();
+        $result['estado'] = TRUE;
+        $result['mensaje'] = 'Retornando servicios';
+        $result['data'] = $servicios;
+        return $result;
     }
 }
