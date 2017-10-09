@@ -98,8 +98,9 @@ class ReportesController extends Controller
         $transacciones = Transaccion::whereIn('id', $arrayIds)
             ->where('tipo', 'C')
             ->get();
-        $data = ['transacciones'=>$transacciones];
+        $data = ['transacciones'=>$transacciones, 'rango'=>$request->fecha1." - ".$request->fecha2];
         $pdf = \PDF::loadView('reportes.primeravez.pdfprimeravez', $data);
+        $pdf->setPaper('A4', 'landscape');
         return $pdf->download('primeravez.pdf');
     }
 }
