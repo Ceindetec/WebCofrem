@@ -16,7 +16,6 @@ class WebApiController extends Controller
 
     public function comunicacion(Request $request)
     {
-
         if ($request->codigo == '02') {
             $result['estado'] = true;
             $result['mensaje'] = 'Comunicacion exitosa';
@@ -24,9 +23,7 @@ class WebApiController extends Controller
             $result['estado'] = false;
             $result['mensaje'] = 'Error de comunicacion';
         }
-
         $resultFinal['resultado'] = $result;
-
         return ($resultFinal);
     }
 
@@ -48,7 +45,7 @@ class WebApiController extends Controller
                 $data['estado_sucursal'] = $sucursal->estado;
                 $data['estado_terminal'] = $terminal->estado;
                 $data['codigo_terminal'] = $terminal->codigo;
-                $data['ip1'] = "192.168.1.52";
+                $data['ip1'] = "192.168.0.20";
 //                $terminal->imei = $request->imei;
 //                $terminal->uid = $request->uuid;
 //                $terminal->mac = $request->mac;
@@ -69,7 +66,6 @@ class WebApiController extends Controller
 
     public function asignaID(Request $request)
     {
-
         $result = [];
         DB::beginTransaction();
         try {
@@ -194,5 +190,87 @@ class WebApiController extends Controller
         $result['mensaje'] = 'Retornando servicios';
         $result['data'] = $servicios;
         return $result;
+    }
+
+    public function consultarClaveTarjeta(Request $request)
+    {
+        $result = [];
+        try {
+            $tarjeta = Tarjetas::where('numero_tarjeta', $request->numero_tarjeta)->first();
+            if (count($tarjeta) > 0) {
+                if ($tarjeta->estado == Tarjetas::$ESTADO_TARJETA_ACTIVA) {
+                    if ($tarjeta->persona_id != NULL) {
+                        $persona = Personas::where('identificacion', $request->identificacion)->first();
+                        if (count($persona) > 0) {
+                            if ($request->password == Encript::decryption($tarjeta->password)) {
+                                $result['estado'] = TRUE;
+                                $result['mensaje'] = 'Datos Correctos';
+                            } else {
+                                $result['estado'] = FALSE;
+                                $result['mensaje'] = 'Clave de la tarjeta invalidad';
+                            }
+                        } else {
+                            $result['estado'] = FALSE;
+                            $result['mensaje'] = 'Numero de indentificacion invalido';
+                        }
+                    } else {
+                        if ($request->password == Encript::decryption($tarjeta->password)) {
+                            $result['estado'] = TRUE;
+                            $result['mensaje'] = 'Datos Correctos';
+                        } else {
+                            $result['estado'] = FALSE;
+                            $result['mensaje'] = 'Clave de la tarjeta invalidad';
+                        }
+                    }
+                } else {
+                    $result['estado'] = FALSE;
+                    $result['mensaje'] = 'Tarjeta inactiva';
+                }
+            } else {
+                $result['estado'] = FALSE;
+                $result['mensaje'] = 'Tarjeta Invalidad';
+            }
+        } catch (\Exception $exception) {
+            $result['estado'] = FALSE;
+            $result['mensaje'] = 'Error en la operacion';
+        }
+        return ['resultado' => $result];
+    }
+
+    public function actulizarClaveTarjeta(Request $request)
+    {
+        $result = [];
+        try {
+            $tarjeta = Tarjetas::where('numero_tarjeta', $request->numero_tarjeta)->first();
+            if (count($tarjeta) > 0) {
+                if ($tarjeta->estado == Tarjetas::$ESTADO_TARJETA_ACTIVA) {
+                    if ($request->password == Encript::decryption($tarjeta->password)) {
+                        if (is_numeric($request->nuevo_password)) {
+                            $tarjeta->password = Encript::encryption(trim($request->nuevo_password));
+                            $tarjeta->cambioclave = 1;
+                            $tarjeta->save();
+                            $result['estado'] = TRUE;
+                            $result['mensaje'] = 'Cambio realizado';
+                        } else {
+                            $result['estado'] = FALSE;
+                            $result['mensaje'] = 'La clave debe ser numerica';
+                        }
+                    } else {
+                        $result['estado'] = FALSE;
+                        $result['mensaje'] = 'Clave de la tarjeta invalidad';
+                    }
+                } else {
+                    $result['estado'] = FALSE;
+                    $result['mensaje'] = 'Tarjeta inactiva';
+                }
+            } else {
+                $result['estado'] = FALSE;
+                $result['mensaje'] = 'Tarjeta Invalidad';
+            }
+        } catch (\Exception $exception) {
+            $result['estado'] = FALSE;
+            $result['mensaje'] = 'Error en la operacion';
+        }
+        return ['resultado' => $result];
     }
 }
