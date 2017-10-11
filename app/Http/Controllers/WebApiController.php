@@ -150,18 +150,28 @@ class WebApiController extends Controller
         try {
             $terminal = Terminales::where('codigo', $request->codigo)->first();
             if (count($terminal) > 0) {
-                $tarjeta = Tarjetas::where('numero_tarjeta', $request->numero_tarjeta)->where('estado', Tarjetas::$ESTADO_TARJETA_ACTIVA)->first();
+                $tarjeta = Tarjetas::where('numero_tarjeta', $request->numero_tarjeta)->first();
                 if (count($tarjeta) > 0) {
-                    if ($tarjeta->persona_id != NULL) {
-                        $persona = Personas::where('identificacion', $request->identificacion)->first();
-                        if (count($persona) > 0) {
-                            $result = $this->retornaServicios($tarjeta, $request);
-                        } else {
-                            $result['estado'] = FALSE;
-                            $result['mensaje'] = 'El numero de identificacion no corresponde a la tarjeta';
+                    if($tarjeta->estado == Tarjetas::$ESTADO_TARJETA_ACTIVA){
+                        if($tarjeta->cambioclave == 1){
+                            if ($tarjeta->persona_id != NULL) {
+                                $persona = Personas::where('identificacion', $request->identificacion)->first();
+                                if (count($persona) > 0) {
+                                    $result = $this->retornaServicios($tarjeta, $request);
+                                } else {
+                                    $result['estado'] = FALSE;
+                                    $result['mensaje'] = 'El numero de identificacion no corresponde a la tarjeta';
+                                }
+                            } else {
+                                $result = $this->retornaServicios($tarjeta, $request);
+                            }
+                        }else{
+                            $result['estado']= FALSE;
+                            $result['mensaje'] = 'Debe realizar cambio de clave';
                         }
-                    } else {
-                        $result = $this->retornaServicios($tarjeta, $request);
+                    }else{
+                        $result['estado']= FALSE;
+                        $result['mensaje'] = 'Tarjeta Inactiva';
                     }
                 } else {
                     $result['estado'] = FALSE;
