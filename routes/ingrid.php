@@ -52,6 +52,13 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('tarjetas/bono/activarporcontrato','TarjetasBonoController@ActivarxContrato')->name('bono.activarxcontrato');
     /*FINALIZA CONSULTA TARJETA BONO*/
 
+    /*INICIA REPORTES SALDOS VENCIDOS  */
+    Route::get('reportes/saldosvencidos/consulta','ReportesController@viewSaldosVencidos')->name('reportes.saldosvencidos');
+    Route::post('reportes/saldosvencidos/resultadoconsulta','ReportesController@consultarSaldosVencidos')->name('resultadosaldosvencidos');
+    Route::get('reportes/saldosvencidos/exportarpdf','ReportesController@pdfSaldosVencidos')->name('pdfsaldosvencidos');
+    Route::get('reportes/saldosvencidos/exportarexcel','ReportesController@excelSaldosVencidos')->name('excelsaldosvencidos');
+    /*FINALIZA REPORTES SALDOS VENCIDOS*/
+
 
 
 });

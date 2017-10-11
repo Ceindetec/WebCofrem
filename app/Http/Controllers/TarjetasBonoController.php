@@ -658,7 +658,7 @@ class TarjetasBonoController extends Controller
             {
                 $detalles = DetalleProdutos::where('contrato_emprs_id', $contrato->id)->get();
                 $fecha_activacion = Carbon::now();
-                $fecha_vencimiento = $fecha_activacion->addYear();
+                $fecha_vencimiento = Carbon::now()->addYear();
                 $actual_inactivas=0;
                 foreach ($detalles as $detalle)
                 {

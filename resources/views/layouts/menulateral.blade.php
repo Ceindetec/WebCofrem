@@ -65,6 +65,7 @@
         <ul class="nav-second-level nav collapse" aria-expanded="true" style="">
             <li><a href="{{route('rprimeravez')}}"> Tarjetas usadas por primera vez </a></li>
             <li><a href="{{route('contratos')}}"> Crear Contratos </a></li>
+            <li><a href="{{route('reportes.saldosvencidos')}}"> Saldos vencidos </a></li>
         </ul>
     </li>
     <!-- <li><a href="{ {route('tarjetasregalo')}}"><i class="ti-layout"></i> Tarjetas Regalo</a></li> -->

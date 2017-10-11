@@ -183,6 +183,7 @@ return [
         Yajra\Oci8\Oci8ServiceProvider::class,
         OwenIt\Auditing\AuditingServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
+	Maatwebsite\Excel\ExcelServiceProvider::class,
 
     ],
 
@@ -241,7 +242,7 @@ return [
         'Encript' => Facades\creditocofrem\Encript::class,
 
         'PDF' => Barryvdh\DomPDF\Facade::class,
-
+	'Excel' => Maatwebsite\Excel\Facades\Excel::class,
     ],
 
 ];
