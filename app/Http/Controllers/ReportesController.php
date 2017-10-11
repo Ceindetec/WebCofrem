@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use function MongoDB\BSON\toJSON;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Excel;
+use PHPExcel_Worksheet_Drawing;
 
 class ReportesController extends Controller
 {
@@ -219,39 +220,69 @@ class ReportesController extends Controller
             $tiposervicio = $request->tiposervicio;
 
             $excel->sheet('SaldosVencidos', function($sheet) use($resultadob, $resultador, $rango, $tiposervicio) {
-                $data = ['resultadob'=>$resultadob, 'resultador'=>$resultador, 'tiposervicio'=>$tiposervicio, 'rango'=>$rango];
-                $sheet->loadView('reportes.saldosvencidos.excelsaldosvencidos',$data);
-               /* $sheet->row(1, array('REPORTE DE SALDOS VENCIDOS'));
-                $sheet->row(1, function ($row) {
+                $hoy=Carbon::now();
+                $objDrawing = new PHPExcel_Worksheet_Drawing;
+                $objDrawing->setPath(public_path('images/logo_mini.png')); //your image path
+                $objDrawing->setCoordinates('A1');
+                $objDrawing->setWorksheet($sheet);
+                $sheet->setWidth(array(
+                    'A'     =>  30,
+                    'B'     =>  20,
+                    'C'     =>  20,
+                    'D'     =>  20,
+                    'E'     =>  20,
+                ));
+
+                $sheet->row(2, array('','REPORTE DE SALDOS VENCIDOS'));
+                $sheet->row(2, function ($row) {
                     $row->setBackground('#4CAF50');
                 });
 
-                $sheet->row(2, array('TARJETAS BONO'));
-                $sheet->row(3, array('Numero tarjeta', 'Monto incial', 'Sobrante', 'Fecha activacion', 'Fecha vencimiento'));
-                $fila = 4;
-                if (sizeof($resultadob) > 0) {
-                    foreach ($resultadob as $miresul) {
-                        $sheet->row($fila, array($miresul["numero_tarjeta"], $miresul["monto_inicial"], $miresul["sobrante"], $miresul["fecha_activacion"], $miresul["fecha_vencimiento"]));
-                        $fila++;
-                    }
-                }
-                else
-                    $sheet->row($fila, array('No hay resultados'));
-                $sheet->row($fila,array('TARJETAS REGALO'));
-                $fila++;
-                if (sizeof($resultador) > 0) {
-                    $sheet->row($fila, array('Numero tarjeta', 'Monto incial', 'Sobrante', 'Fecha activacion', 'Fecha vencimiento'));
-                    $fila++;
-                    foreach ($resultador as $miresul) {
-                        $sheet->row($fila, array($miresul["numero_tarjeta"], $miresul["monto_inicial"], $miresul["sobrante"], $miresul["fecha_activacion"], $miresul["fecha_vencimiento"]));
-                        $fila++;
-                    }
-                }
-                else
-                    $sheet->row($fila, array('No hay resultados'));
-               */
-            });
+                $sheet->row(3, array('','Rango:',$rango,'',''));
+                $sheet->row(4, array('','Fecha:',$hoy,'',''));
+                if($tiposervicio!="R") {
+                    $sheet->row(6, array('TARJETAS BONO'));
+                    $sheet->row(6, function ($row) {
+                        $row->setBackground('#4CAF50');
+                    });
 
+                    $fila = 8;
+                    if (sizeof($resultadob) > 0) {
+                        $sheet->row(7, array('Numero tarjeta', 'Monto incial', 'Sobrante', 'Fecha activacion', 'Fecha vencimiento'));
+                        $sheet->row(7, function ($row) {
+                            $row->setBackground('#f2f2f2');
+                        });
+                        foreach ($resultadob as $miresul) {
+                            $sheet->row($fila, array($miresul["numero_tarjeta"], $miresul["monto_inicial"], $miresul["sobrante"], $miresul["fecha_activacion"], $miresul["fecha_vencimiento"]));
+                            $fila++;
+                        }
+                    } else
+                        $sheet->row($fila, array('No hay resultados'));
+                    $fila++;
+                    $fila++;
+                }
+                else
+                    $fila=6;
+                if($tiposervicio!="B") {
+                    $sheet->row($fila, array('TARJETAS REGALO'));
+                    $sheet->row($fila, function ($row) {
+                        $row->setBackground('#4CAF50');
+                    });
+                    $fila++;
+                    if (sizeof($resultador) > 0) {
+                        $sheet->row($fila, array('Numero tarjeta', 'Monto incial', 'Sobrante', 'Fecha activacion', 'Fecha vencimiento'));
+                        $sheet->row($fila, function ($row) {
+                            $row->setBackground('#f2f2f2');
+                        });
+                        $fila++;
+                        foreach ($resultador as $miresul) {
+                            $sheet->row($fila, array($miresul["numero_tarjeta"], $miresul["monto_inicial"], $miresul["sobrante"], $miresul["fecha_activacion"], $miresul["fecha_vencimiento"]));
+                            $fila++;
+                        }
+                    } else
+                        $sheet->row($fila, array('No hay resultados'));
+                }
+            });
         })->export('xls');
     }
     /*
