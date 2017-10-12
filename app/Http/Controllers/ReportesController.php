@@ -16,11 +16,20 @@ use PHPExcel_Worksheet_Drawing;
 
 class ReportesController extends Controller
 {
+    /**
+     * este metodo trae la vista para la generacion de reporte por primera vez
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function viewReportePrimeraVez()
     {
         return view('reportes.primeravez.primeravez');
     }
 
+    /**
+     * trae la vista parcial del resultado del reporte para tarjetas usadas por primera vez
+     * @param Request $request Rango de fecha selecionado en el formulario
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function resultadoPrimeravez(Request $request)
     {
         $rangos = explode(" - ", $request->rango);
@@ -61,13 +70,17 @@ class ReportesController extends Controller
         $transacciones = Transaccion::whereIn('id', $arrayIds)
             ->where('tipo', 'C')
             ->get();
-        $rango =['fecha1'=> $rangos[0], 'fecha2'=>$rangos[1]];
+        $rango = ['fecha1' => $rangos[0], 'fecha2' => $rangos[1]];
         return view('reportes.primeravez.resultadoprimeravez', compact('transacciones', 'rango'));
     }
 
+    /**
+     * permite exportar a pdf el resultado de las tarjetas usadas por primera vez
+     * @param Request $request
+     * @return mixed
+     */
     public function exportarPdfPrimeravez(Request $request)
     {
-        //dd($request->all());
         $transacciones = Transaccion::whereBetween('fecha', [Carbon::createFromFormat("d/m/Y", $request->fecha1), Carbon::createFromFormat("d/m/Y", $request->fecha2)])
             ->where('tipo', 'C')
             ->groupBy('numero_tarjeta')
@@ -105,11 +118,123 @@ class ReportesController extends Controller
         $transacciones = Transaccion::whereIn('id', $arrayIds)
             ->where('tipo', 'C')
             ->get();
-        $data = ['transacciones'=>$transacciones, 'rango'=>$request->fecha1." - ".$request->fecha2];
+        $data = ['transacciones' => $transacciones, 'rango' => $request->fecha1 . " - " . $request->fecha2];
         $pdf = \PDF::loadView('reportes.primeravez.pdfprimeravez', $data);
         $pdf->setPaper('A4', 'landscape');
         return $pdf->download('primeravez.pdf');
     }
+
+    public function exportarExcelPrimeravez(Request $request)
+    {
+        $transacciones = Transaccion::whereBetween('fecha', [Carbon::createFromFormat("d/m/Y", $request->fecha1), Carbon::createFromFormat("d/m/Y", $request->fecha2)])
+            ->where('tipo', 'C')
+            ->groupBy('numero_tarjeta')
+            ->select('numero_tarjeta')
+            ->get();
+        $arrayTarjetas = [];
+        foreach ($transacciones as $transaccione) {
+            array_push($arrayTarjetas, $transaccione->numero_tarjeta);
+        }
+        $transacciones2 = Transaccion::whereDate('fecha', '<', Carbon::createFromFormat("d/m/Y", $request->fecha1)->addDays(-1))
+            ->whereIn('numero_tarjeta', $arrayTarjetas)
+            ->where('tipo', 'C')
+            ->groupBy('transacciones.numero_tarjeta')
+            ->select('transacciones.numero_tarjeta')
+            ->get();
+        $arrayTarjetas2 = [];
+        foreach ($transacciones2 as $transaccion) {
+            array_push($arrayTarjetas2, $transaccion->numero_tarjeta);
+        }
+        $arrayFinal = [];
+        foreach ($arrayTarjetas as $arrayTarjeta) {
+            if (!in_array($arrayTarjeta, $arrayTarjetas2)) {
+                array_push($arrayFinal, $arrayTarjeta);
+            }
+        }
+        $arrayIds = [];
+        foreach ($arrayFinal as $item) {
+            $id = Transaccion::where('numero_tarjeta', $item)
+                ->where('tipo', 'C')
+                ->orderBy('fecha', 'asc')
+                ->select('id')
+                ->first();
+            array_push($arrayIds, $id->id);
+        }
+        $transacciones = Transaccion::whereIn('id', $arrayIds)
+            ->where('tipo', 'C')
+            ->get();
+
+
+        \Excel::create('ExcelTarjetasPrimeraVez', function ($excel) use ($request, $transacciones) {
+            $fecha1 = $request->fecha1;
+            $fecha2 = $request->fecha2;
+            $rango = $fecha1 . " - " . $fecha2;
+            $transacciones;
+            $excel->sheet('tarjetaPrimeraVez', function ($sheet) use ($transacciones, $rango) {
+                $hoy = Carbon::now();
+                $objDrawing = new PHPExcel_Worksheet_Drawing;
+                $objDrawing->setPath(public_path('images/logo.png')); //your image path
+                $objDrawing->setHeight(50);
+                $objDrawing->setCoordinates('A1');
+                $objDrawing->setWorksheet($sheet);
+                $objDrawing->setOffsetY(10);
+                $sheet->setWidth(array(
+                    'A' => 30,
+                    'B' => 20,
+                    'C' => 20,
+                    'D' => 30,
+                    'E' => 20,
+                    'F' => 20,
+                ));
+
+                $sheet->setMergeColumn(array(
+                    'columns' => array('A'),
+                    'rows' => array(
+                        array(1,4),
+                    )
+                ));
+
+
+                $sheet->row(1, array('', 'REPORTE TARJETAS USADAS POR PRIMERA VEZ'));
+                $sheet->row(1, function ($row) {
+                    $row->setBackground('#4CAF50');
+                });
+
+                $sheet->cells('A1:A4', function($cells) {
+                    $cells->setBackground('#FFFFFF');
+                });
+
+                $sheet->setBorder('A1:A4', 'thin');
+
+                $sheet->row(3, array('', 'Rango:', $rango, '', ''));
+                $sheet->row(4, array('', 'Fecha:', $hoy, '', ''));
+
+                $fila = 8;
+                if (sizeof($transacciones) > 0) {
+                    $sheet->row(7, array('Numero tarjeta', 'Transacción', 'Valor', 'Sucursal', 'Terminal', 'Fecha'));
+                    $sheet->row(7, function ($row) {
+                        $row->setBackground('#f2f2f2');
+                    });
+                    foreach ($transacciones as $miresul) {
+                        $sheet->row($fila,
+                            array($miresul->numero_tarjeta,
+                                $miresul->numero_transaccion,
+                                $miresul->valorTransacion[0]->total,
+                                $miresul->getSucursal->nombre,
+                                $miresul->codigo_terminal,
+                                $miresul->fecha,
+                                ));
+                        $fila++;
+                    }
+                } else
+                    $sheet->row($fila, array('No hay resultados'));
+                $fila++;
+                $fila++;
+            });
+        })->export('xls');
+
+    }
+
     /**
      * INICIA REPORTE SALDOS VENCIDOS
      * LLamar a la vista de consulta de saldos vencidos
@@ -118,6 +243,7 @@ class ReportesController extends Controller
     {
         return view('reportes.saldosvencidos.saldosvencidos');
     }
+
     /*
      * Funcion consultar saldos vencidos
      * - segun el tipo: consultar tarjetas bono, regalo o las dos.
@@ -127,30 +253,27 @@ class ReportesController extends Controller
     {
         $rangos = explode(" - ", $request->rango);
         $tiposervicio = $request->tipo;
-        $resultadob=array();
-        $resultador=array();
-        if($tiposervicio=="B" || $tiposervicio=="T")
-        {
-            $detallesb=DetalleProdutos::join('tarjeta_servicios','detalle_produtos.numero_tarjeta','tarjeta_servicios.numero_tarjeta')
+        $resultadob = array();
+        $resultador = array();
+        if ($tiposervicio == "B" || $tiposervicio == "T") {
+            $detallesb = DetalleProdutos::join('tarjeta_servicios', 'detalle_produtos.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
                 ->whereBetween('detalle_produtos.fecha_vencimiento', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
-                ->where('tarjeta_servicios.servicio_codigo',Tarjetas::$CODIGO_SERVICIO_BONO)
+                ->where('tarjeta_servicios.servicio_codigo', Tarjetas::$CODIGO_SERVICIO_BONO)
                 ->select('detalle_produtos.*')
                 ->get();
-            $listaDetallesb=[];
-            foreach ($detallesb as $detalle)
-            {
-                $gasto=0;
-                $dtransacciones=DetalleTransaccion::where('detalle_producto_id',$detalle->id)->get();
-                foreach ($dtransacciones as $dtransaccione)
-                {
-                    $htransaccion=DB::table('h_estado_transacciones')->where('transaccion_id',$dtransaccione->transaccion_id)->orderBy('id', 'desc')->first();
-                    if($htransaccion->estado==HEstadoTransaccion::$ESTADO_ACTIVO)
-                        $gasto+=$dtransaccione->valor;
+            $listaDetallesb = [];
+            foreach ($detallesb as $detalle) {
+                $gasto = 0;
+                $dtransacciones = DetalleTransaccion::where('detalle_producto_id', $detalle->id)->get();
+                foreach ($dtransacciones as $dtransaccione) {
+                    $htransaccion = DB::table('h_estado_transacciones')->where('transaccion_id', $dtransaccione->transaccion_id)->orderBy('id', 'desc')->first();
+                    if ($htransaccion->estado == HEstadoTransaccion::$ESTADO_ACTIVO)
+                        $gasto += $dtransaccione->valor;
                 }
-                if($gasto<$detalle->monto_inicial) //si hay saldo
+                if ($gasto < $detalle->monto_inicial) //si hay saldo
                 {
-                    $sobrante=$detalle->monto_inicial-$gasto;
-                    $resultadob[]=array('numero_tarjeta' => $detalle->numero_tarjeta,
+                    $sobrante = $detalle->monto_inicial - $gasto;
+                    $resultadob[] = array('numero_tarjeta' => $detalle->numero_tarjeta,
                         'monto_inicial' => $detalle->monto_inicial,
                         'sobrante' => $sobrante,
                         'fecha_activacion' => $detalle->fecha_activacion,
@@ -159,27 +282,24 @@ class ReportesController extends Controller
                 }
             }
         }
-        if($tiposervicio=="R" || $tiposervicio=="T")
-        {
-            $detallesr=DetalleProdutos::join('tarjeta_servicios','detalle_produtos.numero_tarjeta','tarjeta_servicios.numero_tarjeta')
+        if ($tiposervicio == "R" || $tiposervicio == "T") {
+            $detallesr = DetalleProdutos::join('tarjeta_servicios', 'detalle_produtos.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
                 ->whereBetween('detalle_produtos.fecha_vencimiento', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
-                ->where('tarjeta_servicios.servicio_codigo',Tarjetas::$CODIGO_SERVICIO_REGALO)
+                ->where('tarjeta_servicios.servicio_codigo', Tarjetas::$CODIGO_SERVICIO_REGALO)
                 ->select('detalle_produtos.*')
                 ->get();
-            foreach ($detallesr as $detalle)
-            {
-                $gasto=0;
-                $dtransacciones=DetalleTransaccion::where('detalle_producto_id',$detalle->id)->get();
-                foreach ($dtransacciones as $dtransaccione)
-                {
-                    $htransaccion=DB::table('h_estado_transacciones')->where('transaccion_id',$dtransaccione->transaccion_id)->orderBy('id', 'desc')->first();
-                    if($htransaccion->estado==HEstadoTransaccion::$ESTADO_ACTIVO)
-                        $gasto+=$dtransaccione->valor;
+            foreach ($detallesr as $detalle) {
+                $gasto = 0;
+                $dtransacciones = DetalleTransaccion::where('detalle_producto_id', $detalle->id)->get();
+                foreach ($dtransacciones as $dtransaccione) {
+                    $htransaccion = DB::table('h_estado_transacciones')->where('transaccion_id', $dtransaccione->transaccion_id)->orderBy('id', 'desc')->first();
+                    if ($htransaccion->estado == HEstadoTransaccion::$ESTADO_ACTIVO)
+                        $gasto += $dtransaccione->valor;
                 }
-                if($gasto<$detalle->monto_inicial) //si hay saldo
+                if ($gasto < $detalle->monto_inicial) //si hay saldo
                 {
-                    $sobrante=$detalle->monto_inicial-$gasto;
-                    $resultador[]=array('numero_tarjeta' => $detalle->numero_tarjeta,
+                    $sobrante = $detalle->monto_inicial - $gasto;
+                    $resultador[] = array('numero_tarjeta' => $detalle->numero_tarjeta,
                         'monto_inicial' => $detalle->monto_inicial,
                         'sobrante' => $sobrante,
                         'fecha_activacion' => $detalle->fecha_activacion,
@@ -188,9 +308,10 @@ class ReportesController extends Controller
                 }
             }
         }
-        $rango =['fecha1'=> $rangos[0], 'fecha2'=>$rangos[1]];
-        return view('reportes.saldosvencidos.parcialresultadosaldosvencidos', compact('resultadob', 'resultador', 'rango','tiposervicio'));
+        $rango = ['fecha1' => $rangos[0], 'fecha2' => $rangos[1]];
+        return view('reportes.saldosvencidos.parcialresultadosaldosvencidos', compact('resultadob', 'resultador', 'rango', 'tiposervicio'));
     }
+
     /*
      * FUNCION GENERAR PDF para Saldos Vencidos
      * Exporta en formato pdf, los resultados
@@ -198,12 +319,13 @@ class ReportesController extends Controller
      */
     public function pdfSaldosVencidos(Request $request)
     {
-        $data = ['resultadob'=>$request->resultadob, 'resultador'=>$request->resultador, 'tiposervicio'=>$request->tiposervicio, 'rango'=>$request->fecha1." - ".$request->fecha2];
+        $data = ['resultadob' => $request->resultadob, 'resultador' => $request->resultador, 'tiposervicio' => $request->tiposervicio, 'rango' => $request->fecha1 . " - " . $request->fecha2];
         $pdf = \PDF::loadView('reportes.saldosvencidos.pdfsaldosvencidos', $data);
 
         $pdf->setPaper('A4', 'landscape');
         return $pdf->download('saldosvencidos.pdf');
     }
+
     /*
      * FUNCION GENERAR EXCEL para saldos vencidos
      * Exporta a excel, los resultados de las tarjetas
@@ -211,36 +333,36 @@ class ReportesController extends Controller
      */
     public function excelSaldosVencidos(Request $request)
     {
-        \Excel::create('ExcelSaldosVencidos', function($excel) use($request) {
+        \Excel::create('ExcelSaldosVencidos', function ($excel) use ($request) {
             $resultadob = $request->resultadob;
             $resultador = $request->resultador;
-            $fecha1= $request->fecha1;
-            $fecha2= $request->fecha2;
-            $rango=$fecha1." - ".$fecha2;
+            $fecha1 = $request->fecha1;
+            $fecha2 = $request->fecha2;
+            $rango = $fecha1 . " - " . $fecha2;
             $tiposervicio = $request->tiposervicio;
 
-            $excel->sheet('SaldosVencidos', function($sheet) use($resultadob, $resultador, $rango, $tiposervicio) {
-                $hoy=Carbon::now();
+            $excel->sheet('SaldosVencidos', function ($sheet) use ($resultadob, $resultador, $rango, $tiposervicio) {
+                $hoy = Carbon::now();
                 $objDrawing = new PHPExcel_Worksheet_Drawing;
                 $objDrawing->setPath(public_path('images/logo_mini.png')); //your image path
                 $objDrawing->setCoordinates('A1');
                 $objDrawing->setWorksheet($sheet);
                 $sheet->setWidth(array(
-                    'A'     =>  30,
-                    'B'     =>  20,
-                    'C'     =>  20,
-                    'D'     =>  20,
-                    'E'     =>  20,
+                    'A' => 30,
+                    'B' => 20,
+                    'C' => 20,
+                    'D' => 20,
+                    'E' => 20,
                 ));
 
-                $sheet->row(2, array('','REPORTE DE SALDOS VENCIDOS'));
+                $sheet->row(2, array('', 'REPORTE DE SALDOS VENCIDOS'));
                 $sheet->row(2, function ($row) {
                     $row->setBackground('#4CAF50');
                 });
 
-                $sheet->row(3, array('','Rango:',$rango,'',''));
-                $sheet->row(4, array('','Fecha:',$hoy,'',''));
-                if($tiposervicio!="R") {
+                $sheet->row(3, array('', 'Rango:', $rango, '', ''));
+                $sheet->row(4, array('', 'Fecha:', $hoy, '', ''));
+                if ($tiposervicio != "R") {
                     $sheet->row(6, array('TARJETAS BONO'));
                     $sheet->row(6, function ($row) {
                         $row->setBackground('#4CAF50');
@@ -260,10 +382,9 @@ class ReportesController extends Controller
                         $sheet->row($fila, array('No hay resultados'));
                     $fila++;
                     $fila++;
-                }
-                else
-                    $fila=6;
-                if($tiposervicio!="B") {
+                } else
+                    $fila = 6;
+                if ($tiposervicio != "B") {
                     $sheet->row($fila, array('TARJETAS REGALO'));
                     $sheet->row($fila, function ($row) {
                         $row->setBackground('#4CAF50');
