@@ -1,20 +1,20 @@
-
-
 <div class="row">
     <div class="col-sm-12">
-        <h5>Exportar</h5>
         <div class="card-box widget-inline">
             <div class="row">
-                <div class="col-lg-3 col-sm-6">
-                    <div class="widget-inline-box">
-                        <a href="{{route('exportarpdfprimeravez',['fecha1'=>$rango['fecha1'],'fecha2'=>$rango['fecha2']])}}" class="btn btn-primary" >
-                            <i class="fa fa-file-pdf-o" aria-hidden="true"></i> PDF
-                        </a>
-                        <a href="{{route('exportarexcelprimeravez', ['fecha1'=>$rango['fecha1'],'fecha2'=>$rango['fecha2']])}}" class="btn btn-primary waves-effect waves-light">
-                            <i class="fa fa-file-excel-o" aria-hidden="true"></i> EXCEL
-                        </a>
+                    <div class="widget-inline-box text-right">
+                        <strong>Exportar: </strong>
+                        <div class="btn-group">
+                            <a href="{{route('exportarpdfprimeravez',['fecha1'=>$rango['fecha1'],'fecha2'=>$rango['fecha2']])}}"
+                               class="btn btn-sm btn-custom" data-toggle="tooltip" title="PDF">
+                                <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                            </a>
+                            <a href="{{route('exportarexcelprimeravez', ['fecha1'=>$rango['fecha1'],'fecha2'=>$rango['fecha2']])}}"
+                               class="btn btn-sm btn-custom" data-toggle="tooltip" title="EXCEL">
+                                <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            </a>
+                        </div>
                     </div>
-                </div>
             </div>
         </div>
     </div>
@@ -26,7 +26,7 @@
         <div class="card-box widget-inline">
             <div class="row">
                 <div class="col-lg-12 col-sm-12">
-                    <div class="widget-inline-box" >
+                    <div class="widget-inline-box">
                         <div class="table-responsive m-b-20">
                             <table id="datatable" class="table table-striped table-bordered" width="100%">
                                 <thead>
@@ -61,14 +61,11 @@
 </div>
 
 
-
-
-
-
 <script>
-$('#datatable').DataTable({
-    "language": {
-        "url": "{!!route('datatable_es')!!}"
-    },
-});
+    $('[data-toggle="tooltip"]').tooltip();
+    $('#datatable').DataTable({
+        "language": {
+            "url": "{!!route('datatable_es')!!}"
+        },
+    });
 </script>
