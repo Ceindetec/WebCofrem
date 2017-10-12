@@ -56,7 +56,7 @@
 <div class="row">
 
     <div id="logo">
-        <img src="{{url('images/logo.png')}}" width="150px">
+        <img src="{{url('images/logo_mini.png')}}" width="150px">
     </div>
     <div id="info">
         <ul>

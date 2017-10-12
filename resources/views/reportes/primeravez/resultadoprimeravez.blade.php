@@ -10,7 +10,7 @@
                         <a href="{{route('exportarpdfprimeravez',['fecha1'=>$rango['fecha1'],'fecha2'=>$rango['fecha2']])}}" class="btn btn-primary" >
                             <i class="fa fa-file-pdf-o" aria-hidden="true"></i> PDF
                         </a>
-                        <a href="{{route('exportarexcelprimeravez')}}" class="btn btn-primary waves-effect waves-light">
+                        <a href="{{route('exportarexcelprimeravez', ['fecha1'=>$rango['fecha1'],'fecha2'=>$rango['fecha2']])}}" class="btn btn-primary waves-effect waves-light">
                             <i class="fa fa-file-excel-o" aria-hidden="true"></i> EXCEL
                         </a>
                     </div>
