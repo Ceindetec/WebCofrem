@@ -5,8 +5,10 @@ namespace creditocofrem\Http\Controllers;
 use Carbon\Carbon;
 use creditocofrem\DetalleProdutos;
 use creditocofrem\DetalleTransaccion;
+use creditocofrem\Establecimientos;
 use creditocofrem\HEstadoTransaccion;
 use creditocofrem\Servicios;
+use creditocofrem\Sucursales;
 use creditocofrem\Tarjetas;
 use creditocofrem\Transaccion;
 use Illuminate\Http\Request;
@@ -698,7 +700,7 @@ class ReportesController extends Controller
 
                     $fila = 8;
                     if (sizeof($resultadob) > 0) {
-                        $sheet->row(7, array('Numero tarjeta', 'Monto incial', 'Sobrante', 'Fecha activacion', 'Fecha vencimiento'));
+                        $sheet->row(7, array('Número tarjeta', 'Monto inicial', 'Sobrante', 'Fecha activación', 'Fecha vencimiento'));
                         $sheet->row(7, function ($row) {
                             $row->setBackground('#f2f2f2');
                         });
@@ -719,7 +721,7 @@ class ReportesController extends Controller
                     });
                     $fila++;
                     if (sizeof($resultador) > 0) {
-                        $sheet->row($fila, array('Numero tarjeta', 'Monto incial', 'Sobrante', 'Fecha activacion', 'Fecha vencimiento'));
+                        $sheet->row($fila, array('Número tarjeta', 'Monto inicial', 'Sobrante', 'Fecha activación', 'Fecha vencimiento'));
                         $sheet->row($fila, function ($row) {
                             $row->setBackground('#f2f2f2');
                         });
@@ -736,5 +738,164 @@ class ReportesController extends Controller
     }
     /*
      * FINALIZA REPORTES SALDOS VENCIDOS
+     */
+    /*
+     * INICIA REPORTE VENTAS DIARIAS POR ESTABLECIMIENTO
+     */
+    public function viewVentasDiarias()
+    {
+        $establecimientos=Establecimientos::pluck('razon_social', 'id');
+        return view('reportes.ventasdiariasxestablecimiento.ventasdiarias',compact('establecimientos'));
+    }
+    /*
+     * Funcion consultar saldos vencidos
+     * - segun el tipo: consultar tarjetas bono, regalo o las dos.
+     * -
+     */
+    public function consultarVentasDiarias(Request $request)
+    {
+        $rangos = explode(" - ", $request->rango);
+        $resultado=array();
+        $establecimientos=Establecimientos::wherein('id',$request->establecimientos)
+            ->orderby('razon_social','asc')->get();
+        $sucursales=Sucursales::wherein('establecimiento_id',$request->establecimientos)
+            ->orderby('nombre','asc')->get();
+        if($sucursales!=null)
+        {
+            foreach ($sucursales as $sucursale) {
+
+                $dtransacciones = DetalleTransaccion::join('h_estado_transacciones','detalle_transacciones.transaccion_id','h_estado_transacciones.transaccion_id')
+                    ->join('transacciones','detalle_transacciones.transaccion_id','transacciones.id')
+                    ->where('h_estado_transacciones.estado','!=', HEstadoTransaccion::$ESTADO_INACTIVO)
+                    ->where('transacciones.sucursal_id',$sucursale->id)
+                    ->whereBetween('transacciones.fecha', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
+                    ->select('transacciones.fecha as fecha', DB::raw('SUM(detalle_transacciones.valor) as venta'))
+                    ->groupBy('detalle_transacciones.transaccion_id','transacciones.fecha','detalle_transacciones.valor')
+                    ->orderBy('transacciones.fecha', 'asc')
+                    ->get();
+                $fechaanterior="";
+                $venta=0;
+                foreach ($dtransacciones as $dtransaccione) {
+                    $fechaactual=$dtransaccione->fecha;
+                    if($fechaanterior=="")
+                        $fechaanterior=$fechaactual;
+                    if($fechaanterior != $fechaactual)
+                    {
+                        //insertar registro con valor de $venta
+                        $resultado[] = array('establecimiento' => $sucursale->establecimiento_id,
+                            'sucursal' => $sucursale->id,
+                            'fecha' => $fechaanterior,
+                            'venta' => $venta,
+                        );
+                        //tomar valores actuales
+                        $venta=0+($dtransaccione->venta);
+                        $fechaanterior=$fechaactual;
+                    }
+                    else{
+                        //sumar acumulado a $venta
+                        $venta+=$dtransaccione->venta;
+                        //fechaanterior=actual
+                        $fechaanterior=$fechaactual;
+                    }
+                }
+                $resultado[] = array('establecimiento' => $sucursale->establecimiento_id,
+                    'sucursal' => $sucursale->id,
+                    'fecha' => $fechaanterior,
+                    'venta' => $venta,
+                );
+            }
+        }
+       // dd($resultado);
+        $rango =['fecha1'=> $rangos[0], 'fecha2'=>$rangos[1]];
+        return view('reportes.ventasdiariasxestablecimiento.parcialventasdiarias', compact('resultado','rango','establecimientos','sucursales'));
+    }
+    public function selectestablecimientos(Request $request)
+    {
+       // $establecimientos=Establecimientos::pluck('razon_social', 'id');
+        $variable=strtoupper($request->term);
+        //dd($variable);
+        $establecimientos = Establecimientos::where('razon_social', 'like', '%'.$variable.'%')->get();
+        return $establecimientos;
+    }
+    /*
+    * FUNCION GENERAR PDF para ventas diarias por establecimiento
+    * Exporta a pdf, los resultados por dia de las ventas por sucursal
+    */
+    public function pdfVentasDiarias(Request $request)
+    {
+        $data = ['resultado'=>$request->resultado, 'establecimientos'=>$request->establecimientos, 'sucursales'=>$request->sucursales, 'rango'=>$request->fecha1." - ".$request->fecha2];
+        $pdf = \PDF::loadView('reportes.ventasdiariasxestablecimiento.pdfventasdiarias', $data);
+        $pdf->setPaper('A4', 'landscape');
+        return $pdf->download('ventasdiarias.pdf');
+    }
+    /*
+     * FUNCION GENERAR EXCEL para ventas diarias por establecimiento
+     * Exporta a excel, los resultados por dia de las ventas por sucursal
+     */
+    public function excelVentasDiarias(Request $request)
+    {
+        \Excel::create('ExcelSaldosVencidos', function($excel) use($request) {
+            $resultado = $request->resultado;
+            $establecimientos = $request->establecimientos;
+            $fecha1= $request->fecha1;
+            $fecha2= $request->fecha2;
+            $rango=$fecha1." - ".$fecha2;
+            $sucursales = $request->sucursales;
+
+            //FOR ESTABLECIMEINTOS POR CADA UNO CREAR UNA PESTAÃ‘A
+
+            $excel->sheet('SaldosVencidos', function($sheet) use($resultado, $establecimientos, $sucursales, $rango) {
+                $hoy=Carbon::now();
+                $objDrawing = new PHPExcel_Worksheet_Drawing;
+                $objDrawing->setPath(public_path('images/logo_mini.png')); //your image path
+                $objDrawing->setCoordinates('A1');
+                $objDrawing->setWorksheet($sheet);
+                $sheet->setWidth(array(
+                    'A'     =>  30,
+                    'B'     =>  20,
+                    'C'     =>  20,
+                    'D'     =>  20,
+                    'E'     =>  20,
+                ));
+
+                $sheet->row(2, array('','REPORTE DE VENTAS DIARIAS POR ESTABLECIMIENTO'));
+                $sheet->row(2, function ($row) {
+                    $row->setBackground('#4CAF50');
+                });
+
+                $sheet->row(3, array('','Rango:',$rango,'',''));
+                $sheet->row(4, array('','Fecha:',$hoy,'',''));
+
+                //TENER EN CUENTA VALOR DE FILA.
+                //FOR SUCURSALES
+                //FOR (RESULTADO)
+                // SI HAY DATO EN RESULTADO[] DE ESE ESTABLECIMEINTO Y SUCURSAL, MOSTRARLO
+
+                    $sheet->row(6, array('TARJETAS BONO'));
+                    $sheet->row(6, function ($row) {
+                        $row->setBackground('#4CAF50');
+                    });
+
+                    $fila = 8;
+                    if (sizeof($resultadob) > 0) {
+                        $sheet->row(7, array('NÃºmero tarjeta', 'Monto inicial', 'Sobrante', 'Fecha activaciÃ³n', 'Fecha vencimiento'));
+                        $sheet->row(7, function ($row) {
+                            $row->setBackground('#f2f2f2');
+                        });
+                        foreach ($resultadob as $miresul) {
+                            $sheet->row($fila, array($miresul["numero_tarjeta"], $miresul["monto_inicial"], $miresul["sobrante"], $miresul["fecha_activacion"], $miresul["fecha_vencimiento"]));
+                            $fila++;
+                        }
+                    } else
+                        $sheet->row($fila, array('No hay resultados'));
+                    $fila++;
+                    $fila++;
+
+
+            });
+        })->export('xls');
+    }
+    /*
+     * FINALIZA REPORTE VENTAS DIARIAS POR ESTABLECIMIENTO
      */
 }
