@@ -183,7 +183,7 @@ return [
         Yajra\Oci8\Oci8ServiceProvider::class,
         OwenIt\Auditing\AuditingServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
-	Maatwebsite\Excel\ExcelServiceProvider::class,
+	      Maatwebsite\Excel\ExcelServiceProvider::class,
 
     ],
 
@@ -240,9 +240,10 @@ return [
         'Shinobi' => Caffeinated\Shinobi\Facades\Shinobi::class,
 
         'Encript' => Facades\creditocofrem\Encript::class,
+        'AESCrypt' => Facades\creditocofrem\AESCrypt::class,
 
         'PDF' => Barryvdh\DomPDF\Facade::class,
-	'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+	      'Excel' => Maatwebsite\Excel\Facades\Excel::class,
     ],
 
 ];
