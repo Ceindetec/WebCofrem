@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use creditocofrem\DetalleProdutos;
 use creditocofrem\DetalleTransaccion;
 use creditocofrem\HEstadoTransaccion;
+use creditocofrem\Servicios;
 use creditocofrem\Tarjetas;
 use creditocofrem\Transaccion;
 use Illuminate\Http\Request;
@@ -124,6 +125,10 @@ class ReportesController extends Controller
         return $pdf->download('primeravez.pdf');
     }
 
+    /**
+     * metodo que permite exportar a excel el reporte
+     * @param Request $request
+     */
     public function exportarExcelPrimeravez(Request $request)
     {
         $transacciones = Transaccion::whereBetween('fecha', [Carbon::createFromFormat("d/m/Y", $request->fecha1), Carbon::createFromFormat("d/m/Y", $request->fecha2)])
@@ -190,17 +195,16 @@ class ReportesController extends Controller
                 $sheet->setMergeColumn(array(
                     'columns' => array('A'),
                     'rows' => array(
-                        array(1,4),
+                        array(1, 4),
                     )
                 ));
-
 
                 $sheet->row(1, array('', 'REPORTE TARJETAS USADAS POR PRIMERA VEZ'));
                 $sheet->row(1, function ($row) {
                     $row->setBackground('#4CAF50');
                 });
 
-                $sheet->cells('A1:A4', function($cells) {
+                $sheet->cells('A1:A4', function ($cells) {
                     $cells->setBackground('#FFFFFF');
                 });
 
@@ -223,7 +227,7 @@ class ReportesController extends Controller
                                 $miresul->getSucursal->nombre,
                                 $miresul->codigo_terminal,
                                 $miresul->fecha,
-                                ));
+                            ));
                         $fila++;
                     }
                 } else
@@ -233,6 +237,84 @@ class ReportesController extends Controller
             });
         })->export('xls');
 
+    }
+
+    public function viewReporteMontos()
+    {
+        $servicios = Servicios::pluck('descripcion', 'codigo');
+        return view('reportes.montostarjetas.motosportarjetas', compact('servicios'));
+    }
+
+    public function resultadoMontosTarjetas(Request $request)
+    {
+        $result = [];
+        try {
+            $rangos = explode(" - ", $request->rango);
+            $fechaini = "";
+            $regalo = [];
+            $bono = [];
+            if ($request->servicios == 'T') {
+                $montosregalo = DetalleProdutos::where('factura', '<>', NULL)
+                    ->whereBetween('fecha_activacion', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
+                    ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
+                    ->groupBy('monto_inicial')
+                    ->select('monto_inicial')
+                    ->get();
+                if (count($montosregalo) > 0) {
+                    $fechaini = Carbon::createFromFormat("d/m/Y", $rangos[0]);
+                    $contadorfecha = 0;
+                    $contador = 0;
+                    while ($fechaini <= Carbon::createFromFormat("d/m/Y", $rangos[1])) {
+                        foreach ($montosregalo as $monto) {
+                            $detalle = DetalleProdutos::where('factura', '<>', NULL)
+                                ->whereDate('fecha_activacion', $fechaini->toDateString())
+                                ->where('monto_inicial', $monto->monto_inicial)
+                                ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
+                                ->get();
+                            if (count($detalle) > 0) {
+                                $regalo['detalles'][$contadorfecha][$contador] = $detalle;
+                                $contador++;
+                            }
+                        }
+                        $fechaini = $fechaini->addDay();
+                        if(isset($regalo['detalles'][$contadorfecha]))
+                            $contadorfecha++;
+                    }
+                }
+                $montosbono = DetalleProdutos::where('contrato_emprs_id', '<>', NULL)
+                    ->whereBetween('fecha_activacion', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
+                    ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
+                    ->groupBy('monto_inicial')
+                    ->select('monto_inicial')
+                    ->get();
+                if (count($montosbono) > 0) {
+                    $fechaini = Carbon::createFromFormat("d/m/Y", $rangos[0]);
+                    $contadorfecha = 0;
+                    $contador = 0;
+                    while ($fechaini <= Carbon::createFromFormat("d/m/Y", $rangos[1])) {
+                        foreach ($montosbono as $monto) {
+                            $detalle = DetalleProdutos::where('factura', '<>', NULL)
+                                ->whereDate('fecha_activacion', $fechaini->toDateString())
+                                ->where('monto_inicial', $monto->monto_inicial)
+                                ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
+                                ->get();
+                            if (count($detalle) > 0) {
+                                $bono['detalles'][$contadorfecha][$contador] = $detalle;
+                                $contador++;
+                            }
+                        }
+                        $fechaini = $fechaini->addDay();
+                        if(isset($bono['detalles'][$contadorfecha]))
+                            $contadorfecha++;
+                    }
+                }
+                $data = ['regalo' => $regalo, 'bono'=>$bono];
+            }
+
+        } catch (\Exception $exception) {
+            dd($exception->getMessage());
+        }
+        return view('reportes.montostarjetas.parcialresultadomotosportarjeta', compact('data'));
     }
 
     /**

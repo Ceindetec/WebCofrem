@@ -64,8 +64,8 @@
         <a href="javascript: void(0);"  aria-expanded="true"><i class="fa fa-line-chart" aria-hidden="true"></i> Reportes <span class="fa arrow"></span></a>
         <ul class="nav-second-level nav collapse" aria-expanded="true" style="">
             <li><a href="{{route('rprimeravez')}}"> Tarjetas usadas por primera vez </a></li>
-            <li><a href="{{route('contratos')}}"> Crear Contratos </a></li>
             <li><a href="{{route('reportes.saldosvencidos')}}"> Saldos vencidos </a></li>
+            <li><a href="{{route('reportes.montostarjetas')}}"> Activacion por montos </a></li>
         </ul>
     </li>
     <!-- <li><a href="{ {route('tarjetasregalo')}}"><i class="ti-layout"></i> Tarjetas Regalo</a></li> -->
