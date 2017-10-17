@@ -700,7 +700,7 @@ class ReportesController extends Controller
 
                     $fila = 8;
                     if (sizeof($resultadob) > 0) {
-                        $sheet->row(7, array('Número tarjeta', 'Monto inicial', 'Sobrante', 'Fecha activación', 'Fecha vencimiento'));
+                        $sheet->row(7, array('NÃºmero tarjeta', 'Monto inicial', 'Sobrante', 'Fecha activaciÃ³n', 'Fecha vencimiento'));
                         $sheet->row(7, function ($row) {
                             $row->setBackground('#f2f2f2');
                         });
@@ -721,7 +721,7 @@ class ReportesController extends Controller
                     });
                     $fila++;
                     if (sizeof($resultador) > 0) {
-                        $sheet->row($fila, array('Número tarjeta', 'Monto inicial', 'Sobrante', 'Fecha activación', 'Fecha vencimiento'));
+                        $sheet->row($fila, array('NÃºmero tarjeta', 'Monto inicial', 'Sobrante', 'Fecha activaciÃ³n', 'Fecha vencimiento'));
                         $sheet->row($fila, function ($row) {
                             $row->setBackground('#f2f2f2');
                         });

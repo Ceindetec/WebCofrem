@@ -3,18 +3,22 @@
         <h5>Exportar</h5>
         <div class="card-box widget-inline">
             <div class="row">
-                <div class="col-lg-3 col-sm-6">
-                    <div class="widget-inline-box">
-                        <a href="{{route('pdfventasdiarias',['fecha1'=>$rango['fecha1'],'fecha2'=>$rango['fecha2'],'lista_esta'=>$lista_esta,'resultado'=>$resultado])}}" class="btn btn-primary" >
-                            <i class="fa fa-file-pdf-o" aria-hidden="true"></i> PDF
+                <div class="widget-inline-box text-right">
+                    <strong>Exportar: </strong>
+                    <div class="btn-group">
+                        <a href="{{route('pdfventasdiarias',['fecha1'=>$rango['fecha1'],'fecha2'=>$rango['fecha2'],'lista_esta'=>$lista_esta,'resultado'=>$resultado])}}"
+                           class="btn btn-sm btn-custom" data-toggle="tooltip" title="PDF">
+                            <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
                         </a>
-                        <a href="{{route('excelventasdiarias',['fecha1'=>$rango['fecha1'],'fecha2'=>$rango['fecha2'],'lista_esta'=>$lista_esta,'resultado'=>$resultado])}}" class="btn btn-primary waves-effect waves-light">
-                            <i class="fa fa-file-excel-o" aria-hidden="true"></i> EXCEL
+                        <a href="{{route('excelventasdiarias',['fecha1'=>$rango['fecha1'],'fecha2'=>$rango['fecha2'],'lista_esta'=>$lista_esta,'resultado'=>$resultado])}}"
+                           class="btn btn-sm btn-custom" data-toggle="tooltip" title="EXCEL">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
                         </a>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 
