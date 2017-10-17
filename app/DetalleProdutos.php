@@ -24,8 +24,14 @@ class DetalleProdutos extends Model implements AuditableContract
         'factura',
     ];
 
-    public function getUser(){
-        return $this->belongsTo('creditocofrem\User','user_id','id');
+    public function getUser()
+    {
+        return $this->belongsTo('creditocofrem\User', 'user_id', 'id');
+    }
+
+    public function getContrato()
+    {
+        return $this->belongsTo('creditocofrem\Contratos_empr','contratos_emprs_id','id');
     }
 
 }

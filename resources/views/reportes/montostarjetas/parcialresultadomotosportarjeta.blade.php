@@ -5,11 +5,11 @@
                 <div class="widget-inline-box text-right">
                     <strong>Exportar: </strong>
                     <div class="btn-group">
-                        <a href="{{route('exportarpdfprimeravez')}}"
+                        <a href="{{route('reportes.exportarpdfmotosportarjeta', ['fecha1'=>$rango['fecha1'],'fecha2'=>$rango['fecha2'],'servicios'=>$tipoServicio])}}"
                            class="btn btn-sm btn-custom" data-toggle="tooltip" title="PDF">
                             <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
                         </a>
-                        <a href="{{route('exportarexcelprimeravez')}}"
+                        <a href="{{route('reportes.exportarexcelmontosportarjeta', ['fecha1'=>$rango['fecha1'],'fecha2'=>$rango['fecha2'],'servicios'=>$tipoServicio])}}"
                            class="btn btn-sm btn-custom" data-toggle="tooltip" title="EXCEL">
                             <i class="fa fa-file-excel-o" aria-hidden="true"></i>
                         </a>
@@ -89,7 +89,7 @@
                                                 <tr>
                                                     <td>{{$monto->numero_tarjeta}}</td>
                                                     <td>{{$monto->monto_inicial}}</td>
-                                                    <td>{{$monto->contrato_emprs_id}}</td>
+                                                    <td>{{$monto->getContrato->n_contrato}}</td>
                                                     <td>{{$monto->getUser->name}}</td>
                                                 </tr>
                                             @endforeach
