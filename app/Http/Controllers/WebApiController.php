@@ -202,7 +202,7 @@ class WebApiController extends Controller
             }
         } catch (\Exception $exception) {
             $result['estado'] = FALSE;
-            $result['mensaje'] = ApiWS::$TEXT_ERROR_EJECUCION;
+            $result['mensaje'] = $exception->getMessage();//ApiWS::$TEXT_ERROR_EJECUCION;
             $result['codigo'] = ApiWS::$CODIGO_ERROR_EJECUCION;
 
         }
@@ -213,9 +213,10 @@ class WebApiController extends Controller
     public function retornaServicios($tarjeta, $request)
     {
         $result = [];
-        $servicios = TarjetaServicios::where('numero_tarjeta', $tarjeta->numero_tarjeta)
+        $servicios = TarjetaServicios::join('servicios','tarjeta_servicios.servicio_codigo','servicios.codigo')
+            ->where('numero_tarjeta', $tarjeta->numero_tarjeta)
             ->where('estado', TarjetaServicios::$ESTADO_ACTIVO)
-            ->select('servicio_codigo')
+            ->select('servicios.descripcion','servicios.codigo')
             ->get();
         $result['estado'] = TRUE;
         $result['mensaje'] = ApiWS::$TEXT_TRANSACCION_EXITOSA;
