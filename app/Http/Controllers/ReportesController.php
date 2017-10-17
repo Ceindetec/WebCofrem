@@ -239,82 +239,328 @@ class ReportesController extends Controller
 
     }
 
+    /**
+     * trae la vista para generar el reporte de servicios activados descriminados por fecha de activacion y montos
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function viewReporteMontos()
     {
         $servicios = Servicios::pluck('descripcion', 'codigo');
         return view('reportes.montostarjetas.motosportarjetas', compact('servicios'));
     }
 
+    /**
+     * genera la previzualizacion del reporte de servicios activados descriminados por fecha de activacion y montos
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function resultadoMontosTarjetas(Request $request)
     {
         $result = [];
         try {
             $rangos = explode(" - ", $request->rango);
-            $fechaini = "";
-            $regalo = [];
-            $bono = [];
-            if ($request->servicios == 'T') {
-                $montosregalo = DetalleProdutos::where('factura', '<>', NULL)
-                    ->whereBetween('fecha_activacion', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
-                    ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
-                    ->groupBy('monto_inicial')
-                    ->select('monto_inicial')
-                    ->get();
-                if (count($montosregalo) > 0) {
-                    $fechaini = Carbon::createFromFormat("d/m/Y", $rangos[0]);
-                    $contadorfecha = 0;
-                    $contador = 0;
-                    while ($fechaini <= Carbon::createFromFormat("d/m/Y", $rangos[1])) {
-                        foreach ($montosregalo as $monto) {
-                            $detalle = DetalleProdutos::where('factura', '<>', NULL)
-                                ->whereDate('fecha_activacion', $fechaini->toDateString())
-                                ->where('monto_inicial', $monto->monto_inicial)
-                                ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
-                                ->get();
-                            if (count($detalle) > 0) {
-                                $regalo['detalles'][$contadorfecha][$contador] = $detalle;
-                                $contador++;
-                            }
-                        }
-                        $fechaini = $fechaini->addDay();
-                        if(isset($regalo['detalles'][$contadorfecha]))
-                            $contadorfecha++;
-                    }
-                }
-                $montosbono = DetalleProdutos::where('contrato_emprs_id', '<>', NULL)
-                    ->whereBetween('fecha_activacion', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
-                    ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
-                    ->groupBy('monto_inicial')
-                    ->select('monto_inicial')
-                    ->get();
-                if (count($montosbono) > 0) {
-                    $fechaini = Carbon::createFromFormat("d/m/Y", $rangos[0]);
-                    $contadorfecha = 0;
-                    $contador = 0;
-                    while ($fechaini <= Carbon::createFromFormat("d/m/Y", $rangos[1])) {
-                        foreach ($montosbono as $monto) {
-                            $detalle = DetalleProdutos::where('factura', '<>', NULL)
-                                ->whereDate('fecha_activacion', $fechaini->toDateString())
-                                ->where('monto_inicial', $monto->monto_inicial)
-                                ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
-                                ->get();
-                            if (count($detalle) > 0) {
-                                $bono['detalles'][$contadorfecha][$contador] = $detalle;
-                                $contador++;
-                            }
-                        }
-                        $fechaini = $fechaini->addDay();
-                        if(isset($bono['detalles'][$contadorfecha]))
-                            $contadorfecha++;
-                    }
-                }
-                $data = ['regalo' => $regalo, 'bono'=>$bono];
-            }
-
+            $data = $this->dataReporteActivadosPorMontos($rangos, $request);
+            $rango = ['fecha1' => $rangos[0], 'fecha2' => $rangos[1]];
+            $tipoServicio = $request->servicios;
         } catch (\Exception $exception) {
-            dd($exception->getMessage());
+            $data = ['regalo' => [], 'bono' => []];
         }
-        return view('reportes.montostarjetas.parcialresultadomotosportarjeta', compact('data'));
+        return view('reportes.montostarjetas.parcialresultadomotosportarjeta', compact('data', 'rango', 'tipoServicio'));
+    }
+
+    /**
+     * genera la previzualizacion del reporte de servicios activados descriminados por fecha de activacion y montos
+     * @param Request $request
+     * @return mixed
+     */
+    public function exportarPdfMotosPorTarjeta(Request $request)
+    {
+        $rangos = [$request->fecha1,$request->fecha2];
+        $data = $this->dataReporteActivadosPorMontos($rangos, $request);
+        $data = array_merge($data, ['rango' => $request->fecha1 . " - " . $request->fecha2]);
+        $pdf = \PDF::loadView('reportes.montostarjetas.pdfmontosportarjeta', $data);
+        //$pdf->setPaper('A4', 'landscape');
+        return $pdf->download('activacionesporponto - '.Carbon::now()->format('d-m-Y').'.pdf');
+    }
+
+    /**
+     * METODO QUE PERMITE EXPORTAR A EXCEL EL REPORTE DE SERVICIOS ACTIVADOS POR FECGA DE ACTIVACION Y MONTOS
+     * @param Request $request
+     */
+    public function exportarExcelMontosPorTarjeta(Request $request){
+        $rangos = [$request->fecha1,$request->fecha2];
+        $data = $this->dataReporteActivadosPorMontos($rangos, $request);
+        \Excel::create('ExcelMontosPorTarjeta', function ($excel) use ($request, $data) {
+            $fecha1 = $request->fecha1;
+            $fecha2 = $request->fecha2;
+            $rango = $fecha1 . " - " . $fecha2;
+            if(count($data['regalo'])>0){
+                $excel->sheet('Regalo', function ($sheet) use ($data, $rango) {
+                    $hoy = Carbon::now();
+                    $objDrawing = new PHPExcel_Worksheet_Drawing;
+                    $objDrawing->setPath(public_path('images/logo.png')); //your image path
+                    $objDrawing->setHeight(50);
+                    $objDrawing->setCoordinates('A1');
+                    $objDrawing->setWorksheet($sheet);
+                    $objDrawing->setOffsetY(10);
+                    $sheet->setWidth(array(
+                        'A' => 30,
+                        'B' => 20,
+                        'C' => 20,
+                        'D' => 30,
+                    ));
+
+                    $sheet->setMergeColumn(array(
+                        'columns' => array('A'),
+                        'rows' => array(
+                            array(1, 4),
+                        )
+                    ));
+
+                    $sheet->row(1, array('', 'REPORTE SERVICIOS REGALO ACTIVADOS POR MONTOS'));
+                    $sheet->row(1, function ($row) {
+                        $row->setBackground('#4CAF50');
+                    });
+
+                    $sheet->cells('A1:A4', function ($cells) {
+                        $cells->setBackground('#FFFFFF');
+                    });
+
+                    $sheet->setBorder('A1:A4', 'thin');
+
+                    $sheet->row(3, array('', 'Rango:', $rango, ''));
+                    $sheet->row(4, array('', 'Fecha:', $hoy, ''));
+
+                    $fila = 7;
+                    if (sizeof($data['regalo']['detalles']) > 0) {
+                        foreach ($data['regalo']['detalles'] as $detalles){
+                            foreach ($detalles as $montos){
+                                $sheet->row($fila, array('FECHA', $montos[0]->fecha_activacion, 'MONTO INICIAL', $montos[0]->monto_inicial));
+                                $sheet->row($fila, function ($row) {
+                                    $row->setBackground('#4CAF50');
+                                });
+                                $fila++;
+                                $sheet->row($fila, array('Numero tarjeta', 'Monto inicial', 'Factura', 'Usuario'));
+                                $sheet->row($fila, function ($row) {
+                                    $row->setBackground('#f2f2f2');
+                                });
+                                $fila++;
+                                foreach ($montos as $monto){
+                                    $sheet->row($fila,
+                                        array(
+                                            $monto->numero_tarjeta,
+                                            $monto->monto_inicial,
+                                            $monto->factura,
+                                            $monto->getUser->name
+                                        ));
+                                    $fila++;
+                                }
+                                $fila++;
+                            }
+                        }
+                    } else
+                        $sheet->row($fila, array('No hay resultados'));
+                    $fila++;
+                    $fila++;
+                });
+            }
+            if(count($data['bono'])>0){
+                $excel->sheet('Bonos Empresariales', function ($sheet) use ($data, $rango) {
+                    $hoy = Carbon::now();
+                    $objDrawing = new PHPExcel_Worksheet_Drawing;
+                    $objDrawing->setPath(public_path('images/logo.png')); //your image path
+                    $objDrawing->setHeight(50);
+                    $objDrawing->setCoordinates('A1');
+                    $objDrawing->setWorksheet($sheet);
+                    $objDrawing->setOffsetY(10);
+                    $sheet->setWidth(array(
+                        'A' => 30,
+                        'B' => 20,
+                        'C' => 20,
+                        'D' => 30,
+                    ));
+
+                    $sheet->setMergeColumn(array(
+                        'columns' => array('A'),
+                        'rows' => array(
+                            array(1, 4),
+                        )
+                    ));
+
+                    $sheet->row(1, array('', 'REPORTE SERVICIOS BONO EMPRESARIAL ACTIVADOS POR MONTOS'));
+                    $sheet->row(1, function ($row) {
+                        $row->setBackground('#4CAF50');
+                    });
+
+                    $sheet->cells('A1:A4', function ($cells) {
+                        $cells->setBackground('#FFFFFF');
+                    });
+
+                    $sheet->setBorder('A1:A4', 'thin');
+
+                    $sheet->row(3, array('', 'Rango:', $rango, ''));
+                    $sheet->row(4, array('', 'Fecha:', $hoy, ''));
+
+                    $fila = 7;
+                    if (sizeof($data['bono']['detalles']) > 0) {
+                        foreach ($data['bono']['detalles'] as $detalles){
+                            foreach ($detalles as $montos){
+                                $sheet->row($fila, array('FECHA', $montos[0]->fecha_activacion, 'MONTO INICIAL', $montos[0]->monto_inicial));
+                                $sheet->row($fila, function ($row) {
+                                    $row->setBackground('#4CAF50');
+                                });
+                                $fila++;
+                                $sheet->row($fila, array('Numero tarjeta', 'Monto inicial', 'Numero de contrato', 'Usuario'));
+                                $sheet->row($fila, function ($row) {
+                                    $row->setBackground('#f2f2f2');
+                                });
+                                $fila++;
+                                foreach ($montos as $monto){
+                                    $sheet->row($fila,
+                                        array(
+                                            $monto->numero_tarjeta,
+                                            $monto->monto_inicial,
+                                            $monto->getContrato->n_contrato,
+                                            $monto->getUser->name
+                                        ));
+                                    $fila++;
+                                }
+                                $fila++;
+                            }
+                        }
+                    } else
+                        $sheet->row($fila, array('No hay resultados'));
+                    $fila++;
+                    $fila++;
+                });
+            }
+        })->export('xls');
+    }
+
+    /**
+     * metodo reusable para obtener la informacion para el reporte de activacion de servicios discriminados por montos
+     * @param $rangos
+     * @param $request
+     * @return array
+     */
+    private function dataReporteActivadosPorMontos($rangos, $request)
+    {
+        $fechaini = "";
+        $regalo = [];
+        $bono = [];
+        if ($request->servicios == 'T') {
+            $montosregalo = DetalleProdutos::where('factura', '<>', NULL)
+                ->whereBetween('fecha_activacion', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
+                ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
+                ->groupBy('monto_inicial')
+                ->select('monto_inicial')
+                ->get();
+            if (count($montosregalo) > 0) {
+                $fechaini = Carbon::createFromFormat("d/m/Y", $rangos[0]);
+                $contadorfecha = 0;
+                $contador = 0;
+                while ($fechaini <= Carbon::createFromFormat("d/m/Y", $rangos[1])) {
+                    foreach ($montosregalo as $monto) {
+                        $detalle = DetalleProdutos::where('factura', '<>', NULL)
+                            ->whereDate('fecha_activacion', $fechaini->toDateString())
+                            ->where('monto_inicial', $monto->monto_inicial)
+                            ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
+                            ->get();
+                        if (count($detalle) > 0) {
+                            $regalo['detalles'][$contadorfecha][$contador] = $detalle;
+                            $contador++;
+                        }
+                    }
+                    $fechaini = $fechaini->addDay();
+                    if (isset($regalo['detalles'][$contadorfecha]))
+                        $contadorfecha++;
+                }
+            }
+            $montosbono = DetalleProdutos::where('contrato_emprs_id', '<>', NULL)
+                ->whereBetween('fecha_activacion', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
+                ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
+                ->groupBy('monto_inicial')
+                ->select('monto_inicial')
+                ->get();
+            if (count($montosbono) > 0) {
+                $fechaini = Carbon::createFromFormat("d/m/Y", $rangos[0]);
+                $contadorfecha = 0;
+                $contador = 0;
+                while ($fechaini <= Carbon::createFromFormat("d/m/Y", $rangos[1])) {
+                    foreach ($montosbono as $monto) {
+                        $detalle = DetalleProdutos::where('factura', '<>', NULL)
+                            ->whereDate('fecha_activacion', $fechaini->toDateString())
+                            ->where('monto_inicial', $monto->monto_inicial)
+                            ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
+                            ->get();
+                        if (count($detalle) > 0) {
+                            $bono['detalles'][$contadorfecha][$contador] = $detalle;
+                            $contador++;
+                        }
+                    }
+                    $fechaini = $fechaini->addDay();
+                    if (isset($bono['detalles'][$contadorfecha]))
+                        $contadorfecha++;
+                }
+            }
+        } else if ($request->servicios == Tarjetas::$CODIGO_SERVICIO_REGALO) {
+            $montosregalo = DetalleProdutos::where('factura', '<>', NULL)
+                ->whereBetween('fecha_activacion', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
+                ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
+                ->groupBy('monto_inicial')
+                ->select('monto_inicial')
+                ->get();
+            if (count($montosregalo) > 0) {
+                $fechaini = Carbon::createFromFormat("d/m/Y", $rangos[0]);
+                $contadorfecha = 0;
+                $contador = 0;
+                while ($fechaini <= Carbon::createFromFormat("d/m/Y", $rangos[1])) {
+                    foreach ($montosregalo as $monto) {
+                        $detalle = DetalleProdutos::where('factura', '<>', NULL)
+                            ->whereDate('fecha_activacion', $fechaini->toDateString())
+                            ->where('monto_inicial', $monto->monto_inicial)
+                            ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
+                            ->get();
+                        if (count($detalle) > 0) {
+                            $regalo['detalles'][$contadorfecha][$contador] = $detalle;
+                            $contador++;
+                        }
+                    }
+                    $fechaini = $fechaini->addDay();
+                    if (isset($regalo['detalles'][$contadorfecha]))
+                        $contadorfecha++;
+                }
+            }
+        } else if ($request->servicios == Tarjetas::$CODIGO_SERVICIO_BONO) {
+            $montosbono = DetalleProdutos::where('contrato_emprs_id', '<>', NULL)
+                ->whereBetween('fecha_activacion', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
+                ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
+                ->groupBy('monto_inicial')
+                ->select('monto_inicial')
+                ->get();
+            if (count($montosbono) > 0) {
+                $fechaini = Carbon::createFromFormat("d/m/Y", $rangos[0]);
+                $contadorfecha = 0;
+                $contador = 0;
+                while ($fechaini <= Carbon::createFromFormat("d/m/Y", $rangos[1])) {
+                    foreach ($montosbono as $monto) {
+                        $detalle = DetalleProdutos::where('factura', '<>', NULL)
+                            ->whereDate('fecha_activacion', $fechaini->toDateString())
+                            ->where('monto_inicial', $monto->monto_inicial)
+                            ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
+                            ->get();
+                        if (count($detalle) > 0) {
+                            $bono['detalles'][$contadorfecha][$contador] = $detalle;
+                            $contador++;
+                        }
+                    }
+                    $fechaini = $fechaini->addDay();
+                    if (isset($bono['detalles'][$contadorfecha]))
+                        $contadorfecha++;
+                }
+            }
+        }
+        return ['regalo' => $regalo, 'bono' => $bono];
     }
 
     /**
