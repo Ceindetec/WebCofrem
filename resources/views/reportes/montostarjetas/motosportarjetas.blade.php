@@ -1,4 +1,5 @@
 @extends('layouts.admin')
+
 @section('styles')
     <link href="{{asset('plugins/datatables/jquery.dataTables.min.css')}}" rel="stylesheet" type="text/css"/>
     <link href="{{asset('plugins/datatables/buttons.bootstrap.min.css')}}" rel="stylesheet" type="text/css"/>
@@ -12,12 +13,15 @@
 @endsection
 
 @section('contenido')
+
     <div class="container">
+
         <div class="row">
             <div class="col-sm-12">
-                <h4 class="header-title m-t-0 m-b-20">Reporte de tarjetas con saldo vencido </h4>
+                <h4 class="header-title m-t-0 m-b-20">Reporte de activacion de servicios(tarjetas) discriminados por monto </h4>
             </div>
         </div> <!-- end row -->
+
 
         <div class="row">
             <div class="col-sm-12">
@@ -29,17 +33,16 @@
                                 <form class="form-horizontal col-md-12">
                                     <div class="form-group">
                                         <label>Rango de fecha para la consulta</label>
-                                        <input class="form-control input-daterange-datepicker" type="text"
-                                               id="daterange"/>
+                                        <div>
+                                            <input class="form-control input-daterange-datepicker" type="text" id="daterange"/>
+                                        </div>
                                     </div>
                                     <div class="form-group">
                                         <label>Tipo de servicio</label>
-                                        {{Form::select('tiposervicio', ['B' => 'Tarjeta Bono', 'R' => 'Tarjeta Regalo', 'T' => 'Todas'], 'T',["class"=>"form-control" ,"id"=>"tiposervicio"])}}
+                                        {{Form::select('tiposervicio', $servicios, ["T"=>"todas"] ,["class"=>"form-control" ,"id"=>"tiposervicio"])}}
                                     </div>
                                     <div class="form-group">
-                                        <button type="button" class="btn btn-custom" onclick="generarRespuesta()">
-                                            Generar
-                                        </button>
+                                        <button type="button" class="btn btn-custom" onclick="generarRespuesta()" >Generar</button>
                                     </div>
                                 </form>
                             </div>
@@ -74,8 +77,7 @@
     <script src="{{asset('plugins/datatables/dataTables.fixedColumns.min.js')}}"></script>
     <script src="{{asset('plugins/moment/moment.js')}}"></script>
     <script src="{{asset('plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js')}}"></script>
-    <script src="{{asset('plugins/bootstrap-datepicker/locale/bootstrap-datepicker.es.min.js')}}"
-            charset="UTF-8"></script>
+    <script src="{{asset('plugins/bootstrap-datepicker/locale/bootstrap-datepicker.es.min.js')}}" charset="UTF-8"></script>
     <script src="{{asset('plugins/bootstrap-daterangepicker/daterangepicker.js')}}"></script>
     <script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment-with-locales.min.js"></script>
     <script>
@@ -83,6 +85,8 @@
             moment.locale('es');
             var start = moment().subtract(29, 'days');
             var end = moment();
+            $('#tiposervicio').prepend('<option value="T">TODAS</option>');
+            $('#tiposervicio > option[value="T"]').attr('selected', 'selected');
             $('.input-daterange-datepicker').daterangepicker({
                 buttonClasses: ['btn', 'btn-sm'],
                 applyClass: 'btn-success',
@@ -125,17 +129,13 @@
                 }
             });
 
-            {{-- $('form').submit(function (e) {
-                e.preventDefault();
-                var rago = $('.input-daterange-datepicker').val()
-                $('#resultado').load('{{'resultadoprimeravez'}}',{rango:rago});
-            })--}}
-        })
+
+        });
 
         function generarRespuesta() {
             var rango = $('#daterange').val();
-            var tipo = $('#tiposervicio').val();
-            $('#resultado').load('{{route('resultadosaldosvencidos')}}', {rango: rango, tipo: tipo});
+            var tipoServicio = $('#tiposervicio').val();
+            $('#resultado').load('{{route('reportes.resultadomotostarjetas')}}',{rango:rango,servicios:tipoServicio});
         }
     </script>
 @endsection

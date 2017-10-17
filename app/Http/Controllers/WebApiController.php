@@ -2,6 +2,7 @@
 
 namespace creditocofrem\Http\Controllers;
 
+
 use creditocofrem\Personas;
 use creditocofrem\Tarjetas;
 use creditocofrem\TarjetaServicios;
@@ -9,6 +10,8 @@ use creditocofrem\Terminales;
 use Facades\creditocofrem\Encript;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Facades\creditocofrem\AESCrypt;
+use creditocofrem\ApiWS;
 
 class WebApiController extends Controller
 {
@@ -18,10 +21,10 @@ class WebApiController extends Controller
     {
         if ($request->codigo == '02') {
             $result['estado'] = true;
-            $result['mensaje'] = 'Comunicacion exitosa';
+            $result['mensaje'] = ApiWS::$TEXT_COMUNICACION_TEST_EXITOSA;
         } else {
             $result['estado'] = false;
-            $result['mensaje'] = 'Error de comunicacion';
+            $result['mensaje'] = ApiWS::$TEXT_COMUNICACION_TEST_ERROR;
         }
         $resultFinal['resultado'] = $result;
         return ($resultFinal);
@@ -51,15 +54,15 @@ class WebApiController extends Controller
 //                $terminal->mac = $request->mac;
 //                $request->save();
                 $result['estado'] = TRUE;
-                $result['mensaje'] = 'Validacion exitosa';
+                $result['mensaje'] = ApiWS::$TEXT_VALIDACION_EXITOSA;
                 $result['data'] = $data;
             } else {
                 $result['estado'] = FALSE;
-                $result['mensaje'] = 'Terminal no Existe';
+                $result['mensaje'] = ApiWS::$TEXT_TERMINAL_NO_EXISTE;
             }
         } catch (\Exception $exception) {
             $result['estado'] = FALSE;
-            $result['mensaje'] = 'Error de operacion';
+            $result['mensaje'] = ApiWS::$TEXT_ERROR_OPERACION;
         }
         return ['resultado' => $result];
     }
@@ -76,16 +79,16 @@ class WebApiController extends Controller
                 $terminal->mac = $request->mac;
                 $terminal->save();
                 $result['estado'] = TRUE;
-                $result['mensaje'] = 'Validacion exitosa';
+                $result['mensaje'] = ApiWS::$TEXT_VALIDACION_EXITOSA;
                 DB::commit();
             } else {
                 $result['estado'] = FALSE;
-                $result['mensaje'] = 'Terminal no Existe';
+                $result['mensaje'] = ApiWS::$TEXT_TERMINAL_NO_EXISTE;
                 DB::rollBack();
             }
         } catch (\Exception $exception) {
             $result['estado'] = FALSE;
-            $result['mensaje'] = 'Error de operacion';
+            $result['mensaje'] = ApiWS::$TEXT_ERROR_OPERACION;
             DB::rollBack();
         }
         return ['resultado' => $result];
@@ -101,18 +104,19 @@ class WebApiController extends Controller
                 $contrasena = Encript::decryption($teminal->password);
                 if ($request->password == $contrasena) {
                     $result['estado'] = TRUE;
-                    $result['mensaje'] = 'contraseña validad';
+                    $result['mensaje'] = ApiWS::$TEXT_PASSWORD_CORRECTO;
                 } else {
                     $result['estado'] = FALSE;
-                    $result['mensaje'] = 'Contraseña invalidad';
+                    $result['mensaje'] = ApiWS::$TEXT_PASSWORD_INCORECTO;
                 }
             } else {
                 $result['estado'] = FALSE;
-                $result['mensaje'] = 'Codigo de terminal invalido';
+                $result['mensaje'] = ApiWS::$TEXT_TERMINAL_NO_EXISTE;
             }
         } catch (\Exception $exception) {
             $result['estado'] = FALSE;
-            $result['mensaje'] = 'Error de ejecucion ' . $exception->getMessage();
+            $result['mensaje'] = ApiWS::$TEXT_ERROR_EJECUCION;
+            $result['codigo'] = ApiWS::$CODIGO_ERROR_EJECUCION;
         }
         return ['resultado' => $result];
     }
@@ -128,18 +132,19 @@ class WebApiController extends Controller
                 $contrasena = Encript::decryption($sucursal->password);
                 if ($request->password == $contrasena) {
                     $result['estado'] = TRUE;
-                    $result['mensaje'] = 'contraseña validad';
+                    $result['mensaje'] = ApiWS::$TEXT_PASSWORD_CORRECTO;
                 } else {
                     $result['estado'] = FALSE;
-                    $result['mensaje'] = 'Contraseña invalidad';
+                    $result['mensaje'] = ApiWS::$TEXT_PASSWORD_INCORECTO;
                 }
             } else {
                 $result['estado'] = FALSE;
-                $result['mensaje'] = 'Codigo de terminal invalido';
+                $result['mensaje'] = ApiWS::$TEXT_TERMINAL_NO_EXISTE;
             }
         } catch (\Exception $exception) {
             $result['estado'] = FALSE;
-            $result['mensaje'] = 'Error de ejecucion ' . $exception->getMessage();
+            $result['mensaje'] = ApiWS::$TEXT_ERROR_EJECUCION;
+            $result['codigo'] = ApiWS::$CODIGO_ERROR_EJECUCION;
         }
         return ['resultado' => $result];
     }
@@ -160,30 +165,37 @@ class WebApiController extends Controller
                                     $result = $this->retornaServicios($tarjeta, $request);
                                 } else {
                                     $result['estado'] = FALSE;
-                                    $result['mensaje'] = 'El numero de identificacion no corresponde a la tarjeta';
+                                    $result['mensaje'] = ApiWS::$TEXT_DOCUMENTIO_INCORRECTO;
+                                    $result['codigo'] = ApiWS::$CODIGO_DOCUMENTIO_INCORRECTO;
                                 }
                             } else {
                                 $result = $this->retornaServicios($tarjeta, $request);
                             }
                         }else{
                             $result['estado']= FALSE;
-                            $result['mensaje'] = 'Debe realizar cambio de clave';
+                            $result['mensaje'] = ApiWS::$TEXT_CAMBIO_CLAVE;
+                            $result['codigo'] = ApiWS::$CODIGO_CAMBIO_CLAVE;
                         }
                     }else{
                         $result['estado']= FALSE;
-                        $result['mensaje'] = 'Tarjeta Inactiva';
+                        $result['mensaje'] = ApiWS::$TEXT_TARJETA_INACTIVA;
+                        $result['codigo'] = ApiWS::$CODIGO_TARJETA_INACTIVA;
                     }
                 } else {
                     $result['estado'] = FALSE;
-                    $result['mensaje'] = 'Tarjeta no validad';
+                    $result['mensaje'] = ApiWS::$TEXT_TARJETA_NO_VALIDA;
+                    $result['codigo'] = ApiWS::$CODIGO_TARJETA_NO_VALIDA;
                 }
             } else {
                 $result['estado'] = FALSE;
-                $result['mensaje'] = 'codigo de terminal invalido';
+                $result['mensaje'] = ApiWS::$TEXT_TERMINAL_NO_EXISTE;
+                $result['codigo'] = ApiWS::$CODIGO_TERMINAL_NO_EXISTE;
             }
         } catch (\Exception $exception) {
             $result['estado'] = FALSE;
-            $result['mensaje'] = 'Error de ejecucion';
+            $result['mensaje'] = ApiWS::$TEXT_ERROR_EJECUCION;
+            $result['codigo'] = ApiWS::$CODIGO_ERROR_EJECUCION;
+
         }
         return ['resultado' => $result];
     }
@@ -197,7 +209,7 @@ class WebApiController extends Controller
             ->select('servicio_codigo')
             ->get();
         $result['estado'] = TRUE;
-        $result['mensaje'] = 'Retornando servicios';
+        $result['mensaje'] = ApiWS::$TEXT_TRANSACCION_EXITOSA;
         $result['data'] = $servicios;
         return $result;
     }
@@ -214,35 +226,41 @@ class WebApiController extends Controller
                         if (count($persona) > 0) {
                             if ($request->password == Encript::decryption($tarjeta->password)) {
                                 $result['estado'] = TRUE;
-                                $result['mensaje'] = 'Datos Correctos';
+                                $result['mensaje'] = ApiWS::$TEXT_VALIDACION_EXITOSA;
                             } else {
                                 $result['estado'] = FALSE;
-                                $result['mensaje'] = 'Clave de la tarjeta invalidad';
+                                $result['mensaje'] = ApiWS::$TEXT_PASSWORD_INCORECTO;
+                                $result['codigo'] = ApiWS::$CODIGO_PASSWORD_INCORECTO;
                             }
                         } else {
                             $result['estado'] = FALSE;
-                            $result['mensaje'] = 'Numero de indentificacion invalido';
+                            $result['mensaje'] = ApiWS::$TEXT_DOCUMENTIO_INCORRECTO;
+                            $result['codigo'] = ApiWS::$CODIGO_DOCUMENTIO_INCORRECTO;
                         }
                     } else {
                         if ($request->password == Encript::decryption($tarjeta->password)) {
                             $result['estado'] = TRUE;
-                            $result['mensaje'] = 'Datos Correctos';
+                            $result['mensaje'] = ApiWS::$TEXT_VALIDACION_EXITOSA;
                         } else {
                             $result['estado'] = FALSE;
-                            $result['mensaje'] = 'Clave de la tarjeta invalidad';
+                            $result['mensaje'] = ApiWS::$TEXT_PASSWORD_INCORECTO;
+                            $result['codigo'] = ApiWS::$CODIGO_PASSWORD_INCORECTO;
                         }
                     }
-                } else {
-                    $result['estado'] = FALSE;
-                    $result['mensaje'] = 'Tarjeta inactiva';
+                } else{
+                    $result['estado']= FALSE;
+                    $result['mensaje'] = ApiWS::$TEXT_TARJETA_INACTIVA;
+                    $result['codigo'] = ApiWS::$CODIGO_TARJETA_INACTIVA;
                 }
             } else {
                 $result['estado'] = FALSE;
-                $result['mensaje'] = 'Tarjeta Invalidad';
+                $result['mensaje'] = ApiWS::$TEXT_TARJETA_NO_VALIDA;
+                $result['codigo'] = ApiWS::$CODIGO_TARJETA_NO_VALIDA;
             }
         } catch (\Exception $exception) {
             $result['estado'] = FALSE;
-            $result['mensaje'] = 'Error en la operacion';
+            $result['mensaje'] = ApiWS::$TEXT_ERROR_EJECUCION;
+            $result['codigo'] = ApiWS::$CODIGO_ERROR_EJECUCION;
         }
         return ['resultado' => $result];
     }
@@ -260,27 +278,34 @@ class WebApiController extends Controller
                             $tarjeta->cambioclave = 1;
                             $tarjeta->save();
                             $result['estado'] = TRUE;
-                            $result['mensaje'] = 'Cambio realizado';
+                            $result['mensaje'] = ApiWS::$TEXT_TRANSACCION_EXITOSA;
                         } else {
                             $result['estado'] = FALSE;
-                            $result['mensaje'] = 'La clave debe ser numerica';
+                            $result['mensaje'] = ApiWS::$TEXT_PASSWORD_DEBE_SER_NUM;
+                            $result['codigo'] = ApiWS::$CODIGO_PASSWORD_DEBE_SER_NUM;
                         }
                     } else {
                         $result['estado'] = FALSE;
-                        $result['mensaje'] = 'Clave de la tarjeta invalidad';
+                        $result['mensaje'] = ApiWS::$TEXT_PASSWORD_INCORECTO;
+                        $result['codigo'] = ApiWS::$CODIGO_PASSWORD_INCORECTO;
                     }
-                } else {
-                    $result['estado'] = FALSE;
-                    $result['mensaje'] = 'Tarjeta inactiva';
+                } else{
+                    $result['estado']= FALSE;
+                    $result['mensaje'] = ApiWS::$TEXT_TARJETA_INACTIVA;
+                    $result['codigo'] = ApiWS::$CODIGO_TARJETA_INACTIVA;
                 }
             } else {
                 $result['estado'] = FALSE;
-                $result['mensaje'] = 'Tarjeta Invalidad';
+                $result['mensaje'] = ApiWS::$TEXT_TARJETA_NO_VALIDA;
+                $result['codigo'] = ApiWS::$CODIGO_TARJETA_NO_VALIDA;
             }
         } catch (\Exception $exception) {
             $result['estado'] = FALSE;
-            $result['mensaje'] = 'Error en la operacion';
+            $result['mensaje'] = ApiWS::$TEXT_ERROR_EJECUCION;
+            $result['codigo'] = ApiWS::$CODIGO_ERROR_EJECUCION;
         }
         return ['resultado' => $result];
     }
+
+
 }
