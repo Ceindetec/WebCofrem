@@ -167,6 +167,8 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('reportes/motostarjetas','ReportesController@viewReporteMontos')->name('reportes.montostarjetas');
     Route::post('reportes/resultadomotostarjetas','ReportesController@resultadoMontosTarjetas')->name('reportes.resultadomotostarjetas');
+    Route::get('reportes/exportarpdfmotosportarjeta','ReportesController@exportarPdfMotosPorTarjeta')->name('reportes.exportarpdfmotosportarjeta');
+    Route::get('reportes/exportarexcelmontosportarjeta','ReportesController@exportarExcelMontosPorTarjeta')->name('reportes.exportarexcelmontosportarjeta');
 
 
 
