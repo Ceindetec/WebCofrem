@@ -149,6 +149,15 @@ class WebApiController extends Controller
         return ['resultado' => $result];
     }
 
+    /**
+     * Metodo encargado de retornas los servicios activos asociados a una tarjeta
+     * @param \Illuminate\Http\Request $request
+     * - codigo
+     * - numero_tarjeta
+     * - identificacion
+     *
+     * @return array
+     */
     public function getServicios(Request $request)
     {
         $result = [];
@@ -193,7 +202,7 @@ class WebApiController extends Controller
             }
         } catch (\Exception $exception) {
             $result['estado'] = FALSE;
-            $result['mensaje'] = ApiWS::$TEXT_ERROR_EJECUCION;
+            $result['mensaje'] = $exception->getMessage();//ApiWS::$TEXT_ERROR_EJECUCION;
             $result['codigo'] = ApiWS::$CODIGO_ERROR_EJECUCION;
 
         }
@@ -204,13 +213,14 @@ class WebApiController extends Controller
     public function retornaServicios($tarjeta, $request)
     {
         $result = [];
-        $servicios = TarjetaServicios::where('numero_tarjeta', $tarjeta->numero_tarjeta)
+        $servicios = TarjetaServicios::join('servicios','tarjeta_servicios.servicio_codigo','servicios.codigo')
+            ->where('numero_tarjeta', $tarjeta->numero_tarjeta)
             ->where('estado', TarjetaServicios::$ESTADO_ACTIVO)
-            ->select('servicio_codigo')
+            ->select('servicios.descripcion','servicios.codigo')
             ->get();
         $result['estado'] = TRUE;
         $result['mensaje'] = ApiWS::$TEXT_TRANSACCION_EXITOSA;
-        $result['data'] = $servicios;
+        $result['servicios'] = $servicios;
         return $result;
     }
 
