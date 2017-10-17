@@ -756,6 +756,7 @@ class ReportesController extends Controller
     {
         $rangos = explode(" - ", $request->rango);
         $resultado=array();
+        $lista_esta=$request->establecimientos;
         $establecimientos=Establecimientos::wherein('id',$request->establecimientos)
             ->orderby('razon_social','asc')->get();
         $sucursales=Sucursales::wherein('establecimiento_id',$request->establecimientos)
@@ -807,7 +808,7 @@ class ReportesController extends Controller
         }
        // dd($resultado);
         $rango =['fecha1'=> $rangos[0], 'fecha2'=>$rangos[1]];
-        return view('reportes.ventasdiariasxestablecimiento.parcialventasdiarias', compact('resultado','rango','establecimientos','sucursales'));
+        return view('reportes.ventasdiariasxestablecimiento.parcialventasdiarias', compact('resultado','rango','lista_esta','establecimientos','sucursales'));
     }
     public function selectestablecimientos(Request $request)
     {
@@ -823,7 +824,11 @@ class ReportesController extends Controller
     */
     public function pdfVentasDiarias(Request $request)
     {
-        $data = ['resultado'=>$request->resultado, 'establecimientos'=>$request->establecimientos, 'sucursales'=>$request->sucursales, 'rango'=>$request->fecha1." - ".$request->fecha2];
+       // dd($request->lista_esta);
+        $establecimientos=Establecimientos::wherein('id',$request->lista_esta)->orderby('razon_social','asc')->get();
+        $sucursales=Sucursales::wherein('establecimiento_id',$request->lista_esta)->orderby('nombre','asc')->get();
+        //dd($establecimientos);
+        $data = ['resultado'=>$request->resultado, 'establecimientos'=>$establecimientos, 'sucursales'=>$sucursales, 'rango'=>$request->fecha1." - ".$request->fecha2];
         $pdf = \PDF::loadView('reportes.ventasdiariasxestablecimiento.pdfventasdiarias', $data);
         $pdf->setPaper('A4', 'landscape');
         return $pdf->download('ventasdiarias.pdf');
@@ -834,66 +839,108 @@ class ReportesController extends Controller
      */
     public function excelVentasDiarias(Request $request)
     {
-        \Excel::create('ExcelSaldosVencidos', function($excel) use($request) {
+        $establecimientos=Establecimientos::wherein('id',$request->lista_esta)->orderby('razon_social','asc')->get();
+        $sucursales=Sucursales::wherein('establecimiento_id',$request->lista_esta)->orderby('nombre','asc')->get();
+
+        \Excel::create('ExcelVentasDiarias', function($excel) use($request,$establecimientos,$sucursales) {
             $resultado = $request->resultado;
-            $establecimientos = $request->establecimientos;
             $fecha1= $request->fecha1;
             $fecha2= $request->fecha2;
             $rango=$fecha1." - ".$fecha2;
-            $sucursales = $request->sucursales;
-
-            //FOR ESTABLECIMEINTOS POR CADA UNO CREAR UNA PESTAÑA
-
-            $excel->sheet('SaldosVencidos', function($sheet) use($resultado, $establecimientos, $sucursales, $rango) {
-                $hoy=Carbon::now();
-                $objDrawing = new PHPExcel_Worksheet_Drawing;
-                $objDrawing->setPath(public_path('images/logo_mini.png')); //your image path
-                $objDrawing->setCoordinates('A1');
-                $objDrawing->setWorksheet($sheet);
-                $sheet->setWidth(array(
-                    'A'     =>  30,
-                    'B'     =>  20,
-                    'C'     =>  20,
-                    'D'     =>  20,
-                    'E'     =>  20,
-                ));
-
-                $sheet->row(2, array('','REPORTE DE VENTAS DIARIAS POR ESTABLECIMIENTO'));
-                $sheet->row(2, function ($row) {
-                    $row->setBackground('#4CAF50');
-                });
-
-                $sheet->row(3, array('','Rango:',$rango,'',''));
-                $sheet->row(4, array('','Fecha:',$hoy,'',''));
-
-                //TENER EN CUENTA VALOR DE FILA.
-                //FOR SUCURSALES
-                //FOR (RESULTADO)
-                // SI HAY DATO EN RESULTADO[] DE ESE ESTABLECIMEINTO Y SUCURSAL, MOSTRARLO
-
-                    $sheet->row(6, array('TARJETAS BONO'));
-                    $sheet->row(6, function ($row) {
-                        $row->setBackground('#4CAF50');
-                    });
-
-                    $fila = 8;
-                    if (sizeof($resultadob) > 0) {
-                        $sheet->row(7, array('Número tarjeta', 'Monto inicial', 'Sobrante', 'Fecha activación', 'Fecha vencimiento'));
-                        $sheet->row(7, function ($row) {
-                            $row->setBackground('#f2f2f2');
+            $num_esta=0;
+            //FOR ESTABLECIMIENTOS POR CADA UNO CREAR UNA PESTAÑA
+            if(sizeof($establecimientos)>0)
+            {
+                foreach($establecimientos as $establecimiento)
+                {
+                    $num_esta++;
+                        //titulo <h5>Establecimiento: {{$establecimiento->razon_social}}</h5>
+                        $excel->sheet('Est'.$num_esta, function($sheet) use($resultado, $establecimiento, $sucursales, $rango)
+                        {
+                            $haysucursal=0;
+                        $hoy=Carbon::now();
+                        $objDrawing = new PHPExcel_Worksheet_Drawing;
+                        $objDrawing->setPath(public_path('images/logo_mini.png')); //your image path
+                        $objDrawing->setCoordinates('A1');
+                        $objDrawing->setWorksheet($sheet);
+                        $sheet->setWidth(array(
+                            'A'     =>  30,
+                            'B'     =>  20,
+                            'C'     =>  20,
+                            'D'     =>  10,
+                            'E'     =>  10,
+                            'F'     =>  10,
+                        ));
+                        $sheet->row(2, array('','REPORTE DE VENTAS DIARIAS PARA ESTABLECIMIENTO '.$establecimiento->razon_social));
+                        $sheet->row(2, function ($row) {
+                            $row->setBackground('#4CAF50');
                         });
-                        foreach ($resultadob as $miresul) {
-                            $sheet->row($fila, array($miresul["numero_tarjeta"], $miresul["monto_inicial"], $miresul["sobrante"], $miresul["fecha_activacion"], $miresul["fecha_vencimiento"]));
-                            $fila++;
-                        }
-                    } else
-                        $sheet->row($fila, array('No hay resultados'));
-                    $fila++;
-                    $fila++;
 
+                        $sheet->row(3, array('','Rango:',$rango,'',''));
+                        $sheet->row(4, array('','Fecha:',$hoy,'',''));
+                        $fila=6;
+                    foreach($sucursales as $sucursale)
+                    {
+                        $cant=0;
+                        if($sucursale->establecimiento_id==$establecimiento->id)
+                        {
+                            $haysucursal++;
+                            //titulo <h5>{{$sucursale->nombre}}</h5>
+                            if (sizeof($resultado) > 0)
+                            {
+                                //inicia tabla
+                                /*campos:
+                                    <th>Fecha</th>
+                                    <th>Venta</th>*/
+                                $subtotal = 0;
+                                $sheet->row($fila, array('Sucursal: '.$sucursale->nombre));
+                                $sheet->row($fila, function ($row) {
+                                    $row->setBackground('#4CAF50');
+                                });
+                                $fila++;
+                                $fila++;
+                                //if (sizeof($resultado) > 0) {
+                                $sheet->row($fila, array('Fecha', 'Venta'));
+                                $sheet->row($fila, function ($row) {
+                                    $row->setBackground('#f2f2f2');
+                                });
+                                $fila++;
+                                foreach ($resultado as $miresul)
+                                {
+                                    if ($miresul["establecimiento"] == $establecimiento->id && $miresul["sucursal"] == $sucursale->id)
+                                    {
+                                        $cant++;
+                                        //insertar los valores
+                                        /*<td>{{$miresul["fecha"]}}</td>
+                                        <td>{{$miresul["venta"]}}</td>
+                                        $subtotal+=$miresul["venta"];  */
+                                            $sheet->row($fila, array($miresul["fecha"], $miresul["venta"]));
+                                            $fila++;
+                                            $subtotal += $miresul["venta"];
+                                        /*} else
+                                            $sheet->row($fila, array('No hay resultados'));*/
 
-            });
+                                    }//cierra if
+
+                                } //cierra foreach
+                                $sheet->row($fila, array('Total', $subtotal));
+                                $fila++;
+                                $fila++;
+                                //mostrar subtotal $subtotal
+                                //finaliza tabla
+                            }//cierra if
+                            if ($cant == 0)
+                                $sheet->row($fila, array('No hay registros'));
+                        }//cierra if sucursal id
+                    }//cierra foreach
+                    if($haysucursal==0)
+                        $sheet->row($fila, array('No existen sucursales'));
+                    /// mostrar No existen sucursales
+                        });        //CIERRA PESTAÑA
+                } //finaliza foreach
+            } //finaliza if
         })->export('xls');
+
     }
     /*
      * FINALIZA REPORTE VENTAS DIARIAS POR ESTABLECIMIENTO

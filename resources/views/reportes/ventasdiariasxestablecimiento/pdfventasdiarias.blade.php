@@ -60,78 +60,60 @@
     </div>
     <div id="info">
         <ul>
-            <li><label>Nombre: </label><strong>Tarjetas con saldo vencido</strong></li>
+            <li><label>Nombre: </label><strong>Ventas diarias</strong></li>
             <li><label>Fecha: </label><strong>{{\Carbon\Carbon::now()->format('d/m/Y')}}</strong></li>
             <li><label>Rango: </label><strong>{{$rango}}</strong></li>
         </ul>
 
     </div>
     <br>
-    @if($tiposervicio!="R")
-        <h5>Tarjetas Bono</h5>
-        @if(sizeof($resultadob)>0)
-            <div class="table">
-                <table id="datatable" class="table table-striped table-bordered" width="100%">
-                    <thead>
-                    <tr>
-                        <th>Número tarjeta</th>
-                        <th>Monto inicial</th>
-                        <th>Sobrante</th>
-                        <th>Fecha activación</th>
-                        <th>Fecha vencimiento</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($resultadob as $miresul)
-                        <tr>
-                            <td>{{$miresul["numero_tarjeta"]}}</td>
-                            <td>{{$miresul["monto_inicial"]}}</td>
-                            <td>{{$miresul["sobrante"]}}</td>
-                            <td> {{$miresul["fecha_activacion"]}}</td>
-                            <td>{{$miresul["fecha_vencimiento"]}}</td>
-                        </tr>
-                    @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @endif
-        @if(sizeof($resultadob)==0)
-            <p align="center">No hay registros</p>
-        @endif
+    @if(sizeof($establecimientos)>0)
+        @foreach($establecimientos as $establecimiento)
+            <h5>Establecimiento: {{$establecimiento->razon_social}}</h5>
+            <?php $haysucursal=0; ?>
+            @foreach($sucursales as $sucursale)
+                <?php $cant=0; ?>
+                @if($sucursale->establecimiento_id==$establecimiento->id)
+                    <?php $haysucursal++; ?>
+                    <h5>{{$sucursale->nombre}}</h5>
+                    @if(sizeof($resultado)>0)
+                            <div class="table">
+                                <table id="datatable" class="table table-striped table-bordered" width="100%">
+                                    <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Venta</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                            <?php $subtotal=0; ?>
+                            @foreach($resultado as $miresul)
+                                @if($miresul["establecimiento"]==$establecimiento->id && $miresul["sucursal"]==$sucursale->id)
+                                    <?php $cant++; ?>
+                                    <tr>
+                                        <td>{{$miresul["fecha"]}}</td>
+                                        <td>{{$miresul["venta"]}}</td>
+                                        <?php $subtotal+=$miresul["venta"]; ?>
+                                    </tr>
+                                @endif
+                            @endforeach
+                            <tr><td align="center"><b>Total: </b></td><td align="center"> {{$subtotal}}</td></tr>
+                            </tbody>
+                        </table>
+                    @endif
+                    @if($cant==0)
+                        <p align="center">No hay registros</p>
+                    @endif
+                @endif
+            @endforeach
+            @if($haysucursal==0)
+                <p align="center">No existen sucursales</p>
+            @endif
+                            </div>
+            <br>
+        @endforeach
     @endif
-    @if($tiposervicio!="B")
-        <h5>Tarjetas Regalo</h5>
-        @if(sizeof($resultador)>0)
-            <div class="table">
-                <table id="datatable" class="table table-striped table-bordered" width="100%">
-                    <thead>
-                    <tr>
-                        <th>Numero tarjeta</th>
-                        <th>Monto incial</th>
-                        <th>Sobrante</th>
-                        <th>Fecha activacion</th>
-                        <th>Fecha vencimiento</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($resultador as $miresul)
-                        <tr>
-                            <td>{{$miresul["numero_tarjeta"]}}</td>
-                            <td>{{$miresul["monto_inicial"]}}</td>
-                            <td>{{$miresul["sobrante"]}}</td>
-                            <td> {{$miresul["fecha_activacion"]}}</td>
-                            <td>{{$miresul["fecha_vencimiento"]}}</td>
-                        </tr>
-                    @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @endif
-        @if(sizeof($resultador)==0)
-            <p align="center">No hay registros</p>
-        @endif
-    @endif
-    <br>
+
 </div>
 </body>
 </html>

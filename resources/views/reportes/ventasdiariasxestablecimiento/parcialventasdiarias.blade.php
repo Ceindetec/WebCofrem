@@ -5,10 +5,10 @@
             <div class="row">
                 <div class="col-lg-3 col-sm-6">
                     <div class="widget-inline-box">
-                        <a href="{{route('pdfventasdiarias',['fecha1'=>$rango['fecha1'],'fecha2'=>$rango['fecha2'],'establecimientos'=>$establecimientos,'resultado'=>$resultado,'sucursales'=>$sucursales])}}" class="btn btn-primary" >
+                        <a href="{{route('pdfventasdiarias',['fecha1'=>$rango['fecha1'],'fecha2'=>$rango['fecha2'],'lista_esta'=>$lista_esta,'resultado'=>$resultado])}}" class="btn btn-primary" >
                             <i class="fa fa-file-pdf-o" aria-hidden="true"></i> PDF
                         </a>
-                        <a href="{{route('excelventasdiarias',['fecha1'=>$rango['fecha1'],'fecha2'=>$rango['fecha2'],'establecimientos'=>$establecimientos,'resultado'=>$resultado,'sucursales'=>$sucursales])}}" class="btn btn-primary waves-effect waves-light">
+                        <a href="{{route('excelventasdiarias',['fecha1'=>$rango['fecha1'],'fecha2'=>$rango['fecha2'],'lista_esta'=>$lista_esta,'resultado'=>$resultado])}}" class="btn btn-primary waves-effect waves-light">
                             <i class="fa fa-file-excel-o" aria-hidden="true"></i> EXCEL
                         </a>
                     </div>
