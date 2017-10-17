@@ -164,6 +164,12 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('reportes/exportarpdfprimeravez','ReportesController@exportarPdfPrimeravez')->name('exportarpdfprimeravez');
     Route::get('reportes/exportarexcelprimeravez','ReportesController@exportarExcelPrimeravez')->name('exportarexcelprimeravez');
 
+
+    Route::get('reportes/motostarjetas','ReportesController@viewReporteMontos')->name('reportes.montostarjetas');
+    Route::post('reportes/resultadomotostarjetas','ReportesController@resultadoMontosTarjetas')->name('reportes.resultadomotostarjetas');
+
+
+
     /*combobox*/
     Route::get('select/permisos',"HomeController@selectpermisos")->name('selectpermisos');
 
