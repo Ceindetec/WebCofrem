@@ -66,6 +66,7 @@
             <li><a href="{{route('rprimeravez')}}"> Tarjetas usadas por primera vez </a></li>
             <li><a href="{{route('reportes.saldosvencidos')}}"> Saldos vencidos </a></li>
             <li><a href="{{route('reportes.montostarjetas')}}"> Activacion por montos </a></li>
+            <li><a href="{{route('reportes.ventasdiarias')}}"> Ventas diarias </a></li>
         </ul>
     </li>
     <!-- <li><a href="{ {route('tarjetasregalo')}}"><i class="ti-layout"></i> Tarjetas Regalo</a></li> -->

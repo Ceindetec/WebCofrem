@@ -59,6 +59,14 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('reportes/saldosvencidos/exportarexcel','ReportesController@excelSaldosVencidos')->name('excelsaldosvencidos');
     /*FINALIZA REPORTES SALDOS VENCIDOS*/
 
+    /*INICIA REPORTES VENTAS DIARIAS POR ESTABLECIMIENTO  */
+    Route::get('reportes/ventasdiariasxestablecimiento/consulta','ReportesController@viewVentasDiarias')->name('reportes.ventasdiarias');
+    Route::get('select/establecimientos',"ReportesController@selectestablecimientos")->name('selectestablecimientos');
+    Route::post('reportes/ventasdiariasxestablecimiento/resultadoconsulta','ReportesController@consultarVentasDiarias')->name('resultadoventasdiarias');
+    Route::get('reportes/ventasdiariasxestablecimiento/exportarpdf','ReportesController@pdfVentasDiarias')->name('pdfventasdiarias');
+    Route::get('reportes/ventasdiariasxestablecimiento/exportarexcel','ReportesController@excelVentasDiarias')->name('excelventasdiarias');
+    /*combobox*/
 
+    /*FINALIZA REPORTES VENTAS DIARIAS POR ESTABLECIMIENTO*/
 
 });
