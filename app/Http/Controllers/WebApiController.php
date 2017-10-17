@@ -149,6 +149,15 @@ class WebApiController extends Controller
         return ['resultado' => $result];
     }
 
+    /**
+     * Metodo encargado de retornas los servicios activos asociados a una tarjeta
+     * @param \Illuminate\Http\Request $request
+     * - codigo
+     * - numero_tarjeta
+     * - identificacion
+     *
+     * @return array
+     */
     public function getServicios(Request $request)
     {
         $result = [];
@@ -210,7 +219,7 @@ class WebApiController extends Controller
             ->get();
         $result['estado'] = TRUE;
         $result['mensaje'] = ApiWS::$TEXT_TRANSACCION_EXITOSA;
-        $result['data'] = $servicios;
+        $result['servicios'] = $servicios;
         return $result;
     }
 
