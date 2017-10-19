@@ -65,8 +65,14 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('reportes/ventasdiariasxestablecimiento/resultadoconsulta','ReportesController@consultarVentasDiarias')->name('resultadoventasdiarias');
     Route::get('reportes/ventasdiariasxestablecimiento/exportarpdf','ReportesController@pdfVentasDiarias')->name('pdfventasdiarias');
     Route::get('reportes/ventasdiariasxestablecimiento/exportarexcel','ReportesController@excelVentasDiarias')->name('excelventasdiarias');
-    /*combobox*/
-
     /*FINALIZA REPORTES VENTAS DIARIAS POR ESTABLECIMIENTO*/
+
+    /*INICIA REPORTES DATAFONOS POR ESTABLECIMIENTO */
+    Route::get('reportes/datafonosxestablecimiento/consulta','ReportesController@viewDatafonosxEstablecimiento')->name('reportes.datafonosxestablecimientos');
+    Route::get('select/establecimientos',"ReportesController@selectestablecimientos")->name('selectestablecimientos');
+    Route::post('reportes/datafonosxestablecimiento/resultadoconsulta','ReportesController@consultarDatafonosxEstablecimiento')->name('resultadodatafonosxestablecimientos');
+    Route::get('reportes/datafonosxestablecimiento/exportarpdf','ReportesController@pdfDatafonosxEstablecimiento')->name('pdfdatafonosxestablecimientos');
+    Route::get('reportes/datafonosxestablecimiento/exportarexcel','ReportesController@excelDatafonosxEstablecimiento')->name('exceldatafonosxestablecimientos');
+    /*FINALIZA REPORTES DATAFONOS POR ESTABLECIMIENTO*/
 
 });
