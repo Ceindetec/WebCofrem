@@ -5,6 +5,7 @@ namespace creditocofrem\Http\Controllers;
 use Carbon\Carbon;
 use creditocofrem\DetalleProdutos;
 use creditocofrem\DetalleTransaccion;
+use creditocofrem\Duplicado;
 use creditocofrem\Establecimientos;
 use creditocofrem\HEstadoTransaccion;
 use creditocofrem\Servicios;
@@ -573,7 +574,27 @@ class ReportesController extends Controller
     {
         return view('reportes.saldosvencidos.saldosvencidos');
     }
-
+    /*
+     * Funcion RECURSIVA que retorna listado DE DUPLICADO
+     * la lista contiene los numero de tarjeta asociados
+     */
+    public function consultarDuplicados($numtarjeta,$listado)
+    {
+        //buscar si la tarjeta tiene duppicado, si SI, agregar al array listado.
+        $duplicado=Duplicado::where('newtarjeta',$numtarjeta)->first();
+        if($duplicado != null)
+        {
+            //$listado[] = array('numero_tarjeta' => $duplicado->newtarjeta);
+            array_push($listado, $duplicado->oldtarjeta);
+           // dd($duplicado->newtarjeta);
+            $resultado = $this->consultarDuplicados($duplicado->oldtarjeta,$listado);
+            if($resultado != null)
+                $listado = $resultado;
+            return $listado;
+        }
+        else
+            return null;
+    }
     /*
      * Funcion consultar saldos vencidos
      * - segun el tipo: consultar tarjetas bono, regalo o las dos.
@@ -585,16 +606,32 @@ class ReportesController extends Controller
         $tiposervicio = $request->tipo;
         $resultadob = array();
         $resultador = array();
+
         if ($tiposervicio == "B" || $tiposervicio == "T") {
             $detallesb = DetalleProdutos::join('tarjeta_servicios', 'detalle_produtos.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
                 ->whereBetween('detalle_produtos.fecha_vencimiento', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
                 ->where('tarjeta_servicios.servicio_codigo', Tarjetas::$CODIGO_SERVICIO_BONO)
+                ->whereRaw('detalle_produtos.numero_tarjeta NOT IN (SELECT oldtarjeta FROM duplicados )')
                 ->select('detalle_produtos.*')
                 ->get();
             $listaDetallesb = [];
             foreach ($detallesb as $detalle) {
                 $gasto = 0;
-                $dtransacciones = DetalleTransaccion::where('detalle_producto_id', $detalle->id)->get();
+                //buscar Duplicados
+                $listado = [];
+                array_push($listado, $detalle->numero_tarjeta);
+                $respuesta = $this->consultarDuplicados($detalle->numero_tarjeta, $listado);
+                if ($respuesta != null)
+                    $listado = $respuesta;
+                //where in (detalle_producto_id, $listaduplicados)o
+                $detallesb2 = DetalleProdutos::wherein('numero_tarjeta', $listado)->get();
+                $listaidprod=[];
+                foreach ($detallesb2 as $detb){
+                    array_push($listaidprod, $detb->id);
+                }
+                $dtransacciones = DetalleTransaccion::wherein('detalle_producto_id', $listaidprod)->get();
+                //finaliza ajuste para duplicados
+                //$dtransacciones = DetalleTransaccion::where('detalle_producto_id', $detalle->id)->get();
                 foreach ($dtransacciones as $dtransaccione) {
                     $htransaccion = DB::table('h_estado_transacciones')->where('transaccion_id', $dtransaccione->transaccion_id)->orderBy('id', 'desc')->first();
                     if ($htransaccion->estado == HEstadoTransaccion::$ESTADO_ACTIVO)
@@ -620,7 +657,21 @@ class ReportesController extends Controller
                 ->get();
             foreach ($detallesr as $detalle) {
                 $gasto = 0;
-                $dtransacciones = DetalleTransaccion::where('detalle_producto_id', $detalle->id)->get();
+                //buscar Duplicados
+                $listado = [];
+                array_push($listado, $detalle->numero_tarjeta);
+                $respuesta = $this->consultarDuplicados($detalle->numero_tarjeta, $listado);
+                if ($respuesta != null)
+                    $listado = $respuesta;
+                //where in (detalle_producto_id, $listaduplicados)o
+                $detallesr2 = DetalleProdutos::wherein('numero_tarjeta', $listado)->get();
+                $listaidprod=[];
+                foreach ($detallesr2 as $detr){
+                    array_push($listaidprod, $detr->id);
+                }
+                $dtransacciones = DetalleTransaccion::wherein('detalle_producto_id', $listaidprod)->get();
+                //finaliza ajuste para duplicados
+                //$dtransacciones = DetalleTransaccion::where('detalle_producto_id', $detalle->id)->get();
                 foreach ($dtransacciones as $dtransaccione) {
                     $htransaccion = DB::table('h_estado_transacciones')->where('transaccion_id', $dtransaccione->transaccion_id)->orderBy('id', 'desc')->first();
                     if ($htransaccion->estado == HEstadoTransaccion::$ESTADO_ACTIVO)
