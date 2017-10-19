@@ -13,6 +13,9 @@ class Terminales extends Model implements AuditableContract
     public static $ESTADO_TERMINAL_INACTIVA = "I";
     use Auditable;
 
+    public static $TERMINAL_ESTADO_ACTIVA = 'A';
+    public static $TERMINAL_ESTADO_INACTIVA = 'I';
+
     public function getSucursal(){
         return $this->belongsTo('creditocofrem\Sucursales','sucursal_id','id');
     }

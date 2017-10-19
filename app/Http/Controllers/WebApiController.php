@@ -10,13 +10,19 @@ use creditocofrem\Terminales;
 use Facades\creditocofrem\Encript;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Facades\creditocofrem\AESCrypt;
+//use Facades\creditocofrem\AESCrypt;
 use creditocofrem\ApiWS;
+use creditocofrem\Servicios;
 
 class WebApiController extends Controller
 {
     //
-
+    /**
+     * valida que las terminales esten cominicadas
+     * @param Request $request
+     * - codigo
+     * @return mixed
+     */
     public function comunicacion(Request $request)
     {
         if ($request->codigo == '02') {
@@ -30,7 +36,12 @@ class WebApiController extends Controller
         return ($resultFinal);
     }
 
-
+    /**
+     * valida la terminal
+     * @param Request $request
+     * -codigo
+     * @return array
+     */
     public function validarTerminal(Request $request)
     {
         $result = [];
@@ -49,10 +60,6 @@ class WebApiController extends Controller
                 $data['estado_terminal'] = $terminal->estado;
                 $data['codigo_terminal'] = $terminal->codigo;
                 $data['ip1'] = "192.168.0.20";
-//                $terminal->imei = $request->imei;
-//                $terminal->uid = $request->uuid;
-//                $terminal->mac = $request->mac;
-//                $request->save();
                 $result['estado'] = TRUE;
                 $result['mensaje'] = ApiWS::$TEXT_VALIDACION_EXITOSA;
                 $result['data'] = $data;
@@ -67,6 +74,15 @@ class WebApiController extends Controller
         return ['resultado' => $result];
     }
 
+    /**
+     * asigana los datos faltantes de la terminal
+     * @param Request $request
+     * -codigo
+     * -uuid
+     * -mac
+     * -imei
+     * @return array
+     */
     public function asignaID(Request $request)
     {
         $result = [];
@@ -94,7 +110,14 @@ class WebApiController extends Controller
         return ['resultado' => $result];
     }
 
-
+    /**
+     * permite validar la clave de la terminal, esto para caso de configuracion del dispositivo
+     * @param Request $request
+     * -codigo
+     * -password
+     * @return array
+     * -retirna array con codigos de error, y mensaje
+     */
     public function validarClaveTerminal(Request $request)
     {
         $result = [];
@@ -121,7 +144,13 @@ class WebApiController extends Controller
         return ['resultado' => $result];
     }
 
-
+    /**
+     * valida que la clave de la sucursal, esot para casos administrativos (anulacion etc)
+     * @param Request $request
+     * -codigo
+     * -password
+     * @return array
+     */
     public function validarClaveSucursal(Request $request)
     {
         $result = [];
@@ -166,8 +195,8 @@ class WebApiController extends Controller
             if (count($terminal) > 0) {
                 $tarjeta = Tarjetas::where('numero_tarjeta', $request->numero_tarjeta)->first();
                 if (count($tarjeta) > 0) {
-                    if($tarjeta->estado == Tarjetas::$ESTADO_TARJETA_ACTIVA){
-                        if($tarjeta->cambioclave == 1){
+                    if ($tarjeta->estado == Tarjetas::$ESTADO_TARJETA_ACTIVA) {
+                        if ($tarjeta->cambioclave == 1) {
                             if ($tarjeta->persona_id != NULL) {
                                 $persona = Personas::where('identificacion', $request->identificacion)->first();
                                 if (count($persona) > 0) {
@@ -180,13 +209,13 @@ class WebApiController extends Controller
                             } else {
                                 $result = $this->retornaServicios($tarjeta, $request);
                             }
-                        }else{
-                            $result['estado']= FALSE;
+                        } else {
+                            $result['estado'] = FALSE;
                             $result['mensaje'] = ApiWS::$TEXT_CAMBIO_CLAVE;
                             $result['codigo'] = ApiWS::$CODIGO_CAMBIO_CLAVE;
                         }
-                    }else{
-                        $result['estado']= FALSE;
+                    } else {
+                        $result['estado'] = FALSE;
                         $result['mensaje'] = ApiWS::$TEXT_TARJETA_INACTIVA;
                         $result['codigo'] = ApiWS::$CODIGO_TARJETA_INACTIVA;
                     }
@@ -209,14 +238,19 @@ class WebApiController extends Controller
         return ['resultado' => $result];
     }
 
-
-    public function retornaServicios($tarjeta, $request)
+    /**
+     * retorna los servicios de la tarjeta
+     * @param $tarjeta
+     * @param $request
+     * @return array
+     */
+    private function retornaServicios($tarjeta, $request)
     {
         $result = [];
-        $servicios = TarjetaServicios::join('servicios','tarjeta_servicios.servicio_codigo','servicios.codigo')
+        $servicios = TarjetaServicios::join('servicios', 'tarjeta_servicios.servicio_codigo', 'servicios.codigo')
             ->where('numero_tarjeta', $tarjeta->numero_tarjeta)
             ->where('estado', TarjetaServicios::$ESTADO_ACTIVO)
-            ->select('servicios.descripcion','servicios.codigo')
+            ->select('servicios.descripcion', 'servicios.codigo')
             ->get();
         $result['estado'] = TRUE;
         $result['mensaje'] = ApiWS::$TEXT_TRANSACCION_EXITOSA;
@@ -224,6 +258,13 @@ class WebApiController extends Controller
         return $result;
     }
 
+    /**
+     * metodo usado para validar la clave de la tarjeta
+     * @param Request $request
+     * -numero_tarjeta
+     * -password
+     * @return array
+     */
     public function consultarClaveTarjeta(Request $request)
     {
         $result = [];
@@ -257,8 +298,8 @@ class WebApiController extends Controller
                             $result['codigo'] = ApiWS::$CODIGO_PASSWORD_INCORECTO;
                         }
                     }
-                } else{
-                    $result['estado']= FALSE;
+                } else {
+                    $result['estado'] = FALSE;
                     $result['mensaje'] = ApiWS::$TEXT_TARJETA_INACTIVA;
                     $result['codigo'] = ApiWS::$CODIGO_TARJETA_INACTIVA;
                 }
@@ -275,6 +316,14 @@ class WebApiController extends Controller
         return ['resultado' => $result];
     }
 
+    /**
+     * permite actualizar el la contraseña de la tarjeta
+     * @param Request $request
+     * -numero_tarjeta
+     * -password
+     * -nuevo_password
+     * @return array
+     */
     public function actulizarClaveTarjeta(Request $request)
     {
         $result = [];
@@ -299,8 +348,8 @@ class WebApiController extends Controller
                         $result['mensaje'] = ApiWS::$TEXT_PASSWORD_INCORECTO;
                         $result['codigo'] = ApiWS::$CODIGO_PASSWORD_INCORECTO;
                     }
-                } else{
-                    $result['estado']= FALSE;
+                } else {
+                    $result['estado'] = FALSE;
                     $result['mensaje'] = ApiWS::$TEXT_TARJETA_INACTIVA;
                     $result['codigo'] = ApiWS::$CODIGO_TARJETA_INACTIVA;
                 }
@@ -318,4 +367,50 @@ class WebApiController extends Controller
     }
 
 
+    public function consumo(Request $request)
+    {
+        $result = [];
+        try{
+            $terminal = Terminales::where('codigo',$request->codigo)->first();
+            if(count($terminal)>0){
+                if($terminal->estado == Terminales::$TERMINAL_ESTADO_ACTIVA){
+                    $tarjeta = Tarjetas::where('numero_tarjeta', $request->numero_tarjeta)->first();
+                    if($tarjeta != NULL){
+                        if($tarjeta->estado == Tarjetas::$ESTADO_TARJETA_ACTIVA){
+                            if($request->password() == Encript::decryption($tarjeta->password)){
+                                $servicios = explode(',',$request->sevicios);
+                                foreach ($servicios as $servicio){
+                                    if($servicios == Tarjetas::$CODIGO_SERVICIO_REGALO){
+                                        $transaciones = Transa
+                                    }
+                                }
+                            }else{
+                                $result['estado'] = FALSE;
+                                $result['mensaje'] = ApiWS::$TEXT_PASSWORD_INCORECTO;
+                                $result['codigo'] = ApiWS::$CODIGO_PASSWORD_INCORECTO;
+                            }
+                        }else{
+                            $result['estado'] = FALSE;
+                            $result['mensaje'] = ApiWS::$TEXT_TARJETA_INACTIVA;
+                            $result['codigo'] = ApiWS::$CODIGO_TARJETA_INACTIVA;
+                        }
+                    }else{
+                        $result['estado'] = FALSE;
+                        $result['mensaje'] = ApiWS::$TEXT_TARJETA_NO_VALIDA;
+                        $result['codigo'] = ApiWS::$CODIGO_TARJETA_NO_VALIDA;
+                    }
+                }else{
+                    $result['estoado'] = FALSE;
+                    $result['mensaje'] = ApiWS::$TEXT_TERMINAL_INACTIVA;
+                    $result['codigo'] = ApiWS::$CODIGO_TERMINAL_INACTIVA;
+                }
+            }else{
+                $result['estoado'] = FALSE;
+                $result['mensaje'] = ApiWS::$TEXT_TERMINAL_NO_EXISTE;
+                $result['codigo'] = ApiWS::$CODIGO_TERMINAL_NO_EXISTE;
+            }
+        }catch (\Exception $exception){
+
+        }
+    }
 }
