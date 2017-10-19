@@ -381,7 +381,7 @@ class WebApiController extends Controller
                                 $servicios = explode(',',$request->sevicios);
                                 foreach ($servicios as $servicio){
                                     if($servicios == Tarjetas::$CODIGO_SERVICIO_REGALO){
-                                        $transaciones = Transa
+                                        //$transaciones = Transa
                                     }
                                 }
                             }else{
