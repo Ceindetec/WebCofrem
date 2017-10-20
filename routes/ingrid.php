@@ -75,4 +75,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('reportes/datafonosxestablecimiento/exportarexcel','ReportesController@excelDatafonosxEstablecimiento')->name('exceldatafonosxestablecimientos');
     /*FINALIZA REPORTES DATAFONOS POR ESTABLECIMIENTO*/
 
+    /*INICIA REPORTES SALDOS POR TARJETA ACTIVA  */
+    Route::get('reportes/saldotarjeta/consulta','ReportesController@viewSaldoTarjeta')->name('reportes.saldotarjeta');
+    Route::post('reportes/saldotarjeta/resultadoconsulta','ReportesController@consultarSaldoTarjeta')->name('resultadosaldotarjeta');
+    Route::get('reportes/saldotarjeta/exportarpdf','ReportesController@pdfSaldoTarjeta')->name('pdfsaldotarjeta');
+    Route::get('reportes/saldotarjeta/exportarexcel','ReportesController@excelSaldoTarjeta')->name('excelsaldotarjeta');
+    /*FINALIZA REPORTES SALDOS POR TARJETA ACTIVA*/
+
 });

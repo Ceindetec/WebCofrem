@@ -566,7 +566,6 @@ class ReportesController extends Controller
         }
         return ['regalo' => $regalo, 'bono' => $bono];
     }
-
     /**
      * INICIA REPORTE SALDOS VENCIDOS
      * LLamar a la vista de consulta de saldos vencidos
@@ -1172,5 +1171,84 @@ class ReportesController extends Controller
     }
     /*
      * FINALIZA REPORTE DATAFONOS POR ESTABLECIMIENTO
+     */
+    /**
+     * INICIA REPORTE SALDOS TARJETA
+     * LLamar a la vista de consulta de saldos de cada servicio activo de una tarjeta
+     */
+    public function viewSaldoTarjeta()
+    {
+        return view('reportes.saldotarjeta.saldotarjeta');
+    }
+    /*
+     * Funcion consultar saldos de los servicios activos de una tarjeta
+     */
+    public function consultarSaldoTarjeta(Request $request)
+    {
+        $numero_tarjeta = $request->numero_tarjeta;
+        $codigo = $numero_tarjeta;
+        while (strlen($codigo) < 6) {
+            $codigo = "0" . $codigo;
+        }
+        $numero_tarjeta = $codigo;
+        //dd($numero_tarjeta);
+        $resultado = array();
+            $detalles = DetalleProdutos::whereRaw('numero_tarjeta NOT IN (SELECT oldtarjeta FROM duplicados )')
+                ->where('numero_tarjeta',$numero_tarjeta)
+                ->where('estado',DetalleProdutos::$ESTADO_ACTIVO)
+                ->get();
+            //dd($detalles);
+            foreach ($detalles as $detalle) {
+                $gasto = 0;
+                //buscar Duplicados
+                $listado = [];
+                array_push($listado, $detalle->numero_tarjeta);
+                $respuesta = $this->consultarDuplicados($detalle->numero_tarjeta, $listado);
+                if ($respuesta != null)
+                    $listado = $respuesta;
+                //where in (detalle_producto_id, $listaduplicados)o
+                $detalles2 = DetalleProdutos::wherein('numero_tarjeta', $listado)->get();
+                $listaidprod=[];
+                foreach ($detalles2 as $det){
+                    array_push($listaidprod, $det->id);
+                }
+                $dtransacciones = DetalleTransaccion::wherein('detalle_producto_id', $listaidprod)->get();
+                //finaliza ajuste para duplicados
+                //$dtransacciones = DetalleTransaccion::where('detalle_producto_id', $detalle->id)->get();
+                foreach ($dtransacciones as $dtransaccione) {
+                    $htransaccion = DB::table('h_estado_transacciones')->where('transaccion_id', $dtransaccione->transaccion_id)->orderBy('id', 'desc')->first();
+                    if ($htransaccion->estado == HEstadoTransaccion::$ESTADO_ACTIVO)
+                        $gasto += $dtransaccione->valor;
+                }
+                if ($gasto < $detalle->monto_inicial) //si hay saldo
+                {
+                    $sobrante = $detalle->monto_inicial - $gasto;
+                    $tiposervicio='Bono';
+                    if($detalle->contrato_emprs_id == null)
+                        $tiposervicio='Regalo';
+                    $resultado[] = array('monto_inicial' => $detalle->monto_inicial,
+                        'saldo' => $sobrante,
+                        'tipo_servicio' => $tiposervicio,
+                        'fecha_vencimiento' => $detalle->fecha_vencimiento,
+                    );
+                }
+            }
+        return view('reportes.saldotarjeta.parcialsaldotarjeta', compact('resultado', 'numero_tarjeta'));
+    }
+    /*
+     * FUNCION GENERAR PDF para Saldos de tarjeta
+     * Exporta en formato pdf, los resultados
+     * de los saldos de los servicios activos de una tarjeta
+     */
+    public function pdfSaldoTarjeta(Request $request)
+    {
+        $data = ['resultado' => $request->resultado, 'numero_tarjeta' => $request->numero_tarjeta];
+        $pdf = \PDF::loadView('reportes.saldotarjeta.pdfsaldotarjeta', $data);
+
+        $pdf->setPaper('A4', 'landscape');
+        return $pdf->download('SaldosTarjeta.pdf');
+    }
+    /*
+     * FINALIZA REPORTES SALDOS POR TARJETA ACTIVA
      */
 }
