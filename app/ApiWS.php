@@ -27,6 +27,9 @@ class ApiWS{
 
     public static $TEXT_DOCUMENTIO_INCORRECTO = 'El número de identificación no corresponde a la tarjeta';
 
+    public static $TEXT_TERMINAL_INACTIVA = 'La terminal se encuentra inactiva';
+    public static $TEXT_TRANSACCION_INSUFICIENTE = 'Saldo insuficiente';
+
     public static $CODIGO_CAMBIO_CLAVE = 0;
     public static $CODIGO_TARJETA_INACTIVA = 1;
     public static $CODIGO_TARJETA_NO_VALIDA = 2;
@@ -35,6 +38,8 @@ class ApiWS{
     public static $CODIGO_DOCUMENTIO_INCORRECTO = 5;
     public static $CODIGO_PASSWORD_DEBE_SER_NUM = 6;
     public static $CODIGO_ERROR_EJECUCION = 7;
+    public static $CODIGO_TERMINAL_INACTIVA = 8;
+    public static $CODIGO_TRANSACCION_INSUFICIENTE = 9;
 
     /**
      * Modulo de Test de Comunicacion
