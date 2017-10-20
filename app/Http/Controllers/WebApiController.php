@@ -371,7 +371,14 @@ class WebApiController extends Controller
         return ['resultado' => $result];
     }
 
-
+    /**
+     *
+     * @param \Illuminate\Http\Request $request
+     * -codigo
+     * -numero_tarjeta
+     * -
+     * @return array
+     */
     public function consumo(Request $request)
     {
         $result = [];
@@ -466,6 +473,8 @@ class WebApiController extends Controller
                                 if($valorConsumir == 0){
                                     \DB::commit();
                                     $result['estado'] = TRUE;
+                                    $result['numero_transaccion'] = $newTransaccion->numero_transaccion;
+                                    $result['fecha'] = $newTransaccion->fecha;
                                     $result['mensaje'] = 'Transaccion exitosa';
                                 }else{
                                     \DB::rollback();
