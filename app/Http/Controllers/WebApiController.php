@@ -476,6 +476,14 @@ class WebApiController extends Controller
                                     $result['numero_transaccion'] = $newTransaccion->numero_transaccion;
                                     $result['fecha'] = $newTransaccion->fecha;
                                     $result['mensaje'] = 'Transaccion exitosa';
+                                    if($tarjeta->persona_id != NULL){
+                                        $persona = Personas::find($tarjeta->persona_id);
+                                        $result['nombres'] = $persona->nombres;
+                                        $result['apellidos'] = $persona->apellidos;
+                                    }else{
+                                        $result['nombres'] = "";
+                                        $result['apellidos'] = "";
+                                    }
                                 }else{
                                     \DB::rollback();
                                     $result['estado'] = FALSE;
