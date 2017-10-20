@@ -67,6 +67,7 @@
             <li><a href="{{route('reportes.saldosvencidos')}}"> Saldos vencidos </a></li>
             <li><a href="{{route('reportes.montostarjetas')}}"> Activacion por montos </a></li>
             <li><a href="{{route('reportes.ventasdiarias')}}"> Ventas diarias </a></li>
+            <li><a href="{{route('reportes.datafonosxestablecimientos')}}"> Relación de Datafonos </a></li>
         </ul>
     </li>
     <!-- <li><a href="{ {route('tarjetasregalo')}}"><i class="ti-layout"></i> Tarjetas Regalo</a></li> -->

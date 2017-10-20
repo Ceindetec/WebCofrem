@@ -9,6 +9,8 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 class Terminales extends Model implements AuditableContract
 {
     //
+    public static $ESTADO_TERMINAL_ACTIVA = "A";
+    public static $ESTADO_TERMINAL_INACTIVA = "I";
     use Auditable;
 
     public function getSucursal(){
