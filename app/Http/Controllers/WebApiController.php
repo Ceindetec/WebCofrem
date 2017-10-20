@@ -371,7 +371,14 @@ class WebApiController extends Controller
         return ['resultado' => $result];
     }
 
-
+    /**
+     *
+     * @param \Illuminate\Http\Request $request
+     * -codigo
+     * -numero_tarjeta
+     * -
+     * @return array
+     */
     public function consumo(Request $request)
     {
         $result = [];
