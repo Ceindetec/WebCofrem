@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\DB;
 use creditocofrem\ApiWS;
 use creditocofrem\Transaccion;
 use creditocofrem\DetalleTransaccion;
+use creditocofrem\HEstadoTransaccion;
+use creditocofrem\Htarjetas;
+use Carbon\Carbon;
 
 class WebApiController extends Controller
 {
@@ -372,7 +375,9 @@ class WebApiController extends Controller
     public function consumo(Request $request)
     {
         $result = [];
+        \DB::beginTransaction();
         try {
+            $valorConsumir = $request->valor;
             $terminal = Terminales::where('codigo', $request->codigo)->first();
             if (count($terminal) > 0) {
                 if ($terminal->estado == Terminales::$TERMINAL_ESTADO_ACTIVA) {
@@ -381,25 +386,92 @@ class WebApiController extends Controller
                         if ($tarjeta->estado == Tarjetas::$ESTADO_TARJETA_ACTIVA) {
                             if ($request->password == Encript::decryption($tarjeta->password)) {
                                 $servicios = explode(',', $request->servicios);
-                                foreach ($servicios as $servicio) {
-                                    if ($servicio == Tarjetas::$CODIGO_SERVICIO_REGALO) {
-                                        $detalleProdutos = DetalleProdutos::where('numero_tarjeta', $request->numero_tarjeta)
-                                            ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
-                                            ->where('factura', '<>', NULL)
-                                            ->orderBy('fecha_vencimiento', 'asc')
-                                            ->get();
-
-                                        foreach ($detalleProdutos as $detalleProduto){
-                                            $transaciones = Transaccion::join('h_estado_transacciones', 'transacciones.id', 'h_estado_transacciones.transaccion_id')
-                                                ->join('detalle_transacciones','transacciones.id','detalle_transacciones.transaccion_id')
-                                                ->where('transacciones.numero_tarjeta', $request->numero_tarjeta)
-                                                ->where('detalle_transacciones.detalle_producto_id',$detalleProduto->id)
-                                                ->where('h_estado_transacciones.estado', 'A')
-                                                ->get();
-                                        }
-
-
+                                $newTransaccion = new Transaccion();
+                                $ultimaTransaccion = Transaccion::select([\DB::raw('max(numero_transaccion) as numero')])->first();
+                                if ($ultimaTransaccion->numero == null) {
+                                    $numero = '0000000001';
+                                } else {
+                                    $numero = intval($ultimaTransaccion->numero);
+                                    $numero++;
+                                    $largo = strlen($numero);
+                                    for ($i = 0; $i < (10 - $largo); $i++) {
+                                        $numero = "0" . $numero;
                                     }
+                                }
+                                $newTransaccion->numero_transaccion = $numero;
+                                $newTransaccion->numero_tarjeta = $request->numero_tarjeta;
+                                $newTransaccion->codigo_terminal = $request->codigo;
+                                $newTransaccion->tipo = Transaccion::$TIPO_CONSUMO;
+                                $newTransaccion->fecha = Carbon::now();
+                                $newTransaccion->sucursal_id = $terminal->getSucursal->id;
+                                $newTransaccion->save();
+                                $newEstadoTransacion = new HEstadoTransaccion();
+                                $newEstadoTransacion->transaccion_id = $newTransaccion->id;
+                                $newEstadoTransacion->estado = HEstadoTransaccion::$ESTADO_ACTIVO;
+                                $newEstadoTransacion->fecha = Carbon::now();
+                                $newEstadoTransacion->save();
+                                foreach ($servicios as $servicio) {
+                                    if($valorConsumir > 0){
+                                        if ($servicio == Tarjetas::$CODIGO_SERVICIO_REGALO) {
+                                            $detalleProdutos = DetalleProdutos::where('numero_tarjeta', $request->numero_tarjeta)
+                                                ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
+                                                ->where('factura', '<>', NULL)
+                                                ->whereDate('fecha_vencimiento','>',Carbon::now())
+                                                ->orderBy('fecha_vencimiento', 'asc')
+                                                ->get();
+                                            foreach ($detalleProdutos as $detalleProduto){
+                                                $transaciones = Transaccion::join('h_estado_transacciones', 'transacciones.id', 'h_estado_transacciones.transaccion_id')
+                                                    ->join('detalle_transacciones','transacciones.id','detalle_transacciones.transaccion_id')
+                                                    ->where('transacciones.numero_tarjeta', $request->numero_tarjeta)
+                                                    ->where('detalle_transacciones.detalle_producto_id',$detalleProduto->id)
+                                                    ->where('h_estado_transacciones.estado', 'A')
+                                                    ->groupBy('transacciones.numero_tarjeta')
+                                                    ->select(\DB::raw('SUM(valor) as total'))
+                                                    ->get();
+                                                $porconsumir = $detalleProduto->monto_inicial - $transaciones[0]->total;
+                                                if($porconsumir>0){
+                                                    $consumir = $porconsumir - $valorConsumir;
+                                                    if($consumir<0){
+                                                        $newDetalle = new DetalleTransaccion();
+                                                        $newDetalle->transaccion_id = $newTransaccion->id;
+                                                        $newDetalle->detalle_producto_id = $detalleProduto->id;
+                                                        $newDetalle->valor = $porconsumir;
+                                                        $newDetalle->descripcion = DetalleTransaccion::$DESCRIPCION_CONSUMO;
+                                                        $newDetalle->save();
+                                                        $detalleProduto->estado = DetalleProdutos::$ESTADO_INACTIVO;
+                                                        $detalleProduto->save();
+                                                        $historico = new Htarjetas();
+                                                        $historico->estado = 'I';
+                                                        $historico->motivo = 'Consumido el servicio';
+                                                        $historico->fecha = Carbon::now();
+                                                        $historico->user_id = '1';
+                                                        $historico->tarjetas_id = $tarjeta->id;
+                                                        $historico->servicio_codigo = $servicio;
+                                                        $historico->save();
+                                                        $valorConsumir = $valorConsumir - $porconsumir;
+                                                    }else{
+                                                        $newDetalle = new DetalleTransaccion();
+                                                        $newDetalle->transaccion_id = $newTransaccion->id;
+                                                        $newDetalle->detalle_producto_id = $detalleProduto->id;
+                                                        $newDetalle->valor = $valorConsumir;
+                                                        $newDetalle->descripcion = DetalleTransaccion::$DESCRIPCION_CONSUMO;
+                                                        $newDetalle->save();
+                                                        $valorConsumir = 0;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                if($valorConsumir == 0){
+                                    \DB::commit();
+                                    $result['estado'] = TRUE;
+                                    $result['mensaje'] = 'Transaccion exitosa';
+                                }else{
+                                    \DB::rollback();
+                                    $result['estado'] = FALSE;
+                                    $result['mensaje'] = ApiWS::$TEXT_TRANSACCION_INSUFICIENTE;
+                                    $result['codigo'] = ApiWS::$CODIGO_TRANSACCION_INSUFICIENTE;
                                 }
                             } else {
                                 $result['estado'] = FALSE;
@@ -427,9 +499,10 @@ class WebApiController extends Controller
                 $result['codigo'] = ApiWS::$CODIGO_TERMINAL_NO_EXISTE;
             }
         } catch (\Exception $exception) {
-            $result['estoado'] = FALSE;
-            $result['mensaje'] = ApiWS::$TEXT_TERMINAL_NO_EXISTE;
-            $result['codigo'] = ApiWS::$CODIGO_TERMINAL_NO_EXISTE . ' ' . $exception->getMessage();
+            \DB::rollback();
+            $result['estado'] = FALSE;
+            $result['mensaje'] = ApiWS::$TEXT_ERROR_EJECUCION;
+            $result['codigo'] = ApiWS::$CODIGO_ERROR_EJECUCION;
         }
         return ['resultado' => $result];
     }

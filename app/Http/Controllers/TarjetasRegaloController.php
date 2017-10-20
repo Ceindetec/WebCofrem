@@ -615,7 +615,7 @@ class TarjetasRegaloController extends Controller
             ->join('detalle_produtos', 'tarjetas.numero_tarjeta', 'detalle_produtos.numero_tarjeta')
             ->where('tarjeta_servicios.servicio_codigo', Tarjetas::$CODIGO_SERVICIO_REGALO)
             ->where('tarjeta_servicios.estado','<>',TarjetaServicios::$ESTADO_ANULADA)
-            ->select(['detalle_produtos.monto_inicial', 'detalle_produtos.factura as fa', 'detalle_produtos.id as deta_id', 'tarjetas.*'])
+            ->select(['detalle_produtos.monto_inicial', 'detalle_produtos.factura as fa', 'detalle_produtos.id as deta_id', 'detalle_produtos.estado as estadopro','tarjetas.*'])
             ->get();
 
         return Datatables::of($tarjetas)
@@ -626,7 +626,7 @@ class TarjetasRegaloController extends Controller
                 if(Shinobi::can('editar.monto.regalo')){
                     $acciones .= '<a data-modal href="' . route('regalo.editar', $tarjetas->deta_id) . '" type="button" class="btn btn-custom btn-xs">Editar</a>';
                 }
-                if ($tarjetas->estado == 'C') {
+                if ($tarjetas->estadopro == 'I') {
                     $acciones .= '<button type="button" class="btn btn-custom btn-xs" onclick="activar(' . $tarjetas->deta_id . ')">Activar</button>';
                 }
                 $acciones .= '</div>';

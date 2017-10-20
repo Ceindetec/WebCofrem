@@ -95,8 +95,8 @@
                         }
                     },
                     {
-                        data: 'estado',
-                        name: 'estado',
+                        data: 'estadopro',
+                        name: 'estadopro',
                         render: function (data) {
                             if (data == 'A') {
                                 return 'Activo';
