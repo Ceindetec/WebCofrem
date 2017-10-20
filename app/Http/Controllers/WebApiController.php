@@ -473,6 +473,7 @@ class WebApiController extends Controller
                                 if($valorConsumir == 0){
                                     \DB::commit();
                                     $result['estado'] = TRUE;
+                                    $result['numero_transaccion'] = $newTransaccion->numero_transaccion;
                                     $result['mensaje'] = 'Transaccion exitosa';
                                 }else{
                                     \DB::rollback();
