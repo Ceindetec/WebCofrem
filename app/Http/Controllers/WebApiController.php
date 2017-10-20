@@ -3,6 +3,7 @@
 namespace creditocofrem\Http\Controllers;
 
 
+use creditocofrem\DetalleProdutos;
 use creditocofrem\Personas;
 use creditocofrem\Tarjetas;
 use creditocofrem\TarjetaServicios;
@@ -12,7 +13,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 //use Facades\creditocofrem\AESCrypt;
 use creditocofrem\ApiWS;
-use creditocofrem\Servicios;
+use creditocofrem\Transaccion;
+use creditocofrem\DetalleTransaccion;
 
 class WebApiController extends Controller
 {
@@ -370,47 +372,65 @@ class WebApiController extends Controller
     public function consumo(Request $request)
     {
         $result = [];
-        try{
-            $terminal = Terminales::where('codigo',$request->codigo)->first();
-            if(count($terminal)>0){
-                if($terminal->estado == Terminales::$TERMINAL_ESTADO_ACTIVA){
+        try {
+            $terminal = Terminales::where('codigo', $request->codigo)->first();
+            if (count($terminal) > 0) {
+                if ($terminal->estado == Terminales::$TERMINAL_ESTADO_ACTIVA) {
                     $tarjeta = Tarjetas::where('numero_tarjeta', $request->numero_tarjeta)->first();
-                    if($tarjeta != NULL){
-                        if($tarjeta->estado == Tarjetas::$ESTADO_TARJETA_ACTIVA){
-                            if($request->password() == Encript::decryption($tarjeta->password)){
-                                $servicios = explode(',',$request->sevicios);
-                                foreach ($servicios as $servicio){
-                                    if($servicios == Tarjetas::$CODIGO_SERVICIO_REGALO){
-                                        //$transaciones = Transa
+                    if ($tarjeta != NULL) {
+                        if ($tarjeta->estado == Tarjetas::$ESTADO_TARJETA_ACTIVA) {
+                            if ($request->password == Encript::decryption($tarjeta->password)) {
+                                $servicios = explode(',', $request->servicios);
+                                foreach ($servicios as $servicio) {
+                                    if ($servicio == Tarjetas::$CODIGO_SERVICIO_REGALO) {
+                                        $detalleProdutos = DetalleProdutos::where('numero_tarjeta', $request->numero_tarjeta)
+                                            ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
+                                            ->where('factura', '<>', NULL)
+                                            ->orderBy('fecha_vencimiento', 'asc')
+                                            ->get();
+
+                                        foreach ($detalleProdutos as $detalleProduto){
+                                            $transaciones = Transaccion::join('h_estado_transacciones', 'transacciones.id', 'h_estado_transacciones.transaccion_id')
+                                                ->join('detalle_transacciones','transacciones.id','detalle_transacciones.transaccion_id')
+                                                ->where('transacciones.numero_tarjeta', $request->numero_tarjeta)
+                                                ->where('detalle_transacciones.detalle_producto_id',$detalleProduto->id)
+                                                ->where('h_estado_transacciones.estado', 'A')
+                                                ->get();
+                                        }
+
+
                                     }
                                 }
-                            }else{
+                            } else {
                                 $result['estado'] = FALSE;
                                 $result['mensaje'] = ApiWS::$TEXT_PASSWORD_INCORECTO;
                                 $result['codigo'] = ApiWS::$CODIGO_PASSWORD_INCORECTO;
                             }
-                        }else{
+                        } else {
                             $result['estado'] = FALSE;
                             $result['mensaje'] = ApiWS::$TEXT_TARJETA_INACTIVA;
                             $result['codigo'] = ApiWS::$CODIGO_TARJETA_INACTIVA;
                         }
-                    }else{
+                    } else {
                         $result['estado'] = FALSE;
                         $result['mensaje'] = ApiWS::$TEXT_TARJETA_NO_VALIDA;
                         $result['codigo'] = ApiWS::$CODIGO_TARJETA_NO_VALIDA;
                     }
-                }else{
+                } else {
                     $result['estoado'] = FALSE;
                     $result['mensaje'] = ApiWS::$TEXT_TERMINAL_INACTIVA;
                     $result['codigo'] = ApiWS::$CODIGO_TERMINAL_INACTIVA;
                 }
-            }else{
+            } else {
                 $result['estoado'] = FALSE;
                 $result['mensaje'] = ApiWS::$TEXT_TERMINAL_NO_EXISTE;
                 $result['codigo'] = ApiWS::$CODIGO_TERMINAL_NO_EXISTE;
             }
-        }catch (\Exception $exception){
-
+        } catch (\Exception $exception) {
+            $result['estoado'] = FALSE;
+            $result['mensaje'] = ApiWS::$TEXT_TERMINAL_NO_EXISTE;
+            $result['codigo'] = ApiWS::$CODIGO_TERMINAL_NO_EXISTE . ' ' . $exception->getMessage();
         }
+        return ['resultado' => $result];
     }
 }

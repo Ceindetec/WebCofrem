@@ -25,6 +25,7 @@ Route::post('asignaID','WebApiController@asignaID');
 Route::post('getservicios','WebApiController@getServicios');
 Route::post('consultarclavetarjeta','WebApiController@consultarClaveTarjeta');
 Route::post('actulizarclavetarjeta','WebApiController@actulizarClaveTarjeta');
+Route::post('consumo','WebApiController@consumo');
 
 
 
