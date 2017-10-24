@@ -20,7 +20,6 @@
             </div>
         </div>
 
-
         <div class="row">
             <div class="col-sm-12">
                 <div class="table-responsive m-b-20">
@@ -42,6 +41,7 @@
                             <th></th>
                             <th></th>
                             <th></th>
+                            <th></th>
                         </tr>
                         </tfoot>
                     </table>
@@ -49,9 +49,6 @@
             </div>
         </div>
     </div>
-
-
-
 @endsection
 
 @section('scripts')

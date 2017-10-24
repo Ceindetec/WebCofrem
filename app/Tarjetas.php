@@ -18,6 +18,7 @@ class Tarjetas extends Model
     public static $MOTIVO_TARJETA_CREADA = "Creación de la tarjeta - ingreso al inventario";
     public static $MOTIVO_TARJETA_ACTIVA = "Activación de tarjeta";
     public static $MOTIVO_TARJETA_INACTIVA = "Inactivación de tarjeta";
+    public static $MOTIVO_TARJETA_CAMBIO = "Número de tarjeta modificado";
 
 
     public static $TEXT_RESULT_MONTO_SUPERADO = "monto superado";
