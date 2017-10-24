@@ -53,14 +53,16 @@
                                                     @foreach($resultado as $miresul)
                                                         @if($miresul["establecimiento"]==$establecimiento->id && $miresul["sucursal"]==$sucursale->id)
                                                             <?php $cant++; ?>
+                                                            <?php $venta_name = '$ '.number_format( $miresul["venta"], 2, ',', '.'); ?>
                                                         <tr>
                                                             <td>{{$miresul["fecha"]}}</td>
-                                                            <td>{{$miresul["venta"]}}</td>
+                                                            <td>{{$venta_name}}</td>
                                                             <?php $subtotal+=$miresul["venta"]; ?>
                                                         </tr>
                                                         @endif
                                                     @endforeach
-                                                    <tr><td align="center"><b>Total: </b></td><td align="center"> {{$subtotal}}</td></tr>
+                                                    <?php $subtotal_name = '$ '.number_format( $subtotal, 2, ',', '.'); ?>
+                                                    <tr><td align="center"><b>Total: </b></td><td align="center"> {{$subtotal_name}}</td></tr>
                                                     </tbody>
                                                     </table>
                                                 @endif

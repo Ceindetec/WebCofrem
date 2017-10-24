@@ -60,9 +60,27 @@
 
 <script>
     $('[data-toggle="tooltip"]').tooltip();
-    $('#datatable').DataTable({
-        "language": {
-            "url": "{!!route('datatable_es')!!}"
-        },
+    $(function () {
+        $('#datatable').DataTable({
+            "language": {
+                "url": "{!!route('datatable_es')!!}"
+            },
+           /* columns: [
+                {
+                    data: 'monto_inicial',
+                    name: 'monto_inicial',
+                    render: function (data) {
+                        return '$ ' + enmascarar(data);
+                    }
+                },
+                {
+                    data: 'saldo',
+                    name: 'saldo',
+                    render: function (data) {
+                        return '$ ' + enmascarar(data);
+                    }
+                },
+            ],*/
+        });
     });
 </script>

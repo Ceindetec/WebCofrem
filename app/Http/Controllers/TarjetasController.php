@@ -92,6 +92,7 @@ class TarjetasController extends Controller
     public function gridTarjetas()
     {
         $tarjetas = Tarjetas::all();
+        //$servicios = TarjetaServicios::all();
 
         return Datatables::of($tarjetas)
             ->addColumn('servicios', function ($tarjetas) {
@@ -178,6 +179,12 @@ class TarjetasController extends Controller
                 $valor_motivo = Tarjetas::$MOTIVO_TARJETA_CREADA;
             if ($name_estado == Tarjetas::$ESTADO_TARJETA_ACTIVA)
                 $valor_motivo = Tarjetas::$MOTIVO_TARJETA_ACTIVA;
+            if ($name_estado == "M")
+            {
+                $tarjetaser = TarjetaServicios::where("numero_tarjeta",$tarjetas->numero_tarjeta)->first();
+                $name_estado=$tarjetaser->estado;
+                $valor_motivo = Tarjetas::$MOTIVO_TARJETA_CAMBIO;
+            }
 
             $htarjetas->motivo = $valor_motivo;
             $htarjetas->estado = $name_estado;
@@ -235,7 +242,14 @@ class TarjetasController extends Controller
     public function viewEditarTarjeta(Request $request)
     {
         $tarjeta = Tarjetas::find($request->id);
-        return view('tarjetas.modaleditartarjeta', compact('tarjeta'));
+        $tar_ser = '';
+        foreach ($tarjeta->getTarjetaServicios as $servicio) {
+            if ($tar_ser != "")
+                $tar_ser .= ", ";
+            $tar_ser .= $servicio->getServicio->descripcion;
+        }
+        //return $tar_ser;
+        return view('tarjetas.modaleditartarjeta', compact('tarjeta','tar_ser'));
     }
 
     //metodo para editar sólo el campo tipo, de la tarjeta
@@ -246,12 +260,51 @@ class TarjetasController extends Controller
         try {
             //dd($request->all());
             $tarjeta = Tarjetas::find($id);
-            $tarjeta->tipo = $request->tipo;
-            $tarjeta->save();
-            $result['estado'] = true;
-            $result['mensaje'] = 'La tarjeta ha sido actualizada satisfactoriamente.';
-            $result['data'] = $tarjeta;
-            \DB::commit();
+            $numtarjeta_old=$tarjeta->numero_tarjeta;
+            //debe actualizar el valor en todas las tablas donde este ese numero de tarjeta
+            $dproducto = DetalleProdutos::where('numero_tarjeta', $tarjeta->numero_tarjeta)->first();
+            //dd($dproducto);
+            if ($dproducto == null) {
+                $newtarjeta = new Tarjetas();
+                $codigo = $request->numero_tarjeta;
+                while (strlen($codigo) < 6) {
+                    $codigo = "0" . $codigo;
+                }
+                $newtarjeta->numero_tarjeta = $codigo;
+                $newtarjeta->password = $tarjeta->password;
+                $newtarjeta->cambioclave = $tarjeta->cambioclave;
+                $newtarjeta->estado = $tarjeta->estado;
+                $validator = \Validator::make(['numero_tarjeta' => $codigo], [
+                    'numero_tarjeta' => 'required|unique:tarjetas'
+                ]);
+                if ($validator->fails()) {
+                    $result['estado'] = false;
+                    $result['mensaje'] = 'Error.'.$validator->errors()->all();
+                    return result;
+                    //return $validator->errors()->all();
+                }
+               //dd($newtarjeta);
+                $newtarjeta->save();
+                $result['estado'] = true;
+                $result['mensaje'] = 'El número de la tarjeta ha sido actualizado satisfactoriamente.';
+                TarjetaServicios::where("numero_tarjeta",$numtarjeta_old)->update(["numero_tarjeta"=>$codigo]);
+                $result['estado'] = true;
+                $result['mensaje'] = 'El registro de tarjeta servicio ha sido actualizado satisfactoriamente.';
+                //$result['data'] = $tarjeta;
+                //$result = $this->crearHtarjeta($tarjeta, 'M', $request->servicio_codigo);
+                Htarjetas::where("tarjetas_id",$tarjeta->id)->update(["tarjetas_id"=>$newtarjeta->id]);
+                Tarjetas::where('numero_tarjeta',$numtarjeta_old)->delete();
+                $result['estado'] = true;
+                $result['mensaje'] = 'La tarjeta ha sido actualizada satisfactoriamente.';
+                \DB::commit();
+            }
+            else
+            {
+                $result['estado'] = false;
+                $result['mensaje'] = 'No es posible cambiar el numero, la tarjeta ya tiene productos asociados.';
+                //$result['data'] = $tarjeta;
+                \DB::rollBack();
+            }
         } catch (\Exception $exception) {
             $result['estado'] = false;
             $result['mensaje'] = 'No fue posible editar la tarjeta. ' . $exception->getMessage();

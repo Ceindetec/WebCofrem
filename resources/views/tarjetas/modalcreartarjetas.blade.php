@@ -9,7 +9,7 @@
             <div class="form-group">
                 <label class="col-md-2 control-label">Número de tarjeta</label>
                 <div class="col-md-10">
-                    {{Form::text('numero_tarjeta', null ,['class'=>'form-control', "required", "maxlength"=>"7", "data-parsley-type"=>"number", "tabindex"=>"1",'id'=>'numero_tarjeta'])}} <!-- "data-parsley-type"=>"number"] -->
+                    {{Form::text('numero_tarjeta', null ,['class'=>'form-control', "required", "maxlength"=>"6", "data-parsley-type"=>"number", "tabindex"=>"1",'id'=>'numero_tarjeta'])}} <!-- "data-parsley-type"=>"number"] -->
                 </div>
             </div>
             <div class="form-group">

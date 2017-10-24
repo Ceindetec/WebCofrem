@@ -965,7 +965,8 @@ class ReportesController extends Controller
                                         /*<td>{{$miresul["fecha"]}}</td>
                                         <td>{{$miresul["venta"]}}</td>
                                         $subtotal+=$miresul["venta"];  */
-                                            $sheet->row($fila, array($miresul["fecha"], $miresul["venta"]));
+                                        $venta_name = '$ '.number_format( $miresul["venta"], 2, ',', '.');
+                                            $sheet->row($fila, array($miresul["fecha"], $venta_name));
                                             $fila++;
                                             $subtotal += $miresul["venta"];
                                         /*} else
@@ -974,7 +975,8 @@ class ReportesController extends Controller
                                     }//cierra if
 
                                 } //cierra foreach
-                                $sheet->row($fila, array('Total', $subtotal));
+                                $subtotal_name = '$ '.number_format( $subtotal, 2, ',', '.');
+                                $sheet->row($fila, array('Total', $subtotal_name));
                                 $fila++;
                                 $fila++;
                                 //mostrar subtotal $subtotal
@@ -1029,11 +1031,15 @@ class ReportesController extends Controller
 
                 foreach ($terminales as $terminal)
                 {
+                    if($terminal->estado=="A")
+                        $name_estado="Activa";
+                    else
+                        $name_estado="Inactiva";
                     $resultado[] = array('establecimiento' => $sucursale->establecimiento_id,
                             'sucursal' => $sucursale->id,
                             'codigo' => $terminal->codigo,
                             'numero_activo' => $terminal->numero_activo,
-                            'estado' => $terminal->estado,
+                            'estado' => $name_estado,
                         );
 
                 }
@@ -1183,6 +1189,10 @@ class ReportesController extends Controller
     /*
      * Funcion consultar saldos de los servicios activos de una tarjeta
      */
+    /**
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function consultarSaldoTarjeta(Request $request)
     {
         $numero_tarjeta = $request->numero_tarjeta;
@@ -1223,10 +1233,13 @@ class ReportesController extends Controller
                 if ($gasto < $detalle->monto_inicial) //si hay saldo
                 {
                     $sobrante = $detalle->monto_inicial - $gasto;
+                    $sobrante = '$ '.number_format( $sobrante, 2, ',', '.');
+                    $monto = $detalle->monto_inicial;
+                    $monto = '$ '.number_format( $monto, 2, ',', '.');
                     $tiposervicio='Bono';
                     if($detalle->contrato_emprs_id == null)
                         $tiposervicio='Regalo';
-                    $resultado[] = array('monto_inicial' => $detalle->monto_inicial,
+                    $resultado[] = array('monto_inicial' => $monto,
                         'saldo' => $sobrante,
                         'tipo_servicio' => $tiposervicio,
                         'fecha_vencimiento' => $detalle->fecha_vencimiento,

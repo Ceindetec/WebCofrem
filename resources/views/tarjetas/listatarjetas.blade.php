@@ -27,19 +27,19 @@
         <div class="card-box col-md-4">
             <h4 class="m-t-0">Regalo</h4>
             <div class="col-md-12"><label>Total en el sistema: &nbsp; </label><span>{{count($totalRegalo)}}</span></div>
-            <div class="col-md-12"><label>Sin asiganar: &nbsp;</label>{{count($totalRegaloSin)}}</div>
+            <div class="col-md-12"><label>Sin asignar: &nbsp;</label>{{count($totalRegaloSin)}}</div>
             <div class="col-md-12"><label>Asignadas: &nbsp;</label>{{count($totalRegaloAsin)}}</div>
         </div>
         <div class="card-box col-md-4">
             <h4 class="m-t-0">Bono</h4>
             <div class="col-md-12"><label>Total en el sistema: &nbsp;</label><span>{{count($totalBono)}}</span></div>
-            <div class="col-md-12"><label>Sin asiganar: &nbsp;</label>{{count($totalBonoSin)}}</div>
+            <div class="col-md-12"><label>Sin asignar: &nbsp;</label>{{count($totalBonoSin)}}</div>
             <div class="col-md-12"><label>Asignadas: &nbsp;</label>{{count($totalBonoAsin)}}</div>
         </div>
         <div class="card-box col-md-4">
             <h4 class="m-t-0">Cupo</h4>
             <div class="col-md-12"><label>Total en el sistema: &nbsp;</label><span>{{count($totalCupo)}}</span></div>
-            <div class="col-md-12"><label>Sin asiganar: &nbsp;</label>{{count($totalCupoSin)}}</div>
+            <div class="col-md-12"><label>Sin asignar: &nbsp;</label>{{count($totalCupoSin)}}</div>
             <div class="col-md-12"><label>Asignadas: &nbsp;</label>{{count($totalCupoAsin)}}</div>
         </div>
 
