@@ -27,7 +27,7 @@ class ApiWS{
 
     public static $TEXT_DOCUMENTIO_INCORRECTO = 'El número de identificación no corresponde a la tarjeta';
 
-    public static $TEXT_TERMINAL_INACTIVA = 'La terminal se encuentra inactiva';
+    public static $TEXT_TERMINAL_INACTIVA = 'La terminal está inactiva';
     public static $TEXT_TRANSACCION_INSUFICIENTE = 'Saldo insuficiente';
 
     public static $CODIGO_CAMBIO_CLAVE = 0;
