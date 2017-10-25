@@ -106,7 +106,7 @@
                     {data: 'get_empresa.nit', name: 'nit'},
                     {data: 'get_empresa.razon_social', name: 'razon_social'},
                     {data: 'valor_contrato', name: 'valor_contrato'},
-                    {data: 'valor_contrato', name: 'valor_contrato'},
+                    {data: 'fecha', name: 'fecha'},
                     {data: 'action', name: 'action', orderable: false, searchable: false}
                 ],
                 initComplete: function () {

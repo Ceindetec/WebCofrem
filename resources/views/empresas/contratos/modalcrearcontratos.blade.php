@@ -61,7 +61,7 @@
             <div class="form-group">
                 <label class="col-md-2 control-label">Documentos</label>
                 <div class="col-md-10">
-                    {{Form::file('pdf', ['class'=>'form-control', "required"=>"true", "tabindex"=>"8", 'id'=>'pdf'])}}
+                    {{Form::file('pdf', ['class'=>'form-control', "tabindex"=>"8", 'id'=>'pdf'])}}
                 </div>
             </div>
 
@@ -128,7 +128,8 @@
 
         $('#fecha').datepicker({
             autoclose: true,
-            startDate: moment().format(),
+            startDate: moment().subtract(3, 'months').format('DD/MM/YYYY'),
+            endDate: moment().add(3, 'months').format('DD/MM/YYYY'),
             format: 'dd/mm/yyyy',
             language: 'es'
         });
