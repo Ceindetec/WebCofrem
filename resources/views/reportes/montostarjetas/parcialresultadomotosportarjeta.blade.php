@@ -33,7 +33,7 @@
                                 @foreach($data['regalo']['detalles'] as $detalles)
                                     @foreach($detalles as $montos)
                                         <div class="col-md-6 p-0">
-                                            <b>Fecha: </b><span>{{$montos[0]->fecha_activacion}}</span></div>
+                                            <b>Fecha: </b><span>{{\Carbon\Carbon::createFromFormat('Y-m-d H:i:s',$montos[0]->fecha_activacion)->toDateString()}}</span></div>
                                         <div class="col-md-6 text-right"><b>Monto
                                                 Inicial: </b><span>{{$montos[0]->monto_inicial}}</span></div>
                                         <br>
@@ -69,7 +69,7 @@
                                 @foreach($data['bono']['detalles'] as $detalles)
                                     @foreach($detalles as $montos)
                                         <div class="col-md-6 p-0">
-                                            <b>Fecha: </b><span>{{$montos[0]->fecha_activacion}}</span></div>
+                                            <b>Fecha: </b><span>{{\Carbon\Carbon::createFromFormat('Y-m-d H:i:s',$montos[0]->fecha_activacion)->toDateString()}}</span></div>
                                         <div class="col-md-6 text-right"><b>Monto
                                                 Inicial: </b><span>{{$montos[0]->monto_inicial}}</span></div>
                                         <br>

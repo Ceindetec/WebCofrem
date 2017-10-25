@@ -14,7 +14,10 @@ class AlterCcontratoNull extends Migration
     public function up()
     {
         Schema::table('contratos_emprs', function (Blueprint $table) {
-            $table->string('dias_consumo',3)->nullable(true)->change();
+            $table->dropColumn('dias_consumo');
+        });
+        Schema::table('contratos_emprs', function (Blueprint $table) {
+            $table->string('dias_consumo',3)->nullable(true);
         });
     }
 
@@ -25,6 +28,9 @@ class AlterCcontratoNull extends Migration
      */
     public function down()
     {
+        Schema::table('contratos_emprs', function (Blueprint $table) {
+            $table->dropColumn('dias_consumo');
+        });
         Schema::table('contratos_emprs', function (Blueprint $table) {
             $table->double('dias_consumo',10)->nullable(false)->change();
         });
