@@ -491,7 +491,6 @@ class TarjetasBonoController extends Controller
             ->where('tarjeta_servicios.estado','<>',TarjetaServicios::$ESTADO_ANULADA)
             ->select(['detalle_produtos.monto_inicial', 'detalle_produtos.contrato_emprs_id as idcontrato', 'detalle_produtos.id as deta_id', 'tarjetas.*', 'detalle_produtos.fecha_vencimiento as vencimiento'])
             ->get();
-
         return Datatables::of($tarjetas)
             ->addColumn('numcontrato', function ($tarjetas) {
                 $contrato = Contratos_empr::where("id", $tarjetas->idcontrato)->first();
@@ -500,13 +499,15 @@ class TarjetasBonoController extends Controller
             ->addColumn('action', function ($tarjetas) {
                 $acciones = "";
                 $acciones .= '<div class="btn-group">';
-                $acciones .= '<a data-modal href="'.route('gestionarTarjeta',$tarjetas->deta_id).'" type="button" class="btn btn-custom btn-xs">Gestionar</a>';
-                if(Shinobi::can('editar.fecha.bono')){
-                    $acciones .= '<a data-modal href="' . route('bono.editar', $tarjetas->deta_id) . '" type="button" class="btn btn-custom btn-xs">Editar</a>';
-                }
-                if ($tarjetas->estado == Tarjetas::$ESTADO_TARJETA_CREADA) {
-                    $acciones .= '<button type="button" class="btn btn-custom btn-xs" onclick="activar(' . $tarjetas->deta_id . ')">Activar</button>';
-                }
+
+                    $acciones .= '<a data-modal href="' . route('gestionarTarjeta', $tarjetas->deta_id) . '" type="button" class="btn btn-custom btn-xs">Gestionar</a>';
+                    if (Shinobi::can('editar.fecha.bono')) {
+                        $acciones .= '<a data-modal href="' . route('bono.editar', $tarjetas->deta_id) . '" type="button" class="btn btn-custom btn-xs">Editar</a>';
+                    }
+                    if ($tarjetas->estado == Tarjetas::$ESTADO_TARJETA_CREADA) {
+                        $acciones .= '<button type="button" class="btn btn-custom btn-xs" onclick="activar(' . $tarjetas->deta_id . ')">Activar</button>';
+                    }
+
                 $acciones .= '</div>';
                 return $acciones;
             })

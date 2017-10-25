@@ -64,7 +64,7 @@ class WebApiController extends Controller
                 $data['estado_sucursal'] = $sucursal->estado;
                 $data['estado_terminal'] = $terminal->estado;
                 $data['codigo_terminal'] = $terminal->codigo;
-                $data['ip1'] = "192.168.0.20";
+                $data['ip1'] = "192.168.1.52";
                 $result['estado'] = TRUE;
                 $result['mensaje'] = ApiWS::$TEXT_VALIDACION_EXITOSA;
                 $result['data'] = $data;
@@ -376,7 +376,10 @@ class WebApiController extends Controller
      * @param \Illuminate\Http\Request $request
      * -codigo
      * -numero_tarjeta
-     * -
+     * -valor
+     * -password
+     * -servicios
+     *
      * @return array
      */
     public function consumo(Request $request)
@@ -472,9 +475,24 @@ class WebApiController extends Controller
                                 }
                                 if($valorConsumir == 0){
                                     \DB::commit();
+                                    $dt = Carbon::now();
                                     $result['estado'] = TRUE;
                                     $result['numero_transaccion'] = $newTransaccion->numero_transaccion;
-                                    $result['fecha'] = $newTransaccion->fecha;
+                                    $result['fecha'] = $dt->toDateString();
+                                    $result['hora'] = $dt->toTimeString();
+                                    $result['codigoTerminal'] = $terminal->codigo;
+                                    $result['numeroTarjeta'] = $tarjeta->numero_tarjeta;
+                                    $result['tipoTransaccion'] = Transaccion::$TIPO_CONSUMO;
+                                    $result['valor'] = $request->valor;
+                                    $result['detalleServicio'] = $request->servicios;
+                                    if($tarjeta->persona_id != NULL){
+                                        $persona = Personas::find($tarjeta->persona_id);
+                                        $result['cedula'] = $persona->identificacion;
+                                        $result['nombres'] = $persona->nombres." ".$persona->apellidos;
+                                    }else{
+                                        $result['nombres'] = "";
+                                        $result['cedula'] = "";
+                                    }
                                     $result['mensaje'] = 'Transaccion exitosa';
                                 }else{
                                     \DB::rollback();
@@ -498,12 +516,12 @@ class WebApiController extends Controller
                         $result['codigo'] = ApiWS::$CODIGO_TARJETA_NO_VALIDA;
                     }
                 } else {
-                    $result['estoado'] = FALSE;
+                    $result['estado'] = FALSE;
                     $result['mensaje'] = ApiWS::$TEXT_TERMINAL_INACTIVA;
                     $result['codigo'] = ApiWS::$CODIGO_TERMINAL_INACTIVA;
                 }
             } else {
-                $result['estoado'] = FALSE;
+                $result['estado'] = FALSE;
                 $result['mensaje'] = ApiWS::$TEXT_TERMINAL_NO_EXISTE;
                 $result['codigo'] = ApiWS::$CODIGO_TERMINAL_NO_EXISTE;
             }

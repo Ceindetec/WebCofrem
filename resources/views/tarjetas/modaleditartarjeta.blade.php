@@ -1,4 +1,5 @@
 <div id="modaleditartarjetas">
+    {{Form::model($tarjeta,['route'=>['tarjetas.editarp',$tarjeta->id], 'class'=>'form-horizontal', 'id'=>'editartarjeta'])}}
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h4 class="modal-title">Editar Tarjeta</h4>
@@ -8,14 +9,14 @@
             <div class="form-group">
                 <label class="col-md-2 control-label">Número de tarjeta</label>
                 <div class="col-md-10">
-                {{Form::text('numero_tarjeta', null ,['class'=>'form-control',  "id"=>"numero_tarjeta","tabindex"=>"1","required", "maxlength"=>"7", "data-parsley-type"=>"number","readonly", "disabled"])}} <!-- "data-parsley-type"=>"number"] -->
+                {{Form::text('numero_tarjeta', null ,['class'=>'form-control',  "id"=>"numero_tarjeta","tabindex"=>"1","required", "maxlength"=>"6", "data-parsley-type"=>"number"])}} <!-- "data-parsley-type"=>"number"] -->
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="col-md-2 control-label">Tipo</label>
                 <div class="col-md-10">
-                    {{Form::select('tipo', ['A' => 'Afiliado', 'R' => 'Regalo', 'B' => 'Bono'],null, ['class'=>'form-control',"id"=>"tipo", "required", "tabindex"=>"2"])}}
+                {{Form::text('servicios', $tar_ser ,['class'=>'form-control',  "id"=>"servicios","tabindex"=>"2", "disabled"])}}
                 </div>
             </div>
 
@@ -30,8 +31,8 @@
 
 <script>
     $(function () {
-        $("#editartarjetas").parsley();
-        $("#editartarjetas").submit(function (e) {
+        $("#editartarjeta").parsley();
+        $("#editartarjeta").submit(function (e) {
             e.preventDefault();
             var form = $(this);
             $.ajax({
@@ -59,8 +60,6 @@
                             result.mensaje,
                             'error'
                         );
-                        resetInfo(result.data);
-
                     } else {
                         html = '';
                         for (i = 0; i < result.length; i++) {
@@ -89,23 +88,7 @@
             });
         });
 
-        $('#editarcheck').change(function () {
-            if ($(this).is(':checked')) {
-                $('#editartarjetas input, #editartarjetas select').attr('disabled', false)
-            } else {
-                $('#editartarjetas input, #editartarjetas select').attr('disabled', true)
-            }
-        })
     });
 
-    function resetInfo(data) {
-        $('#tipo').val(data.tipo);
-        setTimeout(function () {
-            if ($('#editarcheck').is(':checked')) {
-                $('#editarcheck').trigger('click');
-            }
-        }, 200);
-
-    }
 
 </script>
