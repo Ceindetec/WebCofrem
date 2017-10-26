@@ -25,7 +25,7 @@
                 <div class="card-box widget-inline">
                     <div class="row">
                         <div class="col-lg-3 col-sm-6">
-                            <div class="widget-inline-box">
+                            <div class="widget-inline-box" id="formu1">
                                 <form class="form-horizontal col-md-12">
                                     <div class="form-group">
                                         <label>Rango de fecha para la consulta</label>
@@ -115,7 +115,7 @@
                         "Julio",
                         "Agosto",
                         "Septiembre",
-                        "Ocutbre",
+                        "Octubre",
                         "Noviembre",
                         "Diciembre"
                     ],
@@ -154,6 +154,10 @@
                 language: "es",
                 allowClear: true,
                 cache: true
+            });
+            $("#formu1").submit(function (e) {
+                e.preventDefault();
+                generarRespuesta();
             });
         });
 

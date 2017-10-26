@@ -518,9 +518,9 @@ class TarjetasBonoController extends Controller
         $tarjetas = Tarjetas::join('tarjeta_servicios', 'tarjetas.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
             ->join('detalle_produtos', 'tarjetas.numero_tarjeta', 'detalle_produtos.numero_tarjeta')
             ->where('tarjeta_servicios.servicio_codigo', Tarjetas::$CODIGO_SERVICIO_BONO)
-            ->where('tarjeta_servicios.estado','<>',TarjetaServicios::$ESTADO_ANULADA)
+            ->where('detalle_produtos.estado','<>',TarjetaServicios::$ESTADO_ANULADA)
             ->where('detalle_produtos.contrato_emprs_id','<>',null)
-            ->select(['detalle_produtos.monto_inicial', 'detalle_produtos.contrato_emprs_id as idcontrato', 'detalle_produtos.id as deta_id', 'tarjetas.*', 'detalle_produtos.fecha_vencimiento as vencimiento'])
+            ->select(['detalle_produtos.monto_inicial', 'detalle_produtos.contrato_emprs_id as idcontrato', 'detalle_produtos.id as deta_id', 'tarjetas.*', 'detalle_produtos.fecha_vencimiento as vencimiento','detalle_produtos.estado as estado'])
             ->get();
         return Datatables::of($tarjetas)
             ->addColumn('numcontrato', function ($tarjetas) {
@@ -530,12 +530,11 @@ class TarjetasBonoController extends Controller
             ->addColumn('action', function ($tarjetas) {
                 $acciones = "";
                 $acciones .= '<div class="btn-group">';
-
                     $acciones .= '<a data-modal href="' . route('gestionarTarjeta', $tarjetas->deta_id) . '" type="button" class="btn btn-custom btn-xs">Gestionar</a>';
                     if (Shinobi::can('editar.fecha.bono')) {
                         $acciones .= '<a data-modal href="' . route('bono.editar', $tarjetas->deta_id) . '" type="button" class="btn btn-custom btn-xs">Editar</a>';
                     }
-                    if ($tarjetas->estado == Tarjetas::$ESTADO_TARJETA_CREADA) {
+                    if ($tarjetas->estado == Tarjetas::$ESTADO_TARJETA_INACTIVA) {
                         $acciones .= '<button type="button" class="btn btn-custom btn-xs" onclick="activar(' . $tarjetas->deta_id . ')">Activar</button>';
                     }
 
