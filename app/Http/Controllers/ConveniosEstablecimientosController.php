@@ -126,9 +126,9 @@ class ConveniosEstablecimientosController extends Controller
                     $acciones = '<div class="btn-group">';
                     $acciones = $acciones . '<button class="btn btn-xs btn-danger" onclick="eliminarRango('.$rangos->id.')" ><i class="fa fa-trash"></i> Eliminar</button>';
                     $acciones = $acciones . '</div>';
-                    return $acciones;
-                }
-
+                    return $acciones
+                ;
+            }
             })
             ->make(true);
     }
