@@ -23,7 +23,7 @@
                 <div class="card-box widget-inline">
                     <div class="row">
                         <div class="col-lg-3 col-sm-6">
-                            <div class="widget-inline-box">
+                            <div class="widget-inline-box" id="formu1">
                                 <form class="form-horizontal col-md-12">
                                     <div class="form-group">
                                         <label>Número de tarjeta</label>
@@ -64,6 +64,12 @@
     <script src="{{asset('plugins/moment/moment.js')}}"></script>
     <script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment-with-locales.min.js"></script>
     <script>
+        $(function () {
+            $("#formu1").submit(function (e) {
+                e.preventDefault();
+                generarRespuesta();
+            });
+        });
         function generarRespuesta() {
             var numero_tarjeta = $('#numero_tarjeta').val();
             if(numero_tarjeta != null)

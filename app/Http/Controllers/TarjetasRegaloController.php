@@ -615,6 +615,7 @@ class TarjetasRegaloController extends Controller
             ->join('detalle_produtos', 'tarjetas.numero_tarjeta', 'detalle_produtos.numero_tarjeta')
             ->where('tarjeta_servicios.servicio_codigo', Tarjetas::$CODIGO_SERVICIO_REGALO)
             ->where('tarjeta_servicios.estado','<>',TarjetaServicios::$ESTADO_ANULADA)
+            ->where('detalle_produtos.factura','<>',null)
             ->select(['detalle_produtos.monto_inicial', 'detalle_produtos.factura as fa', 'detalle_produtos.id as deta_id', 'detalle_produtos.estado as estadopro','tarjetas.*'])
             ->get();
 

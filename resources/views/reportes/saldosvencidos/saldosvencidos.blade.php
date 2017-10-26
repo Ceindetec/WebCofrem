@@ -25,7 +25,7 @@
                 <div class="card-box widget-inline">
                     <div class="row">
                         <div class="col-lg-3 col-sm-6">
-                            <div class="widget-inline-box">
+                            <div class="widget-inline-box" id="formu1">
                                 <form class="form-horizontal col-md-12">
                                     <div class="form-group">
                                         <label>Rango de fecha para la consulta</label>
@@ -130,7 +130,12 @@
                 var rago = $('.input-daterange-datepicker').val()
                 $('#resultado').load('{{'resultadoprimeravez'}}',{rango:rago});
             })--}}
+            $("#formu1").submit(function (e) {
+                e.preventDefault();
+                generarRespuesta();
+            });
         })
+
 
         function generarRespuesta() {
             var rango = $('#daterange').val();

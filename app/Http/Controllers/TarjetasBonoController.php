@@ -55,21 +55,32 @@ class TarjetasBonoController extends Controller
          * detalle_transacciones
          * hestado_transacciones
         */
+
         $result = [];
+
         \DB::beginTransaction();
         try {
+
             $contrato = Contratos_empr::where("n_contrato", $request->numero_contrato)->first();
             //dd($contrato);
             if($contrato != null) {
+                var_dump("hola");
+            //dd("hola");
                 $num_tarjeta = $request->numero_tarjeta;
                 while (strlen($num_tarjeta) < 6) {
                     $num_tarjeta = "0" . $num_tarjeta;
                 }
+
+                //$tservicio = TarjetaServicios::where("numero_tarjeta",$num_tarjeta)->where("servicio_codigo",Tarjetas::$CODIGO_SERVICIO_BONO)->first();
+                //dd("valor de resultado tservicio ".$tservicio);
+
                 $tarjeta = Tarjetas::where("numero_tarjeta", $num_tarjeta)->first();
-                if($tarjeta==null) //no existe la tarjeta
+                $result = $this->crearTarjeta($num_tarjeta, Tarjetas::$ESTADO_TARJETA_CREADA, Tarjetas::$CODIGO_SERVICIO_BONO);
+
+                /*if($tarjeta==null) //no existe la tarjeta
                 {
-                    $result = $this->crearTarjeta($num_tarjeta, Tarjetas::$ESTADO_TARJETA_CREADA, Tarjetas::$CODIGO_SERVICIO_BONO);
-                }
+
+                }*/
                 //consulta si existe la persona, SiNO, la inserta.
                 $persona = Personas::where("identificacion", $request->identificacion)->first();
                 if($persona==null) //no existe la persona
@@ -226,22 +237,40 @@ class TarjetasBonoController extends Controller
     {
         $result = [];
         try {
-            $tarjetas = new Tarjetas();
-            $tarjetas->numero_tarjeta = $num_tarjeta;
-            $validator = \Validator::make(['numero_tarjeta' => $num_tarjeta], [
-                'numero_tarjeta' => 'required|unique:tarjetas'
-            ]);
-            if ($validator->fails()) {
-                return $validator->errors()->all();
-            }
-            $ultimos = substr($tarjetas->numero_tarjeta, -4);
-            $tarjetas->password = Encript::encryption($ultimos);
-            $tarjetas->estado = $name_estado;
-            $tarjetas->save();
+            $tarjeta = Tarjetas::where("numero_tarjeta", $num_tarjeta)->first();
             $result['estado'] = true;
-            $result['mensaje'] = 'La tarjeta ha sido creada satisfactoriamente';
-            $result = TarjetasController::crearHtarjeta($tarjetas, $name_estado, $servicio_codigo);
-            $result = TarjetasController::crearTarjetaSer($tarjetas, Tarjetas::$ESTADO_TARJETA_INACTIVA, $servicio_codigo);
+            $result['mensaje'] = 'El servicio de la tarjeta ya existia';
+            if($tarjeta == null) //no existe la tarjeta
+            {
+                $tarjetas = new Tarjetas();
+                $tarjetas->numero_tarjeta = $num_tarjeta;
+                $validator = \Validator::make(['numero_tarjeta' => $num_tarjeta], [
+                    'numero_tarjeta' => 'required|unique:tarjetas'
+                ]);
+                if ($validator->fails()) {
+                    return $validator->errors()->all();
+                }
+                $ultimos = substr($tarjetas->numero_tarjeta, -4);
+                $tarjetas->password = Encript::encryption($ultimos);
+                $tarjetas->estado = $name_estado;
+                $tarjetas->save();
+                $tarjeta=$tarjetas;
+                $result['estado'] = true;
+                $result['mensaje'] = 'La tarjeta ha sido creada satisfactoriamente';
+            }
+
+            $tservicio = TarjetaServicios::where("numero_tarjeta",$num_tarjeta)->where("servicio_codigo",$servicio_codigo)->first();
+
+            if($tservicio == null)//no existe
+            {
+                $result = TarjetasController::crearHtarjeta($tarjeta, $name_estado, $servicio_codigo);
+                $result = TarjetasController::crearTarjetaSer($tarjeta, Tarjetas::$ESTADO_TARJETA_INACTIVA, $servicio_codigo);
+                $result['estado'] = true;
+                $result['mensaje'] = 'El servicio de la tarjeta ha sido creado satisfactoriamente';
+
+            }
+
+
         } catch (\Exception $exception) {
             $result['estado'] = false;
             $result['mensaje'] = 'No fue posible crear la tarjeta' . $exception->getMessage();//. $exception->getMessage()
@@ -384,10 +413,11 @@ class TarjetasBonoController extends Controller
                                         $num_tarjeta = "0" . $num_tarjeta;
                                     }
                                     $tarjeta = Tarjetas::where("numero_tarjeta", $num_tarjeta)->first();
-                                    if ($tarjeta == null) //no existe la tarjeta
+                                    $result = $this->crearTarjeta($num_tarjeta, Tarjetas::$ESTADO_TARJETA_CREADA, Tarjetas::$CODIGO_SERVICIO_BONO);
+                                    /*if ($tarjeta == null) //no existe la tarjeta
                                     {
-                                        $result = $this->crearTarjeta($num_tarjeta, Tarjetas::$ESTADO_TARJETA_CREADA, Tarjetas::$CODIGO_SERVICIO_BONO);
-                                    }
+
+                                    }*/
                                     //consulta si existe la persona, SiNO, la inserta.
                                     $persona = Personas::where("identificacion", $identificacion)->first();
                                     if ($persona == null) //no existe la persona
@@ -488,8 +518,9 @@ class TarjetasBonoController extends Controller
         $tarjetas = Tarjetas::join('tarjeta_servicios', 'tarjetas.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
             ->join('detalle_produtos', 'tarjetas.numero_tarjeta', 'detalle_produtos.numero_tarjeta')
             ->where('tarjeta_servicios.servicio_codigo', Tarjetas::$CODIGO_SERVICIO_BONO)
-            ->where('tarjeta_servicios.estado','<>',TarjetaServicios::$ESTADO_ANULADA)
-            ->select(['detalle_produtos.monto_inicial', 'detalle_produtos.contrato_emprs_id as idcontrato', 'detalle_produtos.id as deta_id', 'tarjetas.*', 'detalle_produtos.fecha_vencimiento as vencimiento'])
+            ->where('detalle_produtos.estado','<>',TarjetaServicios::$ESTADO_ANULADA)
+            ->where('detalle_produtos.contrato_emprs_id','<>',null)
+            ->select(['detalle_produtos.monto_inicial', 'detalle_produtos.contrato_emprs_id as idcontrato', 'detalle_produtos.id as deta_id', 'tarjetas.*', 'detalle_produtos.fecha_vencimiento as vencimiento','detalle_produtos.estado as estado'])
             ->get();
         return Datatables::of($tarjetas)
             ->addColumn('numcontrato', function ($tarjetas) {
@@ -499,12 +530,11 @@ class TarjetasBonoController extends Controller
             ->addColumn('action', function ($tarjetas) {
                 $acciones = "";
                 $acciones .= '<div class="btn-group">';
-
                     $acciones .= '<a data-modal href="' . route('gestionarTarjeta', $tarjetas->deta_id) . '" type="button" class="btn btn-custom btn-xs">Gestionar</a>';
                     if (Shinobi::can('editar.fecha.bono')) {
                         $acciones .= '<a data-modal href="' . route('bono.editar', $tarjetas->deta_id) . '" type="button" class="btn btn-custom btn-xs">Editar</a>';
                     }
-                    if ($tarjetas->estado == Tarjetas::$ESTADO_TARJETA_CREADA) {
+                    if ($tarjetas->estado == Tarjetas::$ESTADO_TARJETA_INACTIVA) {
                         $acciones .= '<button type="button" class="btn btn-custom btn-xs" onclick="activar(' . $tarjetas->deta_id . ')">Activar</button>';
                     }
 
