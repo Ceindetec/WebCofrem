@@ -64,8 +64,6 @@ class TarjetasBonoController extends Controller
             $contrato = Contratos_empr::where("n_contrato", $request->numero_contrato)->first();
             //dd($contrato);
             if($contrato != null) {
-                var_dump("hola");
-            //dd("hola");
                 $num_tarjeta = $request->numero_tarjeta;
                 while (strlen($num_tarjeta) < 6) {
                     $num_tarjeta = "0" . $num_tarjeta;

@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use creditocofrem\DetalleProdutos;
 use creditocofrem\DetalleTransaccion;
 use creditocofrem\Duplicado;
+use creditocofrem\DuplicadoProductos;
 use creditocofrem\Establecimientos;
 use creditocofrem\HEstadoTransaccion;
 use creditocofrem\Servicios;
@@ -577,9 +578,8 @@ class ReportesController extends Controller
     {
         return view('reportes.saldosvencidos.saldosvencidos');
     }
-
     /*
-     * Funcion RECURSIVA que retorna listado DE DUPLICADO
+     * Funcion RECURSIVA que retorna listado DE tarjeta DUPLICADO
      * la lista contiene los numero de tarjeta asociados
      */
     public function consultarDuplicados($numtarjeta, $listado)
@@ -597,7 +597,23 @@ class ReportesController extends Controller
         } else
             return null;
     }
-
+    /*
+     * Funcion RECURSIVA que retorna listado DE productos DUPLICADO
+     * la lista contiene los numero de tarjeta asociados
+     */
+    public function consultarDuplicadoProductos($numproducto, $listado)
+    {
+        //buscar si el producto tiene duppicado, si SI, agregar al array listado.
+        $duplicado = DuplicadoProductos::where('newproducto', $numproducto)->first();
+        if ($duplicado != null) {
+            array_push($listado, $duplicado->oldproducto);
+            $resultado = $this->consultarDuplicados($duplicado->oldproducto, $listado);
+            if ($resultado != null)
+                $listado = $resultado;
+            return $listado;
+        } else
+            return null;
+    }
     /*
      * Funcion consultar saldos vencidos
      * - segun el tipo: consultar tarjetas bono, regalo o las dos.
@@ -614,6 +630,7 @@ class ReportesController extends Controller
             $detallesb = DetalleProdutos::join('tarjeta_servicios', 'detalle_produtos.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
                 ->whereBetween('detalle_produtos.fecha_vencimiento', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
                 ->where('tarjeta_servicios.servicio_codigo', Tarjetas::$CODIGO_SERVICIO_BONO)
+                ->where('detalle_produtos.estado', '<>','N')
                 ->select('detalle_produtos.*')
                 ->get();
             //
@@ -623,17 +640,17 @@ class ReportesController extends Controller
                 $gasto = 0;
                 //buscar Duplicados
                 $listado = [];
-                array_push($listado, $detalle->numero_tarjeta);
-                $respuesta = $this->consultarDuplicados($detalle->numero_tarjeta, $listado);
+                array_push($listado, $detalle->id);
+                $respuesta = $this->consultarDuplicadoProductos($detalle->id, $listado);
                 if ($respuesta != null)
                     $listado = $respuesta;
                 //where in (detalle_producto_id, $listaduplicados)o
-                $detallesb2 = DetalleProdutos::wherein('numero_tarjeta', $listado)->get();
+                /*$detallesb2 = DetalleProdutos::wherein('numero_tarjeta', $listado)->get();
                 $listaidprod = [];
                 foreach ($detallesb2 as $detb) {
                     array_push($listaidprod, $detb->id);
-                }
-                $dtransacciones = DetalleTransaccion::wherein('detalle_producto_id', $listaidprod)->get();
+                }*/
+                $dtransacciones = DetalleTransaccion::wherein('detalle_producto_id', $listado)->get();
                 //finaliza ajuste para duplicados
                 //$dtransacciones = DetalleTransaccion::where('detalle_producto_id', $detalle->id)->get();
                 foreach ($dtransacciones as $dtransaccione) {
@@ -657,23 +674,24 @@ class ReportesController extends Controller
             $detallesr = DetalleProdutos::join('tarjeta_servicios', 'detalle_produtos.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
                 ->whereBetween('detalle_produtos.fecha_vencimiento', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
                 ->where('tarjeta_servicios.servicio_codigo', Tarjetas::$CODIGO_SERVICIO_REGALO)
+                ->where('detalle_produtos.estado', '<>','N')
                 ->select('detalle_produtos.*')
                 ->get();
             foreach ($detallesr as $detalle) {
                 $gasto = 0;
                 //buscar Duplicados
                 $listado = [];
-                array_push($listado, $detalle->numero_tarjeta);
-                $respuesta = $this->consultarDuplicados($detalle->numero_tarjeta, $listado);
+                array_push($listado, $detalle->id);
+                $respuesta = $this->consultarDuplicadoProductos($detalle->id, $listado);
                 if ($respuesta != null)
                     $listado = $respuesta;
                 //where in (detalle_producto_id, $listaduplicados)o
-                $detallesr2 = DetalleProdutos::wherein('numero_tarjeta', $listado)->get();
+               /* $detallesr2 = DetalleProdutos::wherein('numero_tarjeta', $listado)->get();
                 $listaidprod = [];
                 foreach ($detallesr2 as $detr) {
                     array_push($listaidprod, $detr->id);
-                }
-                $dtransacciones = DetalleTransaccion::wherein('detalle_producto_id', $listaidprod)->get();
+                }*/
+                $dtransacciones = DetalleTransaccion::wherein('detalle_producto_id', $listado)->get();
                 //finaliza ajuste para duplicados
                 //$dtransacciones = DetalleTransaccion::where('detalle_producto_id', $detalle->id)->get();
                 foreach ($dtransacciones as $dtransaccione) {
@@ -710,7 +728,6 @@ class ReportesController extends Controller
         $pdf->setPaper('A4', 'landscape');
         return $pdf->download('saldosvencidos.pdf');
     }
-
     /*
      * FUNCION GENERAR EXCEL para saldos vencidos
      * Exporta a excel, los resultados de las tarjetas
@@ -791,7 +808,6 @@ class ReportesController extends Controller
             });
         })->export('xls');
     }
-
     /*
      * FINALIZA REPORTES SALDOS VENCIDOS
      */
@@ -803,9 +819,8 @@ class ReportesController extends Controller
         $establecimientos = Establecimientos::pluck('razon_social', 'id');
         return view('reportes.ventasdiariasxestablecimiento.ventasdiarias', compact('establecimientos'));
     }
-
     /*
-     * Funcion consultar saldos vencidos
+     * Funcion consultar ventas diarias
      * - segun el tipo: consultar tarjetas bono, regalo o las dos.
      * -
      */
@@ -820,7 +835,6 @@ class ReportesController extends Controller
             ->orderby('nombre', 'asc')->get();
         if ($sucursales != null) {
             foreach ($sucursales as $sucursale) {
-
                 $dtransacciones = DetalleTransaccion::join('h_estado_transacciones', 'detalle_transacciones.transaccion_id', 'h_estado_transacciones.transaccion_id')
                     ->join('transacciones', 'detalle_transacciones.transaccion_id', 'transacciones.id')
                     ->where('h_estado_transacciones.estado', '!=', HEstadoTransaccion::$ESTADO_INACTIVO)
@@ -889,7 +903,6 @@ class ReportesController extends Controller
         $pdf->setPaper('A4', 'landscape');
         return $pdf->download('ventasdiarias.pdf');
     }
-
     /*
      * FUNCION GENERAR EXCEL para ventas diarias por establecimiento
      * Exporta a excel, los resultados por dia de las ventas por sucursal
@@ -991,9 +1004,7 @@ class ReportesController extends Controller
                 } //finaliza foreach
             } //finaliza if
         })->export('xls');
-
     }
-
     /*
      * FINALIZA REPORTE VENTAS DIARIAS POR ESTABLECIMIENTO
      */
@@ -1006,7 +1017,6 @@ class ReportesController extends Controller
         $establecimientos = Establecimientos::pluck('razon_social', 'id');
         return view('reportes.datafonosxestablecimiento.datafonosxestablecimiento', compact('establecimientos'));
     }
-
     /*
      * Funcion consultar datafonos por establecimientos
      * - segun el tipo: consultar tarjetas bono, regalo o las dos.
@@ -1063,7 +1073,6 @@ class ReportesController extends Controller
         }
         return view('reportes.datafonosxestablecimiento.parcialresultadodxe', compact('resultado', 'lista_esta', 'establecimientos', 'sucursales', 'resumen'));
     }
-
     /*
     * FUNCION GENERAR PDF para datafonos por establecimiento
     * Exporta a pdf, los datos y estado de datafonos por sucursal
@@ -1079,7 +1088,6 @@ class ReportesController extends Controller
         $pdf->setPaper('A4', 'landscape');
         return $pdf->download('RelacionDatafonos.pdf');
     }
-
     /*
      * FUNCION GENERAR EXCEL para datafonos por establecimiento
      * Exporta a excel, datos y estado de datafonos por sucursal
@@ -1168,7 +1176,6 @@ class ReportesController extends Controller
             } //finaliza if
         })->export('xls');
     }
-
     /*
      * FINALIZA REPORTE DATAFONOS POR ESTABLECIMIENTO
      */
@@ -1180,7 +1187,6 @@ class ReportesController extends Controller
     {
         return view('reportes.saldotarjeta.saldotarjeta');
     }
-
     /*
      * Funcion consultar saldos de los servicios activos de una tarjeta
      */
@@ -1190,15 +1196,13 @@ class ReportesController extends Controller
      */
     public function consultarSaldoTarjeta(Request $request)
     {
-    $numero_tarjeta = $request->numero_tarjeta;
-    $codigo = $numero_tarjeta;
-    while (strlen($codigo) < 6) {
-        $codigo = "0" . $codigo;
-    }
-    $numero_tarjeta = $codigo;
-    //dd($numero_tarjeta);
-    $resultado = array();
-
+        $numero_tarjeta = $request->numero_tarjeta;
+        $codigo = $numero_tarjeta;
+        while (strlen($codigo) < 6) {
+            $codigo = "0" . $codigo;
+        }
+        $numero_tarjeta = $codigo;
+        $resultado = array();
         $listado = [];
         array_push($listado, $numero_tarjeta);
         $respuesta = $this->consultarDuplicados($numero_tarjeta, $listado);
@@ -1207,20 +1211,19 @@ class ReportesController extends Controller
         $detalles = DetalleProdutos::wherein('numero_tarjeta', $listado)
             ->where('estado',DetalleProdutos::$ESTADO_ACTIVO)
             ->get();
-
         foreach ($detalles as $detalle) {
             $gasto = 0;
-
-            $dtransacciones = DetalleTransaccion::where('detalle_producto_id', $detalle->id)->get();
-            //finaliza ajuste para duplicados
-            //$dtransacciones = DetalleTransaccion::where('detalle_producto_id', $detalle->id)->get();
-
+            $listadod = [];
+            array_push($listadod, $detalle->id);
+            $respuesta = $this->consultarDuplicadoProductos($detalle->id, $listadod);
+            if ($respuesta != null)
+                $listadod = $respuesta;
+            $dtransacciones = DetalleTransaccion::wherein('detalle_producto_id', $listadod)->get();//$detalle->id
             foreach ($dtransacciones as $dtransaccione) {
                 $htransaccion = DB::table('h_estado_transacciones')->where('transaccion_id', $dtransaccione->transaccion_id)->orderBy('id', 'desc')->first();
                 if ($htransaccion->estado == HEstadoTransaccion::$ESTADO_ACTIVO)
                     $gasto += $dtransaccione->valor;
             }
-
             $sobrante = $detalle->monto_inicial - $gasto;
             $sobrante = '$ '.number_format( $sobrante, 2, ',', '.');
             $monto = $detalle->monto_inicial;
@@ -1233,11 +1236,7 @@ class ReportesController extends Controller
                 'tipo_servicio' => $tiposervicio,
                 'fecha_vencimiento' => $detalle->fecha_vencimiento,
             );
-
         }
-
-
-
         return view('reportes.saldotarjeta.parcialsaldotarjeta', compact('resultado', 'numero_tarjeta'));
     }
     /*
