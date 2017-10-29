@@ -9,6 +9,7 @@ use creditocofrem\Establecimientos;
 use Yajra\Datatables\Datatables;
 use creditocofrem\Empresas;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 
 class ContratosController extends Controller
@@ -37,7 +38,7 @@ class ContratosController extends Controller
             return Datatables::of($contratos)
                 ->addColumn('action', function ($contratos) {
                     $acciones = '<div class="btn-group">';
-                    // $acciones = $acciones . '<a href="' . route("contrato.editar", ["id" => $empresas->id]) . '" data-modal class="btn btn-xs btn-custom" ><i class="ti-pencil-alt"></i> Editar</a>';
+                   $acciones = $acciones . '<a href="' . route("contrato.editar", ["id" => $contratos->id]) . '" data-modal class="btn btn-xs btn-custom" ><i class="ti-pencil-alt"></i> Editar</a>';
                     $acciones = $acciones . '</div>';
                     return $acciones;
                 })
@@ -64,21 +65,15 @@ class ContratosController extends Controller
 
             $validator = \Validator::make($request->all(), [
 
-                $numero_de_contrato=('n_contrato'),
-                $numero_de_contrato => 'required|unique:contratos_emprs|max:11',
+             'n_contrato' => 'required|unique:contratos_emprs|max:11',
+            ], [
+                'n_contrato.unique'=>'El contrato ya existe'
             ]);
 
             if ($validator->fails()) {
                 return $validator->errors()->all();
-                $result['estado'] = false;
-                $result['mensaje'] = 'El contrato ya existe';
-
             }
 
-                //dd($validator);
-           // if ($validator->fails()) {
-             //   return $validator->errors()->all();
-            // }
             $empresa = Empresas::where("nit", $request->nit)->first();
             //dd($request->nit);
             //dd($empresa);
@@ -95,6 +90,8 @@ class ContratosController extends Controller
                 if ($extension == "pdf") {
                     copy($_FILES['pdf']['tmp_name'], $new_name);
                     $contrato = new Contratos_empr($request->all());
+                    $contrato->fecha = Carbon::createFromFormat('d/m/Y', $request->fecha);
+
                     //  $contrato->n_contrato = strtoupper($contrato->n_contrato);
                     $contrato->empresa_id = $empresa->id;
                     $contrato->cons_mensual = $request->consumo;
@@ -123,6 +120,77 @@ class ContratosController extends Controller
 
     }
 
+
+    //metodo para llamar a la vista para editar la info del contrato
+    public function viewEditarContrato(Request $request)
+    {
+        $contrato = Contratos_empr::find($request->id);
+        $administracion = AdminisTarjetas::pluck('porcentaje', 'id');
+        $empresa= Empresas::where('id', $contrato->empresa_id)->first();
+      //  $fecha=$contrato->fecha;
+      //  $fecha->toDateString();
+
+        return view('empresas.contratos.editarcontratos', compact(['contrato','administracion','empresa']));
+
+    }
+
+    /**
+     * metodo que permite editar un contrato
+     */
+    public function editarContrato(Request $request,$id)
+    {
+        $result= [];
+        try{
+
+                //$contrato = Contratos_empr::where('n_contrato', $request->n_contrato)->first();
+            $contrato = Contratos_empr::find($id);
+            $empresa = Empresas::where("nit", $request->nit)->first();
+          //  dd($id);
+
+                    $contrato->valor_contrato = $request->valor_contrato;
+                    $contrato->valor_impuesto = $request->valor_impuesto;
+                    $contrato->dias_consumo = $request->consumo;
+                    $contrato->fecha = Carbon::createFromFormat('d/m/Y', $request->fecha);
+            $ruta = "contratos_pdf/";
+            $num_contrato = $request->n_contrato;
+            $new_name = $ruta . $num_contrato . ".pdf";
+            $fichero = $request->file('pdf');
+           // dd($fichero);
+            if($fichero!=null)
+            {
+                $nombre_file = $fichero->getClientOriginalName();
+                $extensiones = explode(".", $nombre_file);
+                $extension = end($extensiones);
+
+                if ($extension == "pdf") {
+
+                    copy($_FILES['pdf']['tmp_name'], $new_name);
+                    $contrato-> update($request->all());
+                    $contrato->fecha = Carbon::createFromFormat('d/m/Y', $request->fecha);
+
+                    //  $contrato->n_contrato = strtoupper($contrato->n_contrato);
+                    $contrato->empresa_id = $empresa->id;
+                    $contrato->cons_mensual = $request->consumo;
+
+                    $contrato->pdf = $new_name;
+                    // dd($contrato);
+                }
+            }
+
+              //  copy($_FILES['pdf']['tmp_name'], $new_name);
+
+                  //  $contrato->pdf = $request->pdf;
+
+            $contrato->save();
+            $result['estado'] = true;
+            $result['mensaje'] = 'El contrato ha sido actualizado satisfactorimante.';
+            $result['data'] = $contrato;
+        }catch (\Exception $exception){
+            $result['estado'] = false;
+            $result['mensaje'] = 'No fue posible editar el contrato. '.$exception->getMessage();
+        }
+        return $result;
+    }
 
 
 
