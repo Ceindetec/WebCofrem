@@ -5,6 +5,7 @@ namespace creditocofrem\Http\Controllers\Auth;
 use creditocofrem\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -51,13 +52,16 @@ class LoginController extends Controller
     }
 
 
-   /* protected function redirectPath()
+    protected function redirectPath()
     {
         if (method_exists($this, 'redirectTo')) {
             return $this->redirectTo();
         }
 
-        return property_exists($this, 'redirectTo') ? $this->redirectTo : '/home';
-    }*/
+        if(Auth::User()->isRole('admin'))
+            return property_exists($this, 'redirectTo') ? $this->redirectTo : '/home';
+        else
+            return '/establecimientos';
+    }
 
 }
