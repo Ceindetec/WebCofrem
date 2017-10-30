@@ -11,6 +11,9 @@
 
     <link rel="shortcut icon" href="{{asset('images/logo_sm.png')}}">
 
+
+    <link href="{{asset('plugins/bootstrap-tagsinput/css/bootstrap-tagsinput.css')}}" rel="stylesheet" />
+
     <!-- Bootstrap core CSS -->
 {{Html::Style('css/bootstrap.min.css')}}
 <!-- MetisMenu CSS -->
@@ -102,24 +105,22 @@
                     </div>
 
                     <!-- Top nav left menu -->
-                    <ul class="nav navbar-nav hidden-sm  hidden-xs top-navbar-items">
+                    <!--<ul class="nav navbar-nav hidden-sm  hidden-xs top-navbar-items">
                         <li><a href="#">About</a></li>
                         <li><a href="#">Help</a></li>
                         <li><a href="#">Contact</a></li>
-                    </ul>
+                    </ul>-->
 
                     <!-- Top nav Right menu -->
                     <ul class="nav navbar-nav navbar-right top-navbar-items-right pull-right">
-                        <li class="dropdown top-menu-item-xs">
+                        <!--<li class="dropdown top-menu-item-xs">
                             <a href="#" data-target="#" class="dropdown-toggle menu-right-item" data-toggle="dropdown"
                                aria-expanded="true">
                                 <i class="mdi mdi-bell"></i> <span class="label label-danger">3</span>
                             </a>
                             <ul class="dropdown-menu p-0 dropdown-menu-lg">
-                                <!--<li class="notifi-title"><span class="label label-default pull-right">New 3</span>Notification</li>-->
                                 <li class="list-group notification-list" style="height: 267px;">
                                     <div class="slimscroll">
-                                        <!-- list item-->
                                         <a href="javascript:void(0);" class="list-group-item">
                                             <div class="media">
                                                 <div class="media-left p-r-10">
@@ -135,7 +136,6 @@
                                             </div>
                                         </a>
 
-                                        <!-- list item-->
                                         <a href="javascript:void(0);" class="list-group-item">
                                             <div class="media">
                                                 <div class="media-left p-r-10">
@@ -150,7 +150,7 @@
                                             </div>
                                         </a>
 
-                                        <!-- list item-->
+
                                         <a href="javascript:void(0);" class="list-group-item">
                                             <div class="media">
                                                 <div class="media-left p-r-10">
@@ -167,7 +167,7 @@
                                             </div>
                                         </a>
 
-                                        <!-- list item-->
+
                                         <a href="javascript:void(0);" class="list-group-item">
                                             <div class="media">
                                                 <div class="media-left p-r-10">
@@ -182,7 +182,7 @@
                                             </div>
                                         </a>
 
-                                        <!-- list item-->
+
                                         <a href="javascript:void(0);" class="list-group-item">
                                             <div class="media">
                                                 <div class="media-left p-r-10">
@@ -198,7 +198,6 @@
                                             </div>
                                         </a>
 
-                                        <!-- list item-->
                                         <a href="javascript:void(0);" class="list-group-item">
                                             <div class="media">
                                                 <div class="media-left p-r-10">
@@ -214,13 +213,8 @@
                                         </a>
                                     </div>
                                 </li>
-                                <!--<li>-->
-                                <!--<a href="javascript:void(0);" class="list-group-item text-right">-->
-                                <!--<small class="font-600">See all notifications</small>-->
-                                <!--</a>-->
-                                <!--</li>-->
                             </ul>
-                        </li>
+                        </li>-->
 
                         <li class="dropdown top-menu-item-xs">
                             <a href="" class="dropdown-toggle menu-right-item profile" data-toggle="dropdown"
@@ -322,7 +316,8 @@
 {{Html::Script("js/metisMenu.min.js")}}
 {{Html::Script("js/jquery.slimscroll.min.js")}}
 
-
+<script src="{{asset('plugins/bootstrap-tagsinput/js/bootstrap-tagsinput.min.js')}}"></script>
+<script src="{{asset('plugins/bootstrap-filestyle/js/bootstrap-filestyle.min.js')}}" type="text/javascript"></script>
 <script src="{{asset('plugins/bootstrap-sweetalert/sweetalert.min.js')}}"></script>
 
 <script src="{{asset('plugins/select2/js/select2.min.js')}}" type="text/javascript"></script>

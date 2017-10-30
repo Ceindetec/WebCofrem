@@ -7,38 +7,37 @@
     <div class="modal-body">
         <div class="row">
             <div class="form-group">
+                <label class="col-md-2 control-label">Nit empresa</label>
+                <div class="col-md-10">
+                    {{Form::text('nit', null, ['class'=>'form-control', "required", "tabindex"=>"1", "maxlength"=>"10", "data-parsley-type"=>"number", 'id'=>'nit'])}}
+                </div>
+            </div>
+
+            <div class="form-group">
                 <label class="col-md-2 control-label">Número de contrato</label>
                 <div class="col-md-10">
-                    {{Form::text('n_contrato', null ,['class'=>'form-control', "required", "tabindex"=>"1", 'id'=>'n_contrato'])}}
+                    {{Form::text('n_contrato', null ,['class'=>'form-control', "required", "tabindex"=>"2", 'id'=>'n_contrato'])}}
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="col-md-2 control-label">Valor contrato</label>
                 <div class="col-md-10">
-                    {{Form::text('valor_contrato', null ,['class'=>'form-control money', "required", "data-parsley-type"=>"number", "tabindex"=>"2",'id'=>'valor_contrato'])}}
+                    {{Form::text('valor_contrato', null ,['class'=>'form-control money', "required", "tabindex"=>"3",'id'=>'valor_contrato'])}}
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="col-md-2 control-label">Valor del impuesto</label>
                 <div class="col-md-10">
-                    {{Form::text('valor_impuesto', null ,['class'=>'form-control money', "required", "data-parsley-type"=>"number", "tabindex"=>"3",'id'=>'impuesto'])}}
+                    {{Form::text('valor_impuesto', null ,['class'=>'form-control money', "required", "tabindex"=>"4",'id'=>'impuesto'])}}
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="col-md-2 control-label">Fecha</label>
-                <div class="col-md-4">
-                    {{Form::text("fecha", null,['class'=>'form-control', "required", "tabindex"=>"4", 'id'=>'fecha'])}}
-                </div>
-            </div>
-
-
-            <div class="form-group">
-                <label class="col-md-2 control-label">Empresa</label>
                 <div class="col-md-10">
-                    {{Form::text('nit', null, ['class'=>'form-control', "required", "tabindex"=>"5", "maxlength"=>"10", "data-parsley-type"=>"number", 'id'=>'nit'])}}
+                    {{Form::text("fecha", null,['class'=>'form-control', "required", "tabindex"=>"5", 'id'=>'fecha'])}}
                 </div>
             </div>
 
@@ -61,7 +60,7 @@
             <div class="form-group">
                 <label class="col-md-2 control-label">Documentos</label>
                 <div class="col-md-10">
-                    {{Form::file('pdf', ['class'=>'form-control', "tabindex"=>"8", 'id'=>'pdf'])}}
+                    {{Form::file('pdf', ['class'=>'filestyle', "data-buttontext"=>"Buscar archivo", "tabindex"=>"8", 'id'=>'pdf'])}}
                 </div>
             </div>
 
@@ -111,19 +110,22 @@
 <script>
 
     $(function () {
-
+        $('.money').mask('000.000.000.000.000', {reverse: true});
+        $("#pdf").filestyle({
+            buttonText: "Buscar archivo",
+        });
         var valini = $('input[type=radio]').val();
-        if(valini==1){
-            $('#dias_consumo').attr('disabled',true);
-        }else {
+        if (valini == 1) {
+            $('#dias_consumo').attr('disabled', true);
+        } else {
             $('#dias_consumo').removeAttr('disabled');
         }
-       $('input[type=radio]').change(function () {
-         if($(this).val()==1){
-           $('#dias_consumo').attr('disabled',true);
-        }else {
-          $('#dias_consumo').removeAttr('disabled');
-          }
+        $('input[type=radio]').change(function () {
+            if ($(this).val() == 1) {
+                $('#dias_consumo').attr('disabled', true);
+            } else {
+                $('#dias_consumo').removeAttr('disabled');
+            }
         });
 
         $('#fecha').datepicker({
@@ -140,7 +142,7 @@
             var form = $(this);
 
             var formData = new FormData(form[0]);
-            formData.append( 'pdf', $( '#pdf' )[0].files[0] );
+            formData.append('pdf', $('#pdf')[0].files[0]);
 
             $.ajax({
                 type: "POST",
