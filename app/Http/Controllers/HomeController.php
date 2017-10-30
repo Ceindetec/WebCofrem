@@ -277,7 +277,7 @@ class HomeController extends Controller
             if ($rol->save()) {
                 if(count($request->permisos)>0){
                     foreach ($request->permisos as $permiso){
-                        $rol->syncPermissions($permiso);
+                        $rol->assignPermission($permiso);
                         $rol->save();
                     }
                 }
