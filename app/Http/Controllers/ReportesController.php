@@ -847,7 +847,10 @@ class ReportesController extends Controller
                 $fechaanterior = "";
                 $venta = 0;
                 foreach ($dtransacciones as $dtransaccione) {
-                    $fechaactual = $dtransaccione->fecha;
+                    //$fechaactual = $dtransaccione->fecha;
+                    //$fechaactual=Carbon::createFromFormat("Y/m/d HH:mm:ss", $dtransaccione->fecha);
+                    $dt = Carbon::parse($dtransaccione->fecha);
+                    $fechaactual=$dt->year."-".$dt->month."-".$dt->day;
                     if ($fechaanterior == "")
                         $fechaanterior = $fechaactual;
                     if ($fechaanterior != $fechaactual) {
@@ -1254,5 +1257,172 @@ class ReportesController extends Controller
     }
     /*
      * FINALIZA REPORTES SALDOS POR TARJETA ACTIVA
+     */
+
+    /*
+     * INICIA REPORTE DE TRANSACCIONES POR DATAFONO POR ESTABLECIMIENTO Y SUCURSAL
+     */
+    public function viewTransaccionesxDatafono()
+    {
+        $establecimientos = Establecimientos::pluck('razon_social', 'id');
+        return view('reportes.transaccionesxdatafono.transaccionesxdatafono', compact('establecimientos'));
+    }
+    /*
+     * Funcion consultar transacciones por datafono por establecimientos
+     */
+    public function consultarTransaccionesxDatafono(Request $request)
+    {
+        $resultado = array();
+        $resumen = array();
+        $lista_esta = $request->establecimientos;
+        $establecimientos = Establecimientos::wherein('id', $request->establecimientos)
+            ->orderby('razon_social', 'asc')->get();
+        $sucursales = Sucursales::wherein('establecimiento_id', $request->establecimientos)
+            ->orderby('nombre', 'asc')->get();
+        if ($sucursales != null) {
+            foreach ($sucursales as $sucursale) {
+                $terminales = Terminales::where('sucursal_id', $sucursale->id)
+                    ->orderBy('codigo', 'asc')
+                    ->get();
+
+                foreach ($terminales as $terminal) {
+                    $totaltranx=Transaccion::where('codigo_terminal',$terminal->codigo)->count();
+                    if ($terminal->estado == "A")
+                        $name_estado = "Activa";
+                    else
+                        $name_estado = "Inactiva";
+                    $resultado[] = array('establecimiento' => $sucursale->establecimiento_id,
+                        'sucursal' => $sucursale->id,
+                        'codigo' => $terminal->codigo,
+                        'total' => $totaltranx,
+                    );
+                }
+            }
+            //obtener subtotales de estados de datafonos por establecimiento
+            foreach ($establecimientos as $establecimiento) {
+                $tactivas = 0;
+                $tinactivas = 0;
+                foreach ($resultado as $resul) {
+                    if ($resul['establecimiento'] == $establecimiento->id) {
+                        if ($resul['estado'] == Terminales::$ESTADO_TERMINAL_ACTIVA)
+                            $tactivas++;
+                        else
+                            $tinactivas++;
+                    }
+                }
+                $resumen[] = array('establecimiento' => $establecimiento->id,
+                    'tactivas' => $tactivas,
+                    'tinactivas' => $tinactivas,
+                );
+            }
+            //dd($resumen);
+        }
+        return view('reportes.transaccionesxdatafono.parcialresultadotxd', compact('resultado', 'lista_esta', 'establecimientos', 'sucursales', 'resumen'));
+    }
+    /*
+    * FUNCION GENERAR PDF para transacciones por datafonos por establecimiento
+    * Exporta a pdf, cantidad de tranx por datafonos por sucursal
+    */
+    public function pdfTransaccionesxDatafono(Request $request)
+    {
+        // dd($request->lista_esta);
+        $establecimientos = Establecimientos::wherein('id', $request->lista_esta)->orderby('razon_social', 'asc')->get();
+        $sucursales = Sucursales::wherein('establecimiento_id', $request->lista_esta)->orderby('nombre', 'asc')->get();
+        //dd($establecimientos);
+        $data = ['resultado' => $request->resultado, 'establecimientos' => $establecimientos, 'sucursales' => $sucursales, 'resumen' => $request->resumen];
+        $pdf = \PDF::loadView('reportes.datafonosxestablecimiento.pdfdxe', $data);
+        $pdf->setPaper('A4', 'landscape');
+        return $pdf->download('RelacionDatafonos.pdf');
+    }
+    /*
+     * FUNCION GENERAR EXCEL para transacciones por datafono por establecimiento
+     * Exporta a excel, cantidad de tranx de datafonos por sucursal
+     */
+    public function excelTransaccionesxDatafono(Request $request)
+    {
+        $establecimientos = Establecimientos::wherein('id', $request->lista_esta)->orderby('razon_social', 'asc')->get();
+        $sucursales = Sucursales::wherein('establecimiento_id', $request->lista_esta)->orderby('nombre', 'asc')->get();
+
+        \Excel::create('ExcelDatafonos', function ($excel) use ($request, $establecimientos, $sucursales) {
+            $resultado = $request->resultado;
+            $resumen = $request->resumen;
+            $num_esta = 0;
+            //FOR ESTABLECIMIENTOS POR CADA UNO CREAR UNA PESTAÑA
+            if (sizeof($establecimientos) > 0) {
+                foreach ($establecimientos as $establecimiento) {
+                    $num_esta++;
+                    //titulo <h5>Establecimiento: {{$establecimiento->razon_social}}</h5>
+                    $excel->sheet('Est' . $num_esta, function ($sheet) use ($resultado, $establecimiento, $sucursales, $resumen) {
+                        $haysucursal = 0;
+                        $hoy = Carbon::now();
+                        $objDrawing = new PHPExcel_Worksheet_Drawing;
+                        $objDrawing->setPath(public_path('images/logo_mini.png')); //your image path
+                        $objDrawing->setCoordinates('A1');
+                        $objDrawing->setWorksheet($sheet);
+                        $sheet->setWidth(array(
+                            'A' => 30,
+                            'B' => 20,
+                            'C' => 20,
+                            'D' => 10,
+                            'E' => 10,
+                            'F' => 10,
+                        ));
+                        $sheet->row(2, array('', 'REPORTE DE DATAFONOS DEL ESTABLECIMIENTO: ' . $establecimiento->razon_social));
+                        $sheet->row(2, function ($row) {
+                            $row->setBackground('#4CAF50');
+                        });
+
+                        //$sheet->row(3, array('','Rango:',$rango,'',''));
+                        $sheet->row(3, array('', 'Fecha:', $hoy, '', ''));
+                        $fila = 5;
+                        foreach ($sucursales as $sucursale) {
+                            $cant = 0;
+                            if ($sucursale->establecimiento_id == $establecimiento->id) {
+                                foreach ($resumen as $resum) {
+                                    if ($resum['establecimiento'] == $establecimiento->id) {
+                                        $sheet->row($fila, array('Terminales Activas: ' . $resum['tactivas'], 'Terminales Inactivas: ' . $resum['tinactivas']));
+                                        $sheet->row($fila, function ($row) {
+                                            $row->setBackground('#f2f2f2');
+                                        });
+                                        $fila++;
+                                        $fila++;
+                                    }
+                                }
+                                $haysucursal++;
+                                if (sizeof($resultado) > 0) {
+                                    $subtotal = 0;
+                                    $sheet->row($fila, array('Sucursal: ' . $sucursale->nombre));
+                                    $sheet->row($fila, function ($row) {
+                                        $row->setBackground('#4CAF50');
+                                    });
+                                    $fila++;
+                                    $fila++;
+                                    $sheet->row($fila, array('Código', 'Activo', 'Estado'));
+                                    $sheet->row($fila, function ($row) {
+                                        $row->setBackground('#f2f2f2');
+                                    });
+                                    $fila++;
+                                    foreach ($resultado as $miresul) {
+                                        if ($miresul["establecimiento"] == $establecimiento->id && $miresul["sucursal"] == $sucursale->id) {
+                                            $cant++;
+                                            $sheet->row($fila, array($miresul["codigo"], $miresul["numero_activo"], $miresul["estado"]));
+                                            $fila++;
+                                        }//cierra if
+                                    } //cierra foreach
+                                    $fila++;
+                                }//cierra if
+                                if ($cant == 0)
+                                    $sheet->row($fila, array('No hay registros'));
+                            }//cierra if sucursal id
+                        }//cierra foreach
+                        if ($haysucursal == 0)
+                            $sheet->row($fila, array('No existen sucursales'));
+                    });        //CIERRA PESTAÑA
+                } //finaliza foreach
+            } //finaliza if
+        })->export('xls');
+    }
+    /*
+     * FINALIZA REPORTE TRANX X DATAFONO POR ESTABLECIMIENTO
      */
 }
