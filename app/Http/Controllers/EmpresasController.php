@@ -27,18 +27,18 @@ class EmpresasController extends Controller
     public function gridEmpresas()
     {
         $empresas = Empresas::all();
-        foreach ($empresas as $emp){
+        foreach ($empresas as $emp) {
             $emp->getMunicipio->getDepartamento;
         }
         // dd($empresas);
 //
         return Datatables::of($empresas)
             ->addColumn('action', function ($empresas) {
-               $acciones = '<div class="btn-group">';
-               $acciones = $acciones . '<a href="' . route("empresa.editar", ["id" => $empresas->id]) . '" data-modal class="btn btn-xs btn-custom" ><i class="ti-pencil-alt"></i> Editar</a>';
+                $acciones = '<div class="btn-group">';
+                $acciones = $acciones . '<a href="' . route("empresa.editar", ["id" => $empresas->id]) . '" data-modal class="btn btn-xs btn-custom" ><i class="ti-pencil-alt"></i> Editar</a>';
                 //$acciones = $acciones . '<a class="btn btn-xs btn-primary" href="' . route("listsucursales", [$establecimientos->id]) . '"><i class="ti-layers-alt"></i> Sucursales</a>';
-                  $acciones = $acciones . '</div>';
-                  return $acciones;
+                $acciones = $acciones . '</div>';
+                return $acciones;
             })
             ->make(true);
     }
@@ -71,7 +71,6 @@ class EmpresasController extends Controller
                 return $validator->errors()->all();
             }
             $empresa = new Empresas($request->all());
-            //var_dump($empresa); revisar que parametros necesita para la creacion de la empresa
             $empresa->razon_social = strtoupper($empresa->razon_social);
             $empresa->save();
             $result['estado'] = true;
@@ -87,12 +86,11 @@ class EmpresasController extends Controller
     public function viewEditarEmpresa(Request $request)
     {
         $empresa = Empresas::find($request->id);
-       $depar = Municipios::find($empresa->municipio_codigo)->getDepartamento;
+        $depar = Municipios::find($empresa->municipio_codigo)->getDepartamento;
         $departamentos = Departamentos::pluck('descripcion', 'codigo');
-
-        return view('empresas.editarempresa', compact(['empresa', 'departamentos','depar']));
-
+        return view('empresas.editarempresa', compact(['empresa', 'departamentos', 'depar']));
     }
+
     /**
      * metodo que permite editar un establecimiento comercial
      * @param Request $request campos del establecimiento a editar
@@ -100,8 +98,8 @@ class EmpresasController extends Controller
      */
     public function editarEmpresa(Request $request)
     {
-        $result= [];
-        try{
+        $result = [];
+        try {
             $empresa = Empresas::find($request->getQueryString());
             if ($empresa->nit != $request->nit) {
                 if ($empresa->email != $request->email) {
@@ -137,9 +135,9 @@ class EmpresasController extends Controller
             $result['estado'] = true;
             $result['mensaje'] = 'La empresa ha sido actualizada satisfactorimante.';
             $result['data'] = $empresa;
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             $result['estado'] = false;
-            $result['mensaje'] = 'No fue posible editar la empresa. '.$exception->getMessage();
+            $result['mensaje'] = 'No fue posible editar la empresa. ' . $exception->getMessage();
         }
         return $result;
     }
