@@ -40,6 +40,12 @@
                 </div>
             </div>
 
+            <div class="form-group">
+                <label class="col-md-2 control-label">Direccion</label>
+                <div class="col-md-10">
+                    {{Form::text('direccion', null ,['class'=>'form-control', "required", "maxlength"=>"40"])}}
+                </div>
+            </div>
 
             <div class="form-group">
                     <label class="col-md-2 control-label">E-mail</label>
@@ -64,13 +70,6 @@
                 </div>
             </div>
 
-
-                <div class="form-group">
-                    <label class="col-md-2 control-label">Direccion</label>
-                    <div class="col-md-10">
-                        {{Form::text('direccion', null ,['class'=>'form-control', "required", "maxlength"=>"40"])}}
-                    </div>
-                </div>
 
             <div class="form-group">
                 <label class="col-md-2 control-label">Tipo</label>

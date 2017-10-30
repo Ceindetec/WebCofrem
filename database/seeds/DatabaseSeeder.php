@@ -15,5 +15,7 @@ class DatabaseSeeder extends Seeder
          $this->call(Departamentos::class);
          $this->call(Municipios::class);
          $this->call(TipoTarjetasSeed::class);
+         $this->call(PermisosSeeder::class);
+         $this->call(MotivoSeed::class);
     }
 }

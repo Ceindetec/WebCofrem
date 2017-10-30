@@ -3098,20 +3098,19 @@
         },
         {
             "name": "yajra/laravel-oci8",
-            "version": "v5.4.19",
+            "version": "v5.4.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/yajra/laravel-oci8.git",
-                "reference": "6a64e9ede8937f4794e6d6836a3c7219b0114dd3"
+                "reference": "6f851d75db5d800361e068d037e75cbe7ebd4175"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yajra/laravel-oci8/zipball/6a64e9ede8937f4794e6d6836a3c7219b0114dd3",
-                "reference": "6a64e9ede8937f4794e6d6836a3c7219b0114dd3",
+                "url": "https://api.github.com/repos/yajra/laravel-oci8/zipball/6f851d75db5d800361e068d037e75cbe7ebd4175",
+                "reference": "6f851d75db5d800361e068d037e75cbe7ebd4175",
                 "shasum": ""
             },
             "require": {
-                "ext-oci8": ">=2.0.0",
                 "illuminate/database": "5.4.*",
                 "illuminate/support": "5.4.*",
                 "php": ">=5.6.4",
@@ -3150,7 +3149,7 @@
                 "oracle",
                 "pdo_oci"
             ],
-            "time": "2017-10-20T01:13:54+00:00"
+            "time": "2017-02-17T02:50:09+00:00"
         },
         {
             "name": "yajra/laravel-pdo-via-oci8",

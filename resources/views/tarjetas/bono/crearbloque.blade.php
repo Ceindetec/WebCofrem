@@ -37,7 +37,7 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">Seleccionar archivo</label>
                                 <div class="col-sm-7">
-                                    {{Form::file('archivo',['class'=>'form-control', "required"=>"true", "tabindex"=>"4",'id'=>'archivo','accept'=>'.txt'])}}
+                                    {{Form::file('archivo',['class'=>'filestyle', "data-buttontext"=>"Buscar archivo", "required"=>"true", "tabindex"=>"4",'id'=>'archivo','accept'=>'.txt'])}}
                                 </div>
                             </div>
                             <div class="form-group">
@@ -58,6 +58,10 @@
     {!!Html::script('plugins/jquery-autocomplete/jquery.autocomplete.min.js')!!}
     <script>
         $(function () {
+            $("#archivo").filestyle({
+                buttonText: "Buscar archivo",
+            });
+
             $('#numero_contrato').autocomplete({
                 serviceUrl: '{{route("autoCompleNumContrato")}}',
                 lookupFilter: function (suggestion, originalQuery, queryLowerCase) {
