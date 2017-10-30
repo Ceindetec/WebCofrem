@@ -79,7 +79,7 @@
                                         <p align="center">No existen sucursales</p>
                                     @endif
                                     <br>
-                                    </div>
+                                    <!--</div>-->
                                 @endforeach
                             @endif
                         </div>

@@ -829,10 +829,23 @@ class ReportesController extends Controller
         $rangos = explode(" - ", $request->rango);
         $resultado = array();
         $lista_esta = $request->establecimientos;
-        $establecimientos = Establecimientos::wherein('id', $request->establecimientos)
-            ->orderby('razon_social', 'asc')->get();
-        $sucursales = Sucursales::wherein('establecimiento_id', $request->establecimientos)
-            ->orderby('nombre', 'asc')->get();
+        if(sizeof($lista_esta)>0)
+        {
+            $establecimientos = Establecimientos::wherein('id', $request->establecimientos)
+                ->orderby('razon_social', 'asc')->get();
+        }
+        else
+        {
+            $establecimientos = Establecimientos::orderby('razon_social', 'asc')->get();
+            $lista_esta = [];
+            foreach ($establecimientos as $establecimiento)
+            {
+                array_push($lista_esta, $establecimiento->id);
+            }
+        }
+
+        $sucursales = Sucursales::wherein('establecimiento_id', $lista_esta)
+            ->orderby('nombre', 'asc')->get();//$request->establecimientos
         if ($sucursales != null) {
             foreach ($sucursales as $sucursale) {
                 $dtransacciones = DetalleTransaccion::join('h_estado_transacciones', 'detalle_transacciones.transaccion_id', 'h_estado_transacciones.transaccion_id')
@@ -1030,9 +1043,24 @@ class ReportesController extends Controller
         $resultado = array();
         $resumen = array();
         $lista_esta = $request->establecimientos;
-        $establecimientos = Establecimientos::wherein('id', $request->establecimientos)
-            ->orderby('razon_social', 'asc')->get();
-        $sucursales = Sucursales::wherein('establecimiento_id', $request->establecimientos)
+        /*$establecimientos = Establecimientos::wherein('id', $request->establecimientos)
+            ->orderby('razon_social', 'asc')->get();*/
+        if(sizeof($lista_esta)>0)
+        {
+            $establecimientos = Establecimientos::wherein('id', $request->establecimientos)
+                ->orderby('razon_social', 'asc')->get();
+        }
+        else
+        {
+            $establecimientos = Establecimientos::orderby('razon_social', 'asc')->get();
+            $lista_esta = [];
+            foreach ($establecimientos as $establecimiento)
+            {
+                array_push($lista_esta, $establecimiento->id);
+            }
+        }
+
+        $sucursales = Sucursales::wherein('establecimiento_id', $lista_esta)
             ->orderby('nombre', 'asc')->get();
         if ($sucursales != null) {
             foreach ($sucursales as $sucursale) {
@@ -1061,7 +1089,7 @@ class ReportesController extends Controller
                 $tinactivas = 0;
                 foreach ($resultado as $resul) {
                     if ($resul['establecimiento'] == $establecimiento->id) {
-                        if ($resul['estado'] == Terminales::$ESTADO_TERMINAL_ACTIVA)
+                        if ($resul['estado'] == "Activa")//Terminales::$ESTADO_TERMINAL_ACTIVA
                             $tactivas++;
                         else
                             $tinactivas++;
@@ -1260,7 +1288,7 @@ class ReportesController extends Controller
      */
 
     /*
-     * INICIA REPORTE DE TRANSACCIONES POR DATAFONO POR ESTABLECIMIENTO Y SUCURSAL
+     * INICIA REPORTE DE NUMERO DE TRANSACCIONES POR DATAFONO POR ESTABLECIMIENTO Y SUCURSAL
      */
     public function viewTransaccionesxDatafono()
     {
@@ -1275,9 +1303,23 @@ class ReportesController extends Controller
         $resultado = array();
         $resumen = array();
         $lista_esta = $request->establecimientos;
-        $establecimientos = Establecimientos::wherein('id', $request->establecimientos)
-            ->orderby('razon_social', 'asc')->get();
-        $sucursales = Sucursales::wherein('establecimiento_id', $request->establecimientos)
+        /*$establecimientos = Establecimientos::wherein('id', $request->establecimientos)
+            ->orderby('razon_social', 'asc')->get();*/
+        if(sizeof($lista_esta)>0)
+        {
+            $establecimientos = Establecimientos::wherein('id', $request->establecimientos)
+                ->orderby('razon_social', 'asc')->get();
+        }
+        else
+        {
+            $establecimientos = Establecimientos::orderby('razon_social', 'asc')->get();
+            $lista_esta = [];
+            foreach ($establecimientos as $establecimiento)
+            {
+                array_push($lista_esta, $establecimiento->id);
+            }
+        }
+        $sucursales = Sucursales::wherein('establecimiento_id', $lista_esta)
             ->orderby('nombre', 'asc')->get();
         if ($sucursales != null) {
             foreach ($sucursales as $sucursale) {
@@ -1295,6 +1337,7 @@ class ReportesController extends Controller
                         'sucursal' => $sucursale->id,
                         'codigo' => $terminal->codigo,
                         'total' => $totaltranx,
+                        'estado' => $name_estado,
                     );
                 }
             }
@@ -1304,7 +1347,7 @@ class ReportesController extends Controller
                 $tinactivas = 0;
                 foreach ($resultado as $resul) {
                     if ($resul['establecimiento'] == $establecimiento->id) {
-                        if ($resul['estado'] == Terminales::$ESTADO_TERMINAL_ACTIVA)
+                        if ($resul['estado'] == "Activa")//Terminales::$ESTADO_TERMINAL_ACTIVA
                             $tactivas++;
                         else
                             $tinactivas++;

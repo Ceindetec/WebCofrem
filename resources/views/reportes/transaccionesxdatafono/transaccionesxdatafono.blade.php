@@ -159,9 +159,9 @@
 
         function generarRespuesta() {
             var establecimientos = $('#establecimientos').val();
-            if(establecimientos==null)
+            /*if(establecimientos==null)
                 alert("Debe seleccionar al menos un establecimiento");
-            else
+            else*/
                 $('#resultado').load('{{route('resultadotransaccionesxdatafono')}}',{establecimientos:establecimientos});
         }
 

@@ -128,7 +128,7 @@
             /* metodo para cargar un multiselelect en el frmulario de crear rol
              */
             $(".select2").select2({
-                placeholder: "Seleccione...",
+                placeholder: "Todos",
                 minimumInputLength: 1,
                 ajax: {
                     url: "{{route('selectestablecimientos')}}",
@@ -165,9 +165,9 @@
             var rango = $('#daterange').val();
             var establecimientos = $('#establecimientos').val();
             //alert(establecimientos);
-            if(establecimientos==null)
+            /*if(establecimientos==null)
                 alert("debe seleccionar al menos un establecimiento");
-            else
+            else*/
                 $('#resultado').load('{{route('resultadoventasdiarias')}}',{rango:rango,establecimientos:establecimientos});
         }
 
