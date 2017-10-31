@@ -18,6 +18,8 @@ use creditocofrem\DetalleTransaccion;
 use creditocofrem\HEstadoTransaccion;
 use creditocofrem\Htarjetas;
 use Carbon\Carbon;
+use creditocofrem\Duplicado;
+use creditocofrem\DuplicadoProductos;
 
 class WebApiController extends Controller
 {
@@ -421,27 +423,27 @@ class WebApiController extends Controller
                                 $newEstadoTransacion->fecha = Carbon::now();
                                 $newEstadoTransacion->save();
                                 foreach ($servicios as $servicio) {
-                                    if($valorConsumir > 0){
+                                    if ($valorConsumir > 0) {
                                         if ($servicio == Tarjetas::$CODIGO_SERVICIO_REGALO) {
                                             $detalleProdutos = DetalleProdutos::where('numero_tarjeta', $request->numero_tarjeta)
                                                 ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
                                                 ->where('factura', '<>', NULL)
-                                                ->whereDate('fecha_vencimiento','>',Carbon::now())
+                                                ->whereDate('fecha_vencimiento', '>', Carbon::now())
                                                 ->orderBy('fecha_vencimiento', 'asc')
                                                 ->get();
-                                            foreach ($detalleProdutos as $detalleProduto){
+                                            foreach ($detalleProdutos as $detalleProduto) {
                                                 $transaciones = Transaccion::join('h_estado_transacciones', 'transacciones.id', 'h_estado_transacciones.transaccion_id')
-                                                    ->join('detalle_transacciones','transacciones.id','detalle_transacciones.transaccion_id')
+                                                    ->join('detalle_transacciones', 'transacciones.id', 'detalle_transacciones.transaccion_id')
                                                     ->where('transacciones.numero_tarjeta', $request->numero_tarjeta)
-                                                    ->where('detalle_transacciones.detalle_producto_id',$detalleProduto->id)
+                                                    ->where('detalle_transacciones.detalle_producto_id', $detalleProduto->id)
                                                     ->where('h_estado_transacciones.estado', 'A')
                                                     ->groupBy('transacciones.numero_tarjeta')
                                                     ->select(\DB::raw('SUM(valor) as total'))
                                                     ->get();
                                                 $porconsumir = $detalleProduto->monto_inicial - $transaciones[0]->total;
-                                                if($porconsumir>0){
+                                                if ($porconsumir > 0) {
                                                     $consumir = $porconsumir - $valorConsumir;
-                                                    if($consumir<0){
+                                                    if ($consumir < 0) {
                                                         $newDetalle = new DetalleTransaccion();
                                                         $newDetalle->transaccion_id = $newTransaccion->id;
                                                         $newDetalle->detalle_producto_id = $detalleProduto->id;
@@ -459,7 +461,7 @@ class WebApiController extends Controller
                                                         $historico->servicio_codigo = $servicio;
                                                         $historico->save();
                                                         $valorConsumir = $valorConsumir - $porconsumir;
-                                                    }else{
+                                                    } else {
                                                         $newDetalle = new DetalleTransaccion();
                                                         $newDetalle->transaccion_id = $newTransaccion->id;
                                                         $newDetalle->detalle_producto_id = $detalleProduto->id;
@@ -473,7 +475,7 @@ class WebApiController extends Controller
                                         }
                                     }
                                 }
-                                if($valorConsumir == 0){
+                                if ($valorConsumir == 0) {
                                     \DB::commit();
                                     $dt = Carbon::now();
                                     $result['estado'] = TRUE;
@@ -485,16 +487,16 @@ class WebApiController extends Controller
                                     $result['tipoTransaccion'] = Transaccion::$TIPO_CONSUMO;
                                     $result['valor'] = $request->valor;
                                     $result['detalleServicio'] = $request->servicios;
-                                    if($tarjeta->persona_id != NULL){
+                                    if ($tarjeta->persona_id != NULL) {
                                         $persona = Personas::find($tarjeta->persona_id);
                                         $result['cedula'] = $persona->identificacion;
-                                        $result['nombres'] = $persona->nombres." ".$persona->apellidos;
-                                    }else{
+                                        $result['nombres'] = $persona->nombres . " " . $persona->apellidos;
+                                    } else {
                                         $result['nombres'] = "";
                                         $result['cedula'] = "";
                                     }
                                     $result['mensaje'] = 'Transaccion exitosa';
-                                }else{
+                                } else {
                                     \DB::rollback();
                                     $result['estado'] = FALSE;
                                     $result['mensaje'] = ApiWS::$TEXT_TRANSACCION_INSUFICIENTE;
@@ -532,5 +534,122 @@ class WebApiController extends Controller
             $result['codigo'] = ApiWS::$CODIGO_ERROR_EJECUCION;
         }
         return ['resultado' => $result];
+    }
+
+    public function saldoTarjeta(Request $request)
+    {
+        $result = [];
+        try {
+            $terminal = Terminales::where('codigo', $request->codigo)->first();
+            if ($terminal != NULL) {
+                if ($terminal->estado == Terminales::$TERMINAL_ESTADO_ACTIVA) {
+                    $tarjeta = Tarjetas::where('numero_tarjeta', $request->numero_tarjeta)->first();
+                    if ($tarjeta != NULL) {
+                        if ($tarjeta->estado == Tarjetas::$ESTADO_TARJETA_ACTIVA) {
+                            if ($request->password == Encript::decryption($tarjeta->password)) {
+                                $numero_tarjeta = $request->numero_tarjeta;
+                                $resultado = array();
+                                $listado = [];
+                                array_push($listado, $numero_tarjeta);
+                                $respuesta = $this->consultarDuplicados($numero_tarjeta, $listado);
+                                if ($respuesta != null)
+                                    $listado = $respuesta;
+                                $detalles = DetalleProdutos::wherein('numero_tarjeta', $listado)
+                                    ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
+                                    ->get();
+                                foreach ($detalles as $detalle) {
+                                    $gasto = 0;
+                                    $listadod = [];
+                                    array_push($listadod, $detalle->id);
+                                    $respuesta = $this->consultarDuplicadoProductos($detalle->id, $listadod);
+                                    if ($respuesta != null)
+                                        $listadod = $respuesta;
+                                    $dtransacciones = DetalleTransaccion::wherein('detalle_producto_id', $listadod)->get();//$detalle->id
+                                    foreach ($dtransacciones as $dtransaccione) {
+                                        $htransaccion = DB::table('h_estado_transacciones')->where('transaccion_id', $dtransaccione->transaccion_id)->orderBy('id', 'desc')->first();
+                                        if ($htransaccion->estado == HEstadoTransaccion::$ESTADO_ACTIVO)
+                                            $gasto += $dtransaccione->valor;
+                                    }
+                                    $sobrante = $detalle->monto_inicial - $gasto;
+                                    $sobrante = number_format($sobrante, 2, ',', '.');
+                                    if ($detalle->contrato_emprs_id == null) {
+                                        $codigo_servicio = Tarjetas::$CODIGO_SERVICIO_REGALO;
+                                        $servicio = 'Regalo';
+                                    } else {
+                                        $codigo_servicio = Tarjetas::$CODIGO_SERVICIO_BONO;
+                                        $servicio = 'Bono empresarial';
+                                    }
+                                    $resultado[] = array(
+                                        'codigo_servicio' => $codigo_servicio,
+                                        'servicio' => $servicio,
+                                        'saldo' => $sobrante,
+                                    );
+                                }
+                                $result['estado'] = TRUE;
+                                $result['Saldos'] = $resultado;
+                            } else {
+                                $result['estado'] = FALSE;
+                                $result['mensaje'] = ApiWS::$TEXT_PASSWORD_INCORECTO;
+                                $result['codigo'] = ApiWS::$CODIGO_PASSWORD_INCORECTO;
+                            }
+                        } else {
+                            $result['estado'] = FALSE;
+                            $result['mensaje'] = ApiWS::$TEXT_TARJETA_INACTIVA;
+                            $result['codigo'] = ApiWS::$CODIGO_TARJETA_INACTIVA;
+                        }
+                    } else {
+                        $request['estado'] = FALSE;
+                        $request['mensaje'] = ApiWS::$TEXT_TARJETA_NO_VALIDA;
+                        $request['codigo'] = ApiWS::$CODIGO_TARJETA_NO_VALIDA;
+                    }
+                } else {
+                    $result['estado'] = FALSE;
+                    $result['mensaje'] = ApiWS::$TEXT_TERMINAL_INACTIVA;
+                    $result['codigo'] = ApiWS::$CODIGO_TERMINAL_INACTIVA;
+                }
+            } else {
+                $result['estado'] = FALSE;
+                $result['mensaje'] = ApiWS::$TEXT_TERMINAL_NO_EXISTE;
+                $result['codigo'] = ApiWS::$CODIGO_TERMINAL_NO_EXISTE;
+            }
+        } catch (\Exception $exception) {
+            $result['estado'] = FALSE;
+            $result['mensaje'] = ApiWS::$TEXT_ERROR_EJECUCION;
+            $result['codigo'] = ApiWS::$CODIGO_ERROR_EJECUCION;
+        }
+
+        return ['resultado' => $result];
+    }
+
+    /*
+     * Funcion RECURSIVA que retorna listado DE productos DUPLICADO
+     * la lista contiene los numero de tarjeta asociados
+     */
+    public function consultarDuplicadoProductos($numproducto, $listado)
+    {
+        //buscar si el producto tiene duppicado, si SI, agregar al array listado.
+        $duplicado = DuplicadoProductos::where('newproducto', $numproducto)->first();
+        if ($duplicado != null) {
+            array_push($listado, $duplicado->oldproducto);
+            $resultado = $this->consultarDuplicados($duplicado->oldproducto, $listado);
+            if ($resultado != null)
+                $listado = $resultado;
+            return $listado;
+        } else
+            return null;
+    }
+
+    public function consultarDuplicados($numtarjeta, $listado)
+    {
+        //buscar si la tarjeta tiene duppicado, si SI, agregar al array listado.
+        $duplicado = Duplicado::where('newtarjeta', $numtarjeta)->first();
+        if ($duplicado != null) {
+            array_push($listado, $duplicado->oldtarjeta);
+            $resultado = $this->consultarDuplicados($duplicado->oldtarjeta, $listado);
+            if ($resultado != null)
+                $listado = $resultado;
+            return $listado;
+        } else
+            return null;
     }
 }
