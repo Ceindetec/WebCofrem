@@ -536,6 +536,14 @@ class WebApiController extends Controller
         return ['resultado' => $result];
     }
 
+    /**
+     * metodo que permite traer el saldo de la tarjeta para los servicios que tenga disponible
+     * @param Request $request
+     * -codigo
+     * -numero_tarjeta
+     * -password
+     * @return array
+     */
     public function saldoTarjeta(Request $request)
     {
         $result = [];
