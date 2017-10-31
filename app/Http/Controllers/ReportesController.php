@@ -289,7 +289,7 @@ class ReportesController extends Controller
     }
 
     /**
-     * METODO QUE PERMITE EXPORTAR A EXCEL EL REPORTE DE SERVICIOS ACTIVADOS POR FECGA DE ACTIVACION Y MONTOS
+     * METODO QUE PERMITE EXPORTAR A EXCEL EL REPORTE DE SERVICIOS ACTIVADOS POR FECHA DE ACTIVACION Y MONTOS
      * @param Request $request
      */
     public function exportarExcelMontosPorTarjeta(Request $request)
@@ -735,21 +735,35 @@ class ReportesController extends Controller
             $excel->sheet('SaldosVencidos', function ($sheet) use ($resultadob, $resultador, $rango, $tiposervicio) {
                 $hoy = Carbon::now();
                 $objDrawing = new PHPExcel_Worksheet_Drawing;
-                $objDrawing->setPath(public_path('images/logo_mini.png')); //your image path
+                $objDrawing->setPath(public_path('images/logo.png')); //your image path
+                $objDrawing->setHeight(50);
                 $objDrawing->setCoordinates('A1');
                 $objDrawing->setWorksheet($sheet);
+                $objDrawing->setOffsetY(10);
                 $sheet->setWidth(array(
                     'A' => 30,
                     'B' => 20,
                     'C' => 20,
                     'D' => 20,
                     'E' => 20,
+                    'F' => 20,
                 ));
 
+                $sheet->setMergeColumn(array(
+                    'columns' => array('A'),
+                    'rows' => array(
+                        array(1, 4),
+                    )
+                ));
                 $sheet->row(2, array('', 'REPORTE DE SALDOS VENCIDOS'));
                 $sheet->row(2, function ($row) {
                     $row->setBackground('#4CAF50');
                 });
+                $sheet->cells('A1:A4', function ($cells) {
+                    $cells->setBackground('#FFFFFF');
+                });
+
+                $sheet->setBorder('A1:A4', 'thin');
 
                 $sheet->row(3, array('', 'Rango:', $rango, '', ''));
                 $sheet->row(4, array('', 'Fecha:', $hoy, '', ''));
@@ -931,22 +945,34 @@ class ReportesController extends Controller
                         $haysucursal = 0;
                         $hoy = Carbon::now();
                         $objDrawing = new PHPExcel_Worksheet_Drawing;
-                        $objDrawing->setPath(public_path('images/logo_mini.png')); //your image path
+                        $objDrawing->setPath(public_path('images/logo.png')); //your image path
+                        $objDrawing->setHeight(50);
                         $objDrawing->setCoordinates('A1');
                         $objDrawing->setWorksheet($sheet);
+                        $objDrawing->setOffsetY(10);
                         $sheet->setWidth(array(
                             'A' => 30,
                             'B' => 20,
                             'C' => 20,
-                            'D' => 10,
-                            'E' => 10,
-                            'F' => 10,
+                            'D' => 20,
+                            'E' => 20,
+                            'F' => 20,
+                        ));
+                        $sheet->setMergeColumn(array(
+                            'columns' => array('A'),
+                            'rows' => array(
+                                array(1, 4),
+                            )
                         ));
                         $sheet->row(2, array('', 'REPORTE DE VENTAS DIARIAS PARA ESTABLECIMIENTO ' . $establecimiento->razon_social));
                         $sheet->row(2, function ($row) {
                             $row->setBackground('#4CAF50');
                         });
+                        $sheet->cells('A1:A4', function ($cells) {
+                            $cells->setBackground('#FFFFFF');
+                        });
 
+                        $sheet->setBorder('A1:A4', 'thin');
                         $sheet->row(3, array('', 'Rango:', $rango, '', ''));
                         $sheet->row(4, array('', 'Fecha:', $hoy, '', ''));
                         $fila = 6;
@@ -1132,21 +1158,34 @@ class ReportesController extends Controller
                         $haysucursal = 0;
                         $hoy = Carbon::now();
                         $objDrawing = new PHPExcel_Worksheet_Drawing;
-                        $objDrawing->setPath(public_path('images/logo_mini.png')); //your image path
+                        $objDrawing->setPath(public_path('images/logo.png')); //your image path
+                        $objDrawing->setHeight(50);
                         $objDrawing->setCoordinates('A1');
                         $objDrawing->setWorksheet($sheet);
+                        $objDrawing->setOffsetY(10);
                         $sheet->setWidth(array(
                             'A' => 30,
                             'B' => 20,
                             'C' => 20,
-                            'D' => 10,
-                            'E' => 10,
-                            'F' => 10,
+                            'D' => 20,
+                            'E' => 20,
+                            'F' => 20,
+                        ));
+                        $sheet->setMergeColumn(array(
+                            'columns' => array('A'),
+                            'rows' => array(
+                                array(1, 4),
+                            )
                         ));
                         $sheet->row(2, array('', 'REPORTE DE DATAFONOS DEL ESTABLECIMIENTO: ' . $establecimiento->razon_social));
                         $sheet->row(2, function ($row) {
                             $row->setBackground('#4CAF50');
                         });
+                        $sheet->cells('A1:A4', function ($cells) {
+                            $cells->setBackground('#FFFFFF');
+                        });
+
+                        $sheet->setBorder('A1:A4', 'thin');
 
                         //$sheet->row(3, array('','Rango:',$rango,'',''));
                         $sheet->row(3, array('', 'Fecha:', $hoy, '', ''));
@@ -1294,9 +1333,8 @@ class ReportesController extends Controller
     {
         $resultado = array();
         $resumen = array();
+        $rangos = explode(" - ", $request->rango);
         $lista_esta = $request->establecimientos;
-        /*$establecimientos = Establecimientos::wherein('id', $request->establecimientos)
-            ->orderby('razon_social', 'asc')->get();*/
         if(sizeof($lista_esta)>0)
         {
             $establecimientos = Establecimientos::wherein('id', $request->establecimientos)
@@ -1315,44 +1353,35 @@ class ReportesController extends Controller
             ->orderby('nombre', 'asc')->get();
         if ($sucursales != null) {
             foreach ($sucursales as $sucursale) {
+                $subtotal=0;
                 $terminales = Terminales::where('sucursal_id', $sucursale->id)
                     ->orderBy('codigo', 'asc')
                     ->get();
 
                 foreach ($terminales as $terminal) {
-                    $totaltranx=Transaccion::where('codigo_terminal',$terminal->codigo)->count();
-                    if ($terminal->estado == "A")
-                        $name_estado = "Activa";
+                    $totaltranx=Transaccion::where('codigo_terminal',$terminal->codigo)
+                        ->whereBetween('fecha', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
+                        ->count();
+                    if($terminal->estado==Terminales::$ESTADO_TERMINAL_ACTIVA)
+                        $name_estado="Activo";
                     else
-                        $name_estado = "Inactiva";
+                        $name_estado="Inactivo";
                     $resultado[] = array('establecimiento' => $sucursale->establecimiento_id,
                         'sucursal' => $sucursale->id,
-                        'codigo' => $terminal->codigo,
+                        'terminal' => $terminal->codigo,
                         'total' => $totaltranx,
                         'estado' => $name_estado,
                     );
+                    $subtotal+=$totaltranx;
                 }
-            }
-            //obtener subtotales de estados de datafonos por establecimiento
-            foreach ($establecimientos as $establecimiento) {
-                $tactivas = 0;
-                $tinactivas = 0;
-                foreach ($resultado as $resul) {
-                    if ($resul['establecimiento'] == $establecimiento->id) {
-                        if ($resul['estado'] == "Activa")//Terminales::$ESTADO_TERMINAL_ACTIVA
-                            $tactivas++;
-                        else
-                            $tinactivas++;
-                    }
-                }
-                $resumen[] = array('establecimiento' => $establecimiento->id,
-                    'tactivas' => $tactivas,
-                    'tinactivas' => $tinactivas,
+                $resumen[] = array('establecimiento' => $sucursale->establecimiento_id,
+                    'sucursal' => $sucursale->id,
+                    'total' => $subtotal,
                 );
             }
-            //dd($resumen);
         }
-        return view('reportes.transaccionesxdatafono.parcialresultadotxd', compact('resultado', 'lista_esta', 'establecimientos', 'sucursales', 'resumen'));
+        $rango = ['fecha1' => $rangos[0], 'fecha2' => $rangos[1]];
+        return view('reportes.transaccionesxdatafono.parcialresultadotxd', compact('resultado', 'lista_esta', 'establecimientos', 'sucursales', 'resumen','rango'));
     }
     /*
     * FUNCION GENERAR PDF para transacciones por datafonos por establecimiento
@@ -1364,10 +1393,10 @@ class ReportesController extends Controller
         $establecimientos = Establecimientos::wherein('id', $request->lista_esta)->orderby('razon_social', 'asc')->get();
         $sucursales = Sucursales::wherein('establecimiento_id', $request->lista_esta)->orderby('nombre', 'asc')->get();
         //dd($establecimientos);
-        $data = ['resultado' => $request->resultado, 'establecimientos' => $establecimientos, 'sucursales' => $sucursales, 'resumen' => $request->resumen];
-        $pdf = \PDF::loadView('reportes.datafonosxestablecimiento.pdfdxe', $data);
+        $data = ['resultado' => $request->resultado, 'establecimientos' => $establecimientos, 'sucursales' => $sucursales, 'resumen' => $request->resumen, 'rango' => $request->fecha1 . " - " . $request->fecha2];
+        $pdf = \PDF::loadView('reportes.transaccionesxdatafono.pdftxd', $data);
         $pdf->setPaper('A4', 'landscape');
-        return $pdf->download('RelacionDatafonos.pdf');
+        return $pdf->download('TransaccionesDatafonos.pdf');
     }
     /*
      * FUNCION GENERAR EXCEL para transacciones por datafono por establecimiento
@@ -1378,51 +1407,60 @@ class ReportesController extends Controller
         $establecimientos = Establecimientos::wherein('id', $request->lista_esta)->orderby('razon_social', 'asc')->get();
         $sucursales = Sucursales::wherein('establecimiento_id', $request->lista_esta)->orderby('nombre', 'asc')->get();
 
-        \Excel::create('ExcelDatafonos', function ($excel) use ($request, $establecimientos, $sucursales) {
+        \Excel::create('ExcelTxDatafonos', function ($excel) use ($request, $establecimientos, $sucursales) {
             $resultado = $request->resultado;
             $resumen = $request->resumen;
+            $rango = $request->fecha1 ." - ".$request->fecha2;
             $num_esta = 0;
             //FOR ESTABLECIMIENTOS POR CADA UNO CREAR UNA PESTAÑA
             if (sizeof($establecimientos) > 0) {
                 foreach ($establecimientos as $establecimiento) {
                     $num_esta++;
                     //titulo <h5>Establecimiento: {{$establecimiento->razon_social}}</h5>
-                    $excel->sheet('Est' . $num_esta, function ($sheet) use ($resultado, $establecimiento, $sucursales, $resumen) {
+                    $excel->sheet('Est' . $num_esta, function ($sheet) use ($resultado, $establecimiento, $sucursales, $resumen, $rango) {
                         $haysucursal = 0;
                         $hoy = Carbon::now();
                         $objDrawing = new PHPExcel_Worksheet_Drawing;
-                        $objDrawing->setPath(public_path('images/logo_mini.png')); //your image path
+                        $objDrawing->setPath(public_path('images/logo.png')); //your image path
+                        $objDrawing->setHeight(50);
                         $objDrawing->setCoordinates('A1');
                         $objDrawing->setWorksheet($sheet);
+                        $objDrawing->setOffsetY(10);
+                        /*$objDrawing = new PHPExcel_Worksheet_Drawing;
+                        $objDrawing->setPath(public_path('images/logo_mini.png')); //your image path
+                        $objDrawing->setCoordinates('A1');
+                        $objDrawing->setWorksheet($sheet);*/
                         $sheet->setWidth(array(
                             'A' => 30,
                             'B' => 20,
                             'C' => 20,
-                            'D' => 10,
-                            'E' => 10,
-                            'F' => 10,
+                            'D' => 20,
+                            'E' => 20,
+                            'F' => 20,
                         ));
-                        $sheet->row(2, array('', 'REPORTE DE DATAFONOS DEL ESTABLECIMIENTO: ' . $establecimiento->razon_social));
-                        $sheet->row(2, function ($row) {
+
+                        $sheet->setMergeColumn(array(
+                            'columns' => array('A'),
+                            'rows' => array(
+                                array(1, 4),
+                            )
+                        ));
+                        $sheet->row(1, array('', 'REPORTE DE TRANSACCIONES POR DATAFONO DEL ESTABLECIMIENTO: ' . $establecimiento->razon_social));
+                        $sheet->row(1, function ($row) {
                             $row->setBackground('#4CAF50');
                         });
+                        $sheet->cells('A1:A4', function ($cells) {
+                            $cells->setBackground('#FFFFFF');
+                        });
 
-                        //$sheet->row(3, array('','Rango:',$rango,'',''));
+                        $sheet->setBorder('A1:A4', 'thin');
+
                         $sheet->row(3, array('', 'Fecha:', $hoy, '', ''));
+                        $sheet->row(4, array('', 'Rango:', $rango, '', ''));
                         $fila = 5;
                         foreach ($sucursales as $sucursale) {
                             $cant = 0;
                             if ($sucursale->establecimiento_id == $establecimiento->id) {
-                                foreach ($resumen as $resum) {
-                                    if ($resum['establecimiento'] == $establecimiento->id) {
-                                        $sheet->row($fila, array('Terminales Activas: ' . $resum['tactivas'], 'Terminales Inactivas: ' . $resum['tinactivas']));
-                                        $sheet->row($fila, function ($row) {
-                                            $row->setBackground('#f2f2f2');
-                                        });
-                                        $fila++;
-                                        $fila++;
-                                    }
-                                }
                                 $haysucursal++;
                                 if (sizeof($resultado) > 0) {
                                     $subtotal = 0;
@@ -1432,7 +1470,7 @@ class ReportesController extends Controller
                                     });
                                     $fila++;
                                     $fila++;
-                                    $sheet->row($fila, array('Código', 'Activo', 'Estado'));
+                                    $sheet->row($fila, array('Código del datafono', 'Estado Actual', 'No. de transacciones'));
                                     $sheet->row($fila, function ($row) {
                                         $row->setBackground('#f2f2f2');
                                     });
@@ -1440,11 +1478,21 @@ class ReportesController extends Controller
                                     foreach ($resultado as $miresul) {
                                         if ($miresul["establecimiento"] == $establecimiento->id && $miresul["sucursal"] == $sucursale->id) {
                                             $cant++;
-                                            $sheet->row($fila, array($miresul["codigo"], $miresul["numero_activo"], $miresul["estado"]));
+                                            $sheet->row($fila, array($miresul["terminal"], $miresul["estado"], $miresul["total"]));
                                             $fila++;
                                         }//cierra if
                                     } //cierra foreach
                                     $fila++;
+                                    foreach ($resumen as $resum) {
+                                        if ($resum['sucursal']== $sucursale->id) {
+                                            $sheet->row($fila, array('Total transacciones: ' , $resum['total']));
+                                            $sheet->row($fila, function ($row) {
+                                                $row->setBackground('#f2f2f2');
+                                            });
+                                            $fila++;
+                                            $fila++;
+                                        }
+                                    }
                                 }//cierra if
                                 if ($cant == 0)
                                     $sheet->row($fila, array('No hay registros'));

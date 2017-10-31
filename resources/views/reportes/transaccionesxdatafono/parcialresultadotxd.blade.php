@@ -6,11 +6,11 @@
                 <div class="widget-inline-box text-right">
                     <strong>Exportar: </strong>
                     <div class="btn-group">
-                        <a href="{{route('pdfdatafonosxestablecimientos',['lista_esta'=>$lista_esta,'resultado'=>$resultado,'resumen'=>$resumen])}}"
+                        <a href="{{route('pdftransaccionesxdatafono',['fecha1'=>$rango['fecha1'],'fecha2'=>$rango['fecha2'],'lista_esta'=>$lista_esta,'resultado'=>$resultado,'resumen'=>$resumen])}}"
                            class="btn btn-sm btn-custom" data-toggle="tooltip" title="PDF">
                             <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
                         </a>
-                        <a href="{{route('exceldatafonosxestablecimientos',['lista_esta'=>$lista_esta,'resultado'=>$resultado,'resumen'=>$resumen])}}"
+                        <a href="{{route('exceltransaccionesxdatafono',['fecha1'=>$rango['fecha1'],'fecha2'=>$rango['fecha2'],'lista_esta'=>$lista_esta,'resultado'=>$resultado,'resumen'=>$resumen])}}"
                            class="btn btn-sm btn-custom" data-toggle="tooltip" title="EXCEL">
                             <i class="fa fa-file-excel-o" aria-hidden="true"></i>
                         </a>
@@ -31,15 +31,7 @@
                         <div class="table-responsive m-b-20">
                             @if(sizeof($establecimientos)>0)
                                 @foreach($establecimientos as $establecimiento)
-
                                     <h5>Establecimiento: {{$establecimiento->razon_social}}</h5>
-                                    @foreach ($resumen as $resum)
-                                        @if($resum['establecimiento']== $establecimiento->id)
-                                            <table id="datatable" class="table table-striped table-bordered" width="100%">
-                                                <tr><td>Terminales Activas: </td><td>{{$resum['tactivas']}}</td><td> Terminales Inactivas: </td><td>{{$resum['tinactivas']}}</td></tr>
-                                            </table>
-                                        @endif
-                                    @endforeach
                                     <?php $haysucursal=0; ?>
                                     @foreach($sucursales as $sucursale)
                                         <?php $cant=0; ?>
@@ -50,9 +42,9 @@
                                                 <table id="datatable" class="table table-striped table-bordered" width="100%">
                                                     <thead>
                                                     <tr>
-                                                        <th>Código</th>
-                                                        <th>Activo</th>
-                                                        <th>Estado</th>
+                                                        <th>Codigo del datafono</th>
+                                                        <th>Estado actual</th>
+                                                        <th>No. de transacciones</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -60,15 +52,21 @@
                                                         @if($miresul["establecimiento"]==$establecimiento->id && $miresul["sucursal"]==$sucursale->id)
                                                             <?php $cant++; ?>
                                                             <tr>
-                                                                <td>{{$miresul["codigo"]}}</td>
-                                                                <td>{{$miresul["numero_activo"]}}</td>
+                                                                <td>{{$miresul["terminal"]}}</td>
                                                                 <td>{{$miresul["estado"]}}</td>
+                                                                <td>{{$miresul["total"]}}</td>
                                                             </tr>
                                                         @endif
                                                     @endforeach
-
                                                     </tbody>
                                                 </table>
+                                                    @foreach ($resumen as $resum)
+                                                        @if($resum['sucursal']== $sucursale->id)
+                                                            <table id="datatable" class="table table-striped table-bordered" width="100%">
+                                                                <tr><td>Total transacciones: </td><td>{{$resum['total']}}</td></tr>
+                                                            </table>
+                                                        @endif
+                                                    @endforeach
                                             @endif
                                             @if($cant==0)
                                                 <p align="center">No hay registros</p>
