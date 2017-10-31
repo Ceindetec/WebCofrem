@@ -34,7 +34,7 @@
 
                                     <h5>Establecimiento: {{$establecimiento->razon_social}}</h5>
                                     @foreach ($resumen as $resum)
-                                    @if($resum['establecimiento']== $establecimiento->id)
+                                        @if($resum['establecimiento']== $establecimiento->id)
                                             <table id="datatable" class="table table-striped table-bordered" width="100%">
                                                 <tr><td>Terminales Activas: </td><td>{{$resum['tactivas']}}</td><td> Terminales Inactivas: </td><td>{{$resum['tinactivas']}}</td></tr>
                                             </table>
@@ -79,19 +79,19 @@
                                         <p align="center">No existen sucursales</p>
                                     @endif
                                     <br>
-                                    <!--</div>-->
-                                @endforeach
-                            @endif
                         </div>
+                        @endforeach
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
-
-        @if(sizeof($establecimientos)==0)
-            <p align="center">Debe seleccionar al menos un establecimiento</p>
-        @endif
     </div>
+
+    @if(sizeof($establecimientos)==0)
+        <p align="center">Debe seleccionar al menos un establecimiento</p>
+    @endif
+</div>
 </div>
 
 <script>

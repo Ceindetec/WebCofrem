@@ -578,6 +578,7 @@ class ReportesController extends Controller
     {
         return view('reportes.saldosvencidos.saldosvencidos');
     }
+
     /*
      * Funcion RECURSIVA que retorna listado DE tarjeta DUPLICADO
      * la lista contiene los numero de tarjeta asociados
@@ -597,6 +598,7 @@ class ReportesController extends Controller
         } else
             return null;
     }
+
     /*
      * Funcion RECURSIVA que retorna listado DE productos DUPLICADO
      * la lista contiene los numero de tarjeta asociados
@@ -614,6 +616,7 @@ class ReportesController extends Controller
         } else
             return null;
     }
+
     /*
      * Funcion consultar saldos vencidos
      * - segun el tipo: consultar tarjetas bono, regalo o las dos.
@@ -630,12 +633,9 @@ class ReportesController extends Controller
             $detallesb = DetalleProdutos::join('tarjeta_servicios', 'detalle_produtos.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
                 ->whereBetween('detalle_produtos.fecha_vencimiento', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
                 ->where('tarjeta_servicios.servicio_codigo', Tarjetas::$CODIGO_SERVICIO_BONO)
-                ->where('detalle_produtos.estado', '<>','N')
+                ->where('detalle_produtos.estado', '<>', 'N')
                 ->select('detalle_produtos.*')
                 ->get();
-            //
-            //->whereRaw('detalle_produtos.numero_tarjeta NOT IN (SELECT oldtarjeta FROM duplicados )')
-            $listaDetallesb = [];
             foreach ($detallesb as $detalle) {
                 $gasto = 0;
                 //buscar Duplicados
@@ -644,12 +644,6 @@ class ReportesController extends Controller
                 $respuesta = $this->consultarDuplicadoProductos($detalle->id, $listado);
                 if ($respuesta != null)
                     $listado = $respuesta;
-                //where in (detalle_producto_id, $listaduplicados)o
-                /*$detallesb2 = DetalleProdutos::wherein('numero_tarjeta', $listado)->get();
-                $listaidprod = [];
-                foreach ($detallesb2 as $detb) {
-                    array_push($listaidprod, $detb->id);
-                }*/
                 $dtransacciones = DetalleTransaccion::wherein('detalle_producto_id', $listado)->get();
                 //finaliza ajuste para duplicados
                 //$dtransacciones = DetalleTransaccion::where('detalle_producto_id', $detalle->id)->get();
@@ -674,7 +668,7 @@ class ReportesController extends Controller
             $detallesr = DetalleProdutos::join('tarjeta_servicios', 'detalle_produtos.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
                 ->whereBetween('detalle_produtos.fecha_vencimiento', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
                 ->where('tarjeta_servicios.servicio_codigo', Tarjetas::$CODIGO_SERVICIO_REGALO)
-                ->where('detalle_produtos.estado', '<>','N')
+                ->where('detalle_produtos.estado', '<>', 'N')
                 ->select('detalle_produtos.*')
                 ->get();
             foreach ($detallesr as $detalle) {
@@ -685,12 +679,6 @@ class ReportesController extends Controller
                 $respuesta = $this->consultarDuplicadoProductos($detalle->id, $listado);
                 if ($respuesta != null)
                     $listado = $respuesta;
-                //where in (detalle_producto_id, $listaduplicados)o
-               /* $detallesr2 = DetalleProdutos::wherein('numero_tarjeta', $listado)->get();
-                $listaidprod = [];
-                foreach ($detallesr2 as $detr) {
-                    array_push($listaidprod, $detr->id);
-                }*/
                 $dtransacciones = DetalleTransaccion::wherein('detalle_producto_id', $listado)->get();
                 //finaliza ajuste para duplicados
                 //$dtransacciones = DetalleTransaccion::where('detalle_producto_id', $detalle->id)->get();
@@ -728,6 +716,7 @@ class ReportesController extends Controller
         $pdf->setPaper('A4', 'landscape');
         return $pdf->download('saldosvencidos.pdf');
     }
+
     /*
      * FUNCION GENERAR EXCEL para saldos vencidos
      * Exporta a excel, los resultados de las tarjetas
@@ -819,6 +808,7 @@ class ReportesController extends Controller
         $establecimientos = Establecimientos::pluck('razon_social', 'id');
         return view('reportes.ventasdiariasxestablecimiento.ventasdiarias', compact('establecimientos'));
     }
+
     /*
      * Funcion consultar ventas diarias
      * - segun el tipo: consultar tarjetas bono, regalo o las dos.
@@ -829,10 +819,23 @@ class ReportesController extends Controller
         $rangos = explode(" - ", $request->rango);
         $resultado = array();
         $lista_esta = $request->establecimientos;
-        $establecimientos = Establecimientos::wherein('id', $request->establecimientos)
-            ->orderby('razon_social', 'asc')->get();
-        $sucursales = Sucursales::wherein('establecimiento_id', $request->establecimientos)
-            ->orderby('nombre', 'asc')->get();
+        if(sizeof($lista_esta)>0)
+        {
+            $establecimientos = Establecimientos::wherein('id', $request->establecimientos)
+                ->orderby('razon_social', 'asc')->get();
+        }
+        else
+        {
+            $establecimientos = Establecimientos::orderby('razon_social', 'asc')->get();
+            $lista_esta = [];
+            foreach ($establecimientos as $establecimiento)
+            {
+                array_push($lista_esta, $establecimiento->id);
+            }
+        }
+
+        $sucursales = Sucursales::wherein('establecimiento_id', $lista_esta)
+            ->orderby('nombre', 'asc')->get();//$request->establecimientos
         if ($sucursales != null) {
             foreach ($sucursales as $sucursale) {
                 $dtransacciones = DetalleTransaccion::join('h_estado_transacciones', 'detalle_transacciones.transaccion_id', 'h_estado_transacciones.transaccion_id')
@@ -847,7 +850,10 @@ class ReportesController extends Controller
                 $fechaanterior = "";
                 $venta = 0;
                 foreach ($dtransacciones as $dtransaccione) {
-                    $fechaactual = $dtransaccione->fecha;
+                    //$fechaactual = $dtransaccione->fecha;
+                    //$fechaactual=Carbon::createFromFormat("Y/m/d HH:mm:ss", $dtransaccione->fecha);
+                    $dt = Carbon::parse($dtransaccione->fecha);
+                    $fechaactual=$dt->year."-".$dt->month."-".$dt->day;
                     if ($fechaanterior == "")
                         $fechaanterior = $fechaactual;
                     if ($fechaanterior != $fechaactual) {
@@ -883,7 +889,6 @@ class ReportesController extends Controller
     {
         // $establecimientos=Establecimientos::pluck('razon_social', 'id');
         $variable = strtoupper($request->term);
-        //dd($variable);
         $establecimientos = Establecimientos::where('razon_social', 'like', '%' . $variable . '%')->get();
         return $establecimientos;
     }
@@ -894,15 +899,14 @@ class ReportesController extends Controller
     */
     public function pdfVentasDiarias(Request $request)
     {
-        // dd($request->lista_esta);
         $establecimientos = Establecimientos::wherein('id', $request->lista_esta)->orderby('razon_social', 'asc')->get();
         $sucursales = Sucursales::wherein('establecimiento_id', $request->lista_esta)->orderby('nombre', 'asc')->get();
-        //dd($establecimientos);
         $data = ['resultado' => $request->resultado, 'establecimientos' => $establecimientos, 'sucursales' => $sucursales, 'rango' => $request->fecha1 . " - " . $request->fecha2];
         $pdf = \PDF::loadView('reportes.ventasdiariasxestablecimiento.pdfventasdiarias', $data);
         $pdf->setPaper('A4', 'landscape');
         return $pdf->download('ventasdiarias.pdf');
     }
+
     /*
      * FUNCION GENERAR EXCEL para ventas diarias por establecimiento
      * Exporta a excel, los resultados por dia de las ventas por sucursal
@@ -1017,6 +1021,7 @@ class ReportesController extends Controller
         $establecimientos = Establecimientos::pluck('razon_social', 'id');
         return view('reportes.datafonosxestablecimiento.datafonosxestablecimiento', compact('establecimientos'));
     }
+
     /*
      * Funcion consultar datafonos por establecimientos
      * - segun el tipo: consultar tarjetas bono, regalo o las dos.
@@ -1027,9 +1032,24 @@ class ReportesController extends Controller
         $resultado = array();
         $resumen = array();
         $lista_esta = $request->establecimientos;
-        $establecimientos = Establecimientos::wherein('id', $request->establecimientos)
-            ->orderby('razon_social', 'asc')->get();
-        $sucursales = Sucursales::wherein('establecimiento_id', $request->establecimientos)
+        /*$establecimientos = Establecimientos::wherein('id', $request->establecimientos)
+            ->orderby('razon_social', 'asc')->get();*/
+        if(sizeof($lista_esta)>0)
+        {
+            $establecimientos = Establecimientos::wherein('id', $request->establecimientos)
+                ->orderby('razon_social', 'asc')->get();
+        }
+        else
+        {
+            $establecimientos = Establecimientos::orderby('razon_social', 'asc')->get();
+            $lista_esta = [];
+            foreach ($establecimientos as $establecimiento)
+            {
+                array_push($lista_esta, $establecimiento->id);
+            }
+        }
+
+        $sucursales = Sucursales::wherein('establecimiento_id', $lista_esta)
             ->orderby('nombre', 'asc')->get();
         if ($sucursales != null) {
             foreach ($sucursales as $sucursale) {
@@ -1058,7 +1078,7 @@ class ReportesController extends Controller
                 $tinactivas = 0;
                 foreach ($resultado as $resul) {
                     if ($resul['establecimiento'] == $establecimiento->id) {
-                        if ($resul['estado'] == Terminales::$ESTADO_TERMINAL_ACTIVA)
+                        if ($resul['estado'] == "Activa")//Terminales::$ESTADO_TERMINAL_ACTIVA
                             $tactivas++;
                         else
                             $tinactivas++;
@@ -1073,6 +1093,7 @@ class ReportesController extends Controller
         }
         return view('reportes.datafonosxestablecimiento.parcialresultadodxe', compact('resultado', 'lista_esta', 'establecimientos', 'sucursales', 'resumen'));
     }
+
     /*
     * FUNCION GENERAR PDF para datafonos por establecimiento
     * Exporta a pdf, los datos y estado de datafonos por sucursal
@@ -1088,6 +1109,7 @@ class ReportesController extends Controller
         $pdf->setPaper('A4', 'landscape');
         return $pdf->download('RelacionDatafonos.pdf');
     }
+
     /*
      * FUNCION GENERAR EXCEL para datafonos por establecimiento
      * Exporta a excel, datos y estado de datafonos por sucursal
@@ -1209,7 +1231,7 @@ class ReportesController extends Controller
         if ($respuesta != null)
             $listado = $respuesta;
         $detalles = DetalleProdutos::wherein('numero_tarjeta', $listado)
-            ->where('estado',DetalleProdutos::$ESTADO_ACTIVO)
+            ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
             ->get();
         foreach ($detalles as $detalle) {
             $gasto = 0;
@@ -1225,12 +1247,12 @@ class ReportesController extends Controller
                     $gasto += $dtransaccione->valor;
             }
             $sobrante = $detalle->monto_inicial - $gasto;
-            $sobrante = '$ '.number_format( $sobrante, 2, ',', '.');
+            $sobrante = '$ ' . number_format($sobrante, 2, ',', '.');
             $monto = $detalle->monto_inicial;
-            $monto = '$ '.number_format( $monto, 2, ',', '.');
-            $tiposervicio='Bono';
-            if($detalle->contrato_emprs_id == null)
-                $tiposervicio='Regalo';
+            $monto = '$ ' . number_format($monto, 2, ',', '.');
+            $tiposervicio = 'Bono';
+            if ($detalle->contrato_emprs_id == null)
+                $tiposervicio = 'Regalo';
             $resultado[] = array('monto_inicial' => $monto,
                 'saldo' => $sobrante,
                 'tipo_servicio' => $tiposervicio,
@@ -1239,6 +1261,7 @@ class ReportesController extends Controller
         }
         return view('reportes.saldotarjeta.parcialsaldotarjeta', compact('resultado', 'numero_tarjeta'));
     }
+
     /*
      * FUNCION GENERAR PDF para Saldos de tarjeta
      * Exporta en formato pdf, los resultados
@@ -1254,5 +1277,187 @@ class ReportesController extends Controller
     }
     /*
      * FINALIZA REPORTES SALDOS POR TARJETA ACTIVA
+     */
+
+    /*
+     * INICIA REPORTE DE NUMERO DE TRANSACCIONES POR DATAFONO POR ESTABLECIMIENTO Y SUCURSAL
+     */
+    public function viewTransaccionesxDatafono()
+    {
+        $establecimientos = Establecimientos::pluck('razon_social', 'id');
+        return view('reportes.transaccionesxdatafono.transaccionesxdatafono', compact('establecimientos'));
+    }
+    /*
+     * Funcion consultar transacciones por datafono por establecimientos
+     */
+    public function consultarTransaccionesxDatafono(Request $request)
+    {
+        $resultado = array();
+        $resumen = array();
+        $lista_esta = $request->establecimientos;
+        /*$establecimientos = Establecimientos::wherein('id', $request->establecimientos)
+            ->orderby('razon_social', 'asc')->get();*/
+        if(sizeof($lista_esta)>0)
+        {
+            $establecimientos = Establecimientos::wherein('id', $request->establecimientos)
+                ->orderby('razon_social', 'asc')->get();
+        }
+        else
+        {
+            $establecimientos = Establecimientos::orderby('razon_social', 'asc')->get();
+            $lista_esta = [];
+            foreach ($establecimientos as $establecimiento)
+            {
+                array_push($lista_esta, $establecimiento->id);
+            }
+        }
+        $sucursales = Sucursales::wherein('establecimiento_id', $lista_esta)
+            ->orderby('nombre', 'asc')->get();
+        if ($sucursales != null) {
+            foreach ($sucursales as $sucursale) {
+                $terminales = Terminales::where('sucursal_id', $sucursale->id)
+                    ->orderBy('codigo', 'asc')
+                    ->get();
+
+                foreach ($terminales as $terminal) {
+                    $totaltranx=Transaccion::where('codigo_terminal',$terminal->codigo)->count();
+                    if ($terminal->estado == "A")
+                        $name_estado = "Activa";
+                    else
+                        $name_estado = "Inactiva";
+                    $resultado[] = array('establecimiento' => $sucursale->establecimiento_id,
+                        'sucursal' => $sucursale->id,
+                        'codigo' => $terminal->codigo,
+                        'total' => $totaltranx,
+                        'estado' => $name_estado,
+                    );
+                }
+            }
+            //obtener subtotales de estados de datafonos por establecimiento
+            foreach ($establecimientos as $establecimiento) {
+                $tactivas = 0;
+                $tinactivas = 0;
+                foreach ($resultado as $resul) {
+                    if ($resul['establecimiento'] == $establecimiento->id) {
+                        if ($resul['estado'] == "Activa")//Terminales::$ESTADO_TERMINAL_ACTIVA
+                            $tactivas++;
+                        else
+                            $tinactivas++;
+                    }
+                }
+                $resumen[] = array('establecimiento' => $establecimiento->id,
+                    'tactivas' => $tactivas,
+                    'tinactivas' => $tinactivas,
+                );
+            }
+            //dd($resumen);
+        }
+        return view('reportes.transaccionesxdatafono.parcialresultadotxd', compact('resultado', 'lista_esta', 'establecimientos', 'sucursales', 'resumen'));
+    }
+    /*
+    * FUNCION GENERAR PDF para transacciones por datafonos por establecimiento
+    * Exporta a pdf, cantidad de tranx por datafonos por sucursal
+    */
+    public function pdfTransaccionesxDatafono(Request $request)
+    {
+        // dd($request->lista_esta);
+        $establecimientos = Establecimientos::wherein('id', $request->lista_esta)->orderby('razon_social', 'asc')->get();
+        $sucursales = Sucursales::wherein('establecimiento_id', $request->lista_esta)->orderby('nombre', 'asc')->get();
+        //dd($establecimientos);
+        $data = ['resultado' => $request->resultado, 'establecimientos' => $establecimientos, 'sucursales' => $sucursales, 'resumen' => $request->resumen];
+        $pdf = \PDF::loadView('reportes.datafonosxestablecimiento.pdfdxe', $data);
+        $pdf->setPaper('A4', 'landscape');
+        return $pdf->download('RelacionDatafonos.pdf');
+    }
+    /*
+     * FUNCION GENERAR EXCEL para transacciones por datafono por establecimiento
+     * Exporta a excel, cantidad de tranx de datafonos por sucursal
+     */
+    public function excelTransaccionesxDatafono(Request $request)
+    {
+        $establecimientos = Establecimientos::wherein('id', $request->lista_esta)->orderby('razon_social', 'asc')->get();
+        $sucursales = Sucursales::wherein('establecimiento_id', $request->lista_esta)->orderby('nombre', 'asc')->get();
+
+        \Excel::create('ExcelDatafonos', function ($excel) use ($request, $establecimientos, $sucursales) {
+            $resultado = $request->resultado;
+            $resumen = $request->resumen;
+            $num_esta = 0;
+            //FOR ESTABLECIMIENTOS POR CADA UNO CREAR UNA PESTAÑA
+            if (sizeof($establecimientos) > 0) {
+                foreach ($establecimientos as $establecimiento) {
+                    $num_esta++;
+                    //titulo <h5>Establecimiento: {{$establecimiento->razon_social}}</h5>
+                    $excel->sheet('Est' . $num_esta, function ($sheet) use ($resultado, $establecimiento, $sucursales, $resumen) {
+                        $haysucursal = 0;
+                        $hoy = Carbon::now();
+                        $objDrawing = new PHPExcel_Worksheet_Drawing;
+                        $objDrawing->setPath(public_path('images/logo_mini.png')); //your image path
+                        $objDrawing->setCoordinates('A1');
+                        $objDrawing->setWorksheet($sheet);
+                        $sheet->setWidth(array(
+                            'A' => 30,
+                            'B' => 20,
+                            'C' => 20,
+                            'D' => 10,
+                            'E' => 10,
+                            'F' => 10,
+                        ));
+                        $sheet->row(2, array('', 'REPORTE DE DATAFONOS DEL ESTABLECIMIENTO: ' . $establecimiento->razon_social));
+                        $sheet->row(2, function ($row) {
+                            $row->setBackground('#4CAF50');
+                        });
+
+                        //$sheet->row(3, array('','Rango:',$rango,'',''));
+                        $sheet->row(3, array('', 'Fecha:', $hoy, '', ''));
+                        $fila = 5;
+                        foreach ($sucursales as $sucursale) {
+                            $cant = 0;
+                            if ($sucursale->establecimiento_id == $establecimiento->id) {
+                                foreach ($resumen as $resum) {
+                                    if ($resum['establecimiento'] == $establecimiento->id) {
+                                        $sheet->row($fila, array('Terminales Activas: ' . $resum['tactivas'], 'Terminales Inactivas: ' . $resum['tinactivas']));
+                                        $sheet->row($fila, function ($row) {
+                                            $row->setBackground('#f2f2f2');
+                                        });
+                                        $fila++;
+                                        $fila++;
+                                    }
+                                }
+                                $haysucursal++;
+                                if (sizeof($resultado) > 0) {
+                                    $subtotal = 0;
+                                    $sheet->row($fila, array('Sucursal: ' . $sucursale->nombre));
+                                    $sheet->row($fila, function ($row) {
+                                        $row->setBackground('#4CAF50');
+                                    });
+                                    $fila++;
+                                    $fila++;
+                                    $sheet->row($fila, array('Código', 'Activo', 'Estado'));
+                                    $sheet->row($fila, function ($row) {
+                                        $row->setBackground('#f2f2f2');
+                                    });
+                                    $fila++;
+                                    foreach ($resultado as $miresul) {
+                                        if ($miresul["establecimiento"] == $establecimiento->id && $miresul["sucursal"] == $sucursale->id) {
+                                            $cant++;
+                                            $sheet->row($fila, array($miresul["codigo"], $miresul["numero_activo"], $miresul["estado"]));
+                                            $fila++;
+                                        }//cierra if
+                                    } //cierra foreach
+                                    $fila++;
+                                }//cierra if
+                                if ($cant == 0)
+                                    $sheet->row($fila, array('No hay registros'));
+                            }//cierra if sucursal id
+                        }//cierra foreach
+                        if ($haysucursal == 0)
+                            $sheet->row($fila, array('No existen sucursales'));
+                    });        //CIERRA PESTAÑA
+                } //finaliza foreach
+            } //finaliza if
+        })->export('xls');
+    }
+    /*
+     * FINALIZA REPORTE TRANX X DATAFONO POR ESTABLECIMIENTO
      */
 }
