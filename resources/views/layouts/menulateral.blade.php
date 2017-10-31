@@ -69,6 +69,7 @@
             <li><a href="{{route('reportes.ventasdiarias')}}"> Ventas diarias </a></li>
             <li><a href="{{route('reportes.datafonosxestablecimientos')}}"> Relación de Datafonos </a></li>
             <li><a href="{{route('reportes.saldotarjeta')}}"> Saldos de tarjeta </a></li>
+            <li><a href="{{route('reportes.transaccionesxdatafono')}}"> Transacciones por datafono </a></li>
         </ul>
     </li>
 </ul>
