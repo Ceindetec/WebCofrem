@@ -7,6 +7,7 @@ use creditocofrem\CuenContaTarjeta;
 use creditocofrem\Departamentos;
 use creditocofrem\PagaPlastico;
 use creditocofrem\Servicios;
+use creditocofrem\Tarjetas;
 use creditocofrem\ValorTarjeta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -81,6 +82,14 @@ class ParametrizacionTarjetasController extends Controller
                         $result['mensaje'] = 'Ya exite este porcentaje de administracion para este tipo de tarjeta';
                         return $result;
                     }
+                }
+            }
+            if($codigo == Tarjetas::$CODIGO_SERVICIO_REGALO){
+                $existePararegalo = AdminisTarjetas::where('estado', 'A')->where('servicio_codigo', $codigo)->first();
+                if($existePararegalo != NULL){
+                    $result['estado'] = false;
+                    $result['mensaje'] = 'Existe una parametrizacion activa para este producto';
+                    return $result;
                 }
             }
             $parametro = new AdminisTarjetas($request->all());
@@ -233,7 +242,6 @@ class ParametrizacionTarjetasController extends Controller
             DB::rollBack();
             $result['estado'] = false;
             $result['mensaje'] = 'No fue posible actualizar la cuenta contable. ' . $exception->getMessage();
-            
         }
         return $result;
     }
