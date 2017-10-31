@@ -90,4 +90,12 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('reportes/transaccionesxdatafono/exportarexcel','ReportesController@excelTransaccionesxDatafono')->name('exceltransaccionesxdatafono');
     /*FINALIZA REPORTE TRANSACCIONES POR DATAFONO*/
 
+    /*INICIA REPORTE PROMEDIO POR DATAFONO*/
+    Route::get('reportes/promedioxdatafono/consulta','ReportesController@viewPromedioxDatafono')->name('reportes.promedioxdatafono');
+    Route::get('select/establecimientos',"ReportesController@selectestablecimientos")->name('selectestablecimientos');
+    Route::post('reportes/promedioxdatafono/resultadoconsulta','ReportesController@consultarPromedioxDatafono')->name('resultadopromedioxdatafono');
+    Route::get('reportes/promedioxdatafono/exportarpdf','ReportesController@pdfPromedioxDatafono')->name('pdfpromedioxdatafono');
+    Route::get('reportes/promedioxdatafono/exportarexcel','ReportesController@excelPromedioxDatafono')->name('excelpromedioxdatafono');
+    /*FINALIZA REPORTE PROMEDIO POR DATAFONO*/
+
 });
