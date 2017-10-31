@@ -233,6 +233,7 @@ class ParametrizacionTarjetasController extends Controller
             DB::rollBack();
             $result['estado'] = false;
             $result['mensaje'] = 'No fue posible actualizar la cuenta contable. ' . $exception->getMessage();
+            
         }
         return $result;
     }
