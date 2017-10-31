@@ -8,7 +8,8 @@
 
 namespace creditocofrem;
 
-class ApiWS{
+class ApiWS
+{
 
     /**
      * General de la aplicacion
@@ -30,6 +31,11 @@ class ApiWS{
     public static $TEXT_TERMINAL_INACTIVA = 'La terminal está inactiva';
     public static $TEXT_TRANSACCION_INSUFICIENTE = 'Saldo insuficiente';
 
+    public static $TEXT_NUMERO_TRANSACCION_INVALIDO = 'Numero de transaccion invalido';
+
+    public static $TEXT_NUMERO_TRANSACCION_NO_CORRESPONDE = 'La transaccion no corresponde a este datafono';
+    public static $TEXT_FECHA_INVALIDA = 'Solo se puede anular transacciones del dia actual';
+
     public static $CODIGO_CAMBIO_CLAVE = 0;
     public static $CODIGO_TARJETA_INACTIVA = 1;
     public static $CODIGO_TARJETA_NO_VALIDA = 2;
@@ -40,6 +46,9 @@ class ApiWS{
     public static $CODIGO_ERROR_EJECUCION = 7;
     public static $CODIGO_TERMINAL_INACTIVA = 8;
     public static $CODIGO_TRANSACCION_INSUFICIENTE = 9;
+    public static $CODIGO_NUMERO_TRANSACCION_INVALIDO = 10;
+    public static $CODIGO_NUMERO_TRANSACCION_NO_CORRESPONDE = 11;
+    public static $CODIGO_FECHA_INVALIDA = 12;
 
     /**
      * Modulo de Test de Comunicacion
@@ -51,11 +60,6 @@ class ApiWS{
      * modulo de GetServicios
      */
     public static $TEXT_CAMBIO_CLAVE = 'Debe realizar cambio de clave';
-
-
-
-
-
 
 
 }
