@@ -82,4 +82,12 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('reportes/saldotarjeta/exportarexcel','ReportesController@excelSaldoTarjeta')->name('excelsaldotarjeta');
     /*FINALIZA REPORTES SALDOS POR TARJETA ACTIVA*/
 
+    /*INICIA REPORTE TRANSACCIONES POR DATAFONO*/
+    Route::get('reportes/transaccionesxdatafono/consulta','ReportesController@viewTransaccionesxDatafono')->name('reportes.transaccionesxdatafono');
+    Route::get('select/establecimientos',"ReportesController@selectestablecimientos")->name('selectestablecimientos');
+    Route::post('reportes/transaccionesxdatafono/resultadoconsulta','ReportesController@consultarTransaccionesxDatafono')->name('resultadotransaccionesxdatafono');
+    Route::get('reportes/transaccionesxdatafono/exportarpdf','ReportesController@pdfTransaccionesxDatafono')->name('pdftransaccionesxdatafono');
+    Route::get('reportes/transaccionesxdatafono/exportarexcel','ReportesController@excelTransaccionesxDatafono')->name('exceltransaccionesxdatafono');
+    /*FINALIZA REPORTE TRANSACCIONES POR DATAFONO*/
+
 });

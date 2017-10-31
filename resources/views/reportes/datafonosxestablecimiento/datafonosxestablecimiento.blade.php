@@ -111,7 +111,7 @@
                         "Julio",
                         "Agosto",
                         "Septiembre",
-                        "Ocutbre",
+                        "Octubre",
                         "Noviembre",
                         "Diciembre"
                     ],
@@ -124,7 +124,7 @@
             /* metodo para cargar un multiselelect en el frmulario de crear rol
              */
             $(".select2").select2({
-                placeholder: "Seleccione...",
+                placeholder: "Todos",
                 minimumInputLength: 1,
                 ajax: {
                     url: "{{route('selectestablecimientos')}}",
@@ -155,9 +155,9 @@
 
         function generarRespuesta() {
             var establecimientos = $('#establecimientos').val();
-            if(establecimientos==null)
+           /* if(establecimientos==null)
                 alert("Debe seleccionar al menos un establecimiento");
-            else
+            else*/
                 $('#resultado').load('{{route('resultadodatafonosxestablecimientos')}}',{establecimientos:establecimientos});
         }
 

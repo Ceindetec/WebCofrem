@@ -15,7 +15,7 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-12">
-                <h4 class="header-title m-t-0 m-b-20">Reporte de ventas diarias por establecimiento </h4>
+                <h4 class="header-title m-t-0 m-b-20">Reporte de # de transacciones por datafono </h4>
             </div>
         </div> <!-- end row -->
 
@@ -25,17 +25,13 @@
                 <div class="card-box widget-inline">
                     <div class="row">
                         <div class="col-lg-3 col-sm-6">
-                            <div class="widget-inline-box" id="formu1">
-                                <form class="form-horizontal col-md-12">
-                                    <div class="form-group">
-                                        <label>Rango de fecha para la consulta</label>
-                                        <input class="form-control input-daterange-datepicker" type="text" id="daterange"/>
-                                    </div>
+                            <div class="widget-inline-box">
+                                <form class="form-horizontal col-md-12" id="formu1">
                                     <!-- { {Form::select("establecimiento[]",$establecimientos,null,['class'=>'select2 form-control', "tabindex"=>"2",'id'=>'establecimiento[]', "required"=>"required","multiple"=>"multiple"])}} -->
                                     <div class="form-group">
                                         <label>Establecimiento</label>
-                                        {{Form::select("establecimientos[]",$establecimientos,null,['class'=>'select2 form-control', "tabindex"=>"2",'id'=>'establecimientos', "required"=>"required","multiple"=>"multiple","data-placeholder"=>"Seleccione ..." ])}}
-                                        <!-- <select class="select2 form-control" multiple="multiple" name="establecimientos[]" required="required" data-placeholder="Seleccione ..." style="width: 100%" id="establecimientos" ></select> -->
+                                    {{Form::select("establecimientos[]",$establecimientos,null,['class'=>'select2 form-control', "tabindex"=>"2",'id'=>'establecimientos', "required"=>"required","multiple"=>"multiple","data-placeholder"=>"Seleccione ..." ])}}
+                                    <!-- <select class="select2 form-control" multiple="multiple" name="establecimientos[]" required="required" data-placeholder="Seleccione ..." style="width: 100%" id="establecimientos" ></select> -->
                                     </div>
                                     <div class="form-group">
                                         <button type="button" class="btn btn-custom" onclick="generarRespuesta()" >Generar</button>
@@ -122,13 +118,17 @@
                     "firstDay": 1
                 }
             });
+            $("#formu1").submit(function (e) {
+                e.preventDefault();
+                generarRespuesta();
+            });
 
-        })
+        });
         $(function () {
             /* metodo para cargar un multiselelect en el frmulario de crear rol
              */
             $(".select2").select2({
-                placeholder: "Todos",
+                placeholder: "Seleccione...",
                 minimumInputLength: 1,
                 ajax: {
                     url: "{{route('selectestablecimientos')}}",
@@ -155,20 +155,14 @@
                 allowClear: true,
                 cache: true
             });
-            $("#formu1").submit(function (e) {
-                e.preventDefault();
-                generarRespuesta();
-            });
         });
 
         function generarRespuesta() {
-            var rango = $('#daterange').val();
             var establecimientos = $('#establecimientos').val();
-            //alert(establecimientos);
             /*if(establecimientos==null)
-                alert("debe seleccionar al menos un establecimiento");
+                alert("Debe seleccionar al menos un establecimiento");
             else*/
-                $('#resultado').load('{{route('resultadoventasdiarias')}}',{rango:rango,establecimientos:establecimientos});
+                $('#resultado').load('{{route('resultadotransaccionesxdatafono')}}',{establecimientos:establecimientos});
         }
 
     </script>
