@@ -833,17 +833,13 @@ class ReportesController extends Controller
         $rangos = explode(" - ", $request->rango);
         $resultado = array();
         $lista_esta = $request->establecimientos;
-        if(sizeof($lista_esta)>0)
-        {
+        if (sizeof($lista_esta) > 0) {
             $establecimientos = Establecimientos::wherein('id', $request->establecimientos)
                 ->orderby('razon_social', 'asc')->get();
-        }
-        else
-        {
+        } else {
             $establecimientos = Establecimientos::orderby('razon_social', 'asc')->get();
             $lista_esta = [];
-            foreach ($establecimientos as $establecimiento)
-            {
+            foreach ($establecimientos as $establecimiento) {
                 array_push($lista_esta, $establecimiento->id);
             }
         }
@@ -854,7 +850,7 @@ class ReportesController extends Controller
             foreach ($sucursales as $sucursale) {
                 $dtransacciones = DetalleTransaccion::join('h_estado_transacciones', 'detalle_transacciones.transaccion_id', 'h_estado_transacciones.transaccion_id')
                     ->join('transacciones', 'detalle_transacciones.transaccion_id', 'transacciones.id')
-                    ->where('h_estado_transacciones.estado', '!=', HEstadoTransaccion::$ESTADO_INACTIVO)
+                    ->where('h_estado_transacciones.estado', '<>', HEstadoTransaccion::$ESTADO_INACTIVO)
                     ->where('transacciones.sucursal_id', $sucursale->id)
                     ->whereBetween('transacciones.fecha', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
                     ->select('transacciones.fecha as fecha', DB::raw('SUM(detalle_transacciones.valor) as venta'))
@@ -867,7 +863,7 @@ class ReportesController extends Controller
                     //$fechaactual = $dtransaccione->fecha;
                     //$fechaactual=Carbon::createFromFormat("Y/m/d HH:mm:ss", $dtransaccione->fecha);
                     $dt = Carbon::parse($dtransaccione->fecha);
-                    $fechaactual=$dt->year."-".$dt->month."-".$dt->day;
+                    $fechaactual = $dt->year . "-" . $dt->month . "-" . $dt->day;
                     if ($fechaanterior == "")
                         $fechaanterior = $fechaactual;
                     if ($fechaanterior != $fechaactual) {
@@ -1060,17 +1056,13 @@ class ReportesController extends Controller
         $lista_esta = $request->establecimientos;
         /*$establecimientos = Establecimientos::wherein('id', $request->establecimientos)
             ->orderby('razon_social', 'asc')->get();*/
-        if(sizeof($lista_esta)>0)
-        {
+        if (sizeof($lista_esta) > 0) {
             $establecimientos = Establecimientos::wherein('id', $request->establecimientos)
                 ->orderby('razon_social', 'asc')->get();
-        }
-        else
-        {
+        } else {
             $establecimientos = Establecimientos::orderby('razon_social', 'asc')->get();
             $lista_esta = [];
-            foreach ($establecimientos as $establecimiento)
-            {
+            foreach ($establecimientos as $establecimiento) {
                 array_push($lista_esta, $establecimiento->id);
             }
         }
@@ -1326,6 +1318,7 @@ class ReportesController extends Controller
         $establecimientos = Establecimientos::pluck('razon_social', 'id');
         return view('reportes.transaccionesxdatafono.transaccionesxdatafono', compact('establecimientos'));
     }
+
     /*
      * Funcion consultar transacciones por datafono por establecimientos
      */
@@ -1335,17 +1328,13 @@ class ReportesController extends Controller
         $resumen = array();
         $rangos = explode(" - ", $request->rango);
         $lista_esta = $request->establecimientos;
-        if(sizeof($lista_esta)>0)
-        {
+        if (sizeof($lista_esta) > 0) {
             $establecimientos = Establecimientos::wherein('id', $request->establecimientos)
                 ->orderby('razon_social', 'asc')->get();
-        }
-        else
-        {
+        } else {
             $establecimientos = Establecimientos::orderby('razon_social', 'asc')->get();
             $lista_esta = [];
-            foreach ($establecimientos as $establecimiento)
-            {
+            foreach ($establecimientos as $establecimiento) {
                 array_push($lista_esta, $establecimiento->id);
             }
         }
@@ -1353,26 +1342,26 @@ class ReportesController extends Controller
             ->orderby('nombre', 'asc')->get();
         if ($sucursales != null) {
             foreach ($sucursales as $sucursale) {
-                $subtotal=0;
+                $subtotal = 0;
                 $terminales = Terminales::where('sucursal_id', $sucursale->id)
                     ->orderBy('codigo', 'asc')
                     ->get();
 
                 foreach ($terminales as $terminal) {
-                    $totaltranx=Transaccion::where('codigo_terminal',$terminal->codigo)
+                    $totaltranx = Transaccion::where('codigo_terminal', $terminal->codigo)
                         ->whereBetween('fecha', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
                         ->count();
-                    if($terminal->estado==Terminales::$ESTADO_TERMINAL_ACTIVA)
-                        $name_estado="Activo";
+                    if ($terminal->estado == Terminales::$ESTADO_TERMINAL_ACTIVA)
+                        $name_estado = "Activo";
                     else
-                        $name_estado="Inactivo";
+                        $name_estado = "Inactivo";
                     $resultado[] = array('establecimiento' => $sucursale->establecimiento_id,
                         'sucursal' => $sucursale->id,
                         'terminal' => $terminal->codigo,
                         'total' => $totaltranx,
                         'estado' => $name_estado,
                     );
-                    $subtotal+=$totaltranx;
+                    $subtotal += $totaltranx;
                 }
                 $resumen[] = array('establecimiento' => $sucursale->establecimiento_id,
                     'sucursal' => $sucursale->id,
@@ -1381,8 +1370,9 @@ class ReportesController extends Controller
             }
         }
         $rango = ['fecha1' => $rangos[0], 'fecha2' => $rangos[1]];
-        return view('reportes.transaccionesxdatafono.parcialresultadotxd', compact('resultado', 'lista_esta', 'establecimientos', 'sucursales', 'resumen','rango'));
+        return view('reportes.transaccionesxdatafono.parcialresultadotxd', compact('resultado', 'lista_esta', 'establecimientos', 'sucursales', 'resumen', 'rango'));
     }
+
     /*
     * FUNCION GENERAR PDF para transacciones por datafonos por establecimiento
     * Exporta a pdf, cantidad de tranx por datafonos por sucursal
@@ -1398,6 +1388,7 @@ class ReportesController extends Controller
         $pdf->setPaper('A4', 'landscape');
         return $pdf->download('TransaccionesDatafonos.pdf');
     }
+
     /*
      * FUNCION GENERAR EXCEL para transacciones por datafono por establecimiento
      * Exporta a excel, cantidad de tranx de datafonos por sucursal
@@ -1410,7 +1401,7 @@ class ReportesController extends Controller
         \Excel::create('ExcelTxDatafonos', function ($excel) use ($request, $establecimientos, $sucursales) {
             $resultado = $request->resultado;
             $resumen = $request->resumen;
-            $rango = $request->fecha1 ." - ".$request->fecha2;
+            $rango = $request->fecha1 . " - " . $request->fecha2;
             $num_esta = 0;
             //FOR ESTABLECIMIENTOS POR CADA UNO CREAR UNA PESTAÑA
             if (sizeof($establecimientos) > 0) {
@@ -1484,8 +1475,8 @@ class ReportesController extends Controller
                                     } //cierra foreach
                                     $fila++;
                                     foreach ($resumen as $resum) {
-                                        if ($resum['sucursal']== $sucursale->id) {
-                                            $sheet->row($fila, array('Total transacciones: ' , $resum['total']));
+                                        if ($resum['sucursal'] == $sucursale->id) {
+                                            $sheet->row($fila, array('Total transacciones: ', $resum['total']));
                                             $sheet->row($fila, function ($row) {
                                                 $row->setBackground('#f2f2f2');
                                             });
