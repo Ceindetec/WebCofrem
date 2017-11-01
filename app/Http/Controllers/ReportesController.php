@@ -856,7 +856,7 @@ class ReportesController extends Controller
                     ->select('transacciones.fecha as fecha', DB::raw('SUM(detalle_transacciones.valor) as venta'))
                     ->groupBy('detalle_transacciones.transaccion_id', 'transacciones.fecha', 'detalle_transacciones.valor')
                     ->orderBy('transacciones.fecha', 'asc')
-                    ->get();
+                    ->get(); 
                 $fechaanterior = "";
                 $venta = 0;
                 foreach ($dtransacciones as $dtransaccione) {
