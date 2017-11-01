@@ -843,7 +843,6 @@ class ReportesController extends Controller
                 array_push($lista_esta, $establecimiento->id);
             }
         }
-
         $sucursales = Sucursales::wherein('establecimiento_id', $lista_esta)
             ->orderby('nombre', 'asc')->get();//$request->establecimientos
         if ($sucursales != null) {
@@ -851,6 +850,7 @@ class ReportesController extends Controller
                 $dtransacciones = DetalleTransaccion::join('h_estado_transacciones', 'detalle_transacciones.transaccion_id', 'h_estado_transacciones.transaccion_id')
                     ->join('transacciones', 'detalle_transacciones.transaccion_id', 'transacciones.id')
                     ->where('h_estado_transacciones.estado', '<>', HEstadoTransaccion::$ESTADO_INACTIVO)
+                    ->whereraw('"DETALLE_TRANSACCIONES"."TRANSACCION_ID" NOT IN (select "TRANSACCION_ID" FROM "H_ESTADO_TRANSACCIONES" WHERE "ESTADO"=?)',[HEstadoTransaccion::$ESTADO_INACTIVO])
                     ->where('transacciones.sucursal_id', $sucursale->id)
                     ->whereBetween('transacciones.fecha', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
                     ->select('transacciones.fecha as fecha', DB::raw('SUM(detalle_transacciones.valor) as venta'))
@@ -860,10 +860,6 @@ class ReportesController extends Controller
                 $fechaanterior = "";
                 $venta = 0;
                 foreach ($dtransacciones as $dtransaccione) {
-                    //$fechaactual = $dtransaccione->fecha;
-                    //$fechaactual=Carbon::createFromFormat("Y/m/d HH:mm:ss", $dtransaccione->fecha);
-                    $htransaccion = DB::table('h_estado_transacciones')->where('transaccion_id', $dtransaccione->transaccion_id)->orderBy('id', 'desc')->first();
-                    if ($htransaccion->estado == HEstadoTransaccion::$ESTADO_ACTIVO) {
                         $dt = Carbon::parse($dtransaccione->fecha);
                     $fechaactual = $dt->year . "-" . $dt->month . "-" . $dt->day;
                         if ($fechaanterior == "")
@@ -884,7 +880,6 @@ class ReportesController extends Controller
                             //fechaanterior=actual
                             $fechaanterior = $fechaactual;
                         }
-                    }
                 }
                 $resultado[] = array('establecimiento' => $sucursale->establecimiento_id,
                     'sucursal' => $sucursale->id,
