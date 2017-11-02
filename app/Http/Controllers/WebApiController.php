@@ -536,6 +536,14 @@ class WebApiController extends Controller
         return ['resultado' => $result];
     }
 
+    /**
+     * metodo que permite traer el saldo de la tarjeta para los servicios que tenga disponible
+     * @param Request $request
+     * -codigo
+     * -numero_tarjeta
+     * -password
+     * @return array
+     */
     public function saldoTarjeta(Request $request)
     {
         $result = [];
@@ -598,9 +606,9 @@ class WebApiController extends Controller
                             $result['codigo'] = ApiWS::$CODIGO_TARJETA_INACTIVA;
                         }
                     } else {
-                        $request['estado'] = FALSE;
-                        $request['mensaje'] = ApiWS::$TEXT_TARJETA_NO_VALIDA;
-                        $request['codigo'] = ApiWS::$CODIGO_TARJETA_NO_VALIDA;
+                        $result['estado'] = FALSE;
+                        $result['mensaje'] = ApiWS::$TEXT_TARJETA_NO_VALIDA;
+                        $result['codigo'] = ApiWS::$CODIGO_TARJETA_NO_VALIDA;
                     }
                 } else {
                     $result['estado'] = FALSE;
@@ -621,11 +629,122 @@ class WebApiController extends Controller
         return ['resultado' => $result];
     }
 
+    /**
+     * metodo para anular una transaccion
+     * @param Request $request
+     * -codigo
+     * -numero_tarjeta
+     * -numero_transaccion
+     * -identificacion
+     * -password
+     * @return array
+     */
+    public function anulacion(Request $request)
+    {
+        $result = [];
+        try {
+            $terminal = Terminales::where('codigo', $request->codigo)->first();
+            if ($terminal != NULL) {
+                if ($terminal->estado == Terminales::$ESTADO_TERMINAL_ACTIVA) {
+                    $tarjeta = Tarjetas::where('numero_tarjeta', $request->numero_tarjeta)->first();
+                    if ($tarjeta != NULL) {
+                        if ($tarjeta->estado == Tarjetas::$ESTADO_TARJETA_ACTIVA) {
+                            if ($request->password == Encript::decryption($tarjeta->password)) {
+                                if ($tarjeta->persona_id != NULL) {
+                                    $persona = Personas::find($tarjeta->persona_id);
+                                    if ($persona->documento == $request->documento) {
+                                        $result = $this->anulaTransaccion($request);
+                                    } else {
+                                        $result['estado'] = FALSE;
+                                        $result['mensaje'] = ApiWS::$TEXT_DOCUMENTIO_INCORRECTO;
+                                        $result['codigo'] = ApiWS::$CODIGO_DOCUMENTIO_INCORRECTO;
+                                    }
+                                } else {
+                                    $result = $this->anulaTransaccion($request);
+                                }
+                            } else {
+                                $result['estado'] = FALSE;
+                                $result['mensaje'] = ApiWS::$TEXT_PASSWORD_INCORECTO;
+                                $result['codigo'] = ApiWS::$CODIGO_PASSWORD_INCORECTO;
+                            }
+                        } else {
+                            $result['estado'] = FALSE;
+                            $result['mensaje'] = ApiWS::$TEXT_TARJETA_INACTIVA;
+                            $result['codigo'] = ApiWS::$CODIGO_TARJETA_INACTIVA;
+                        }
+                    } else {
+                        $result['estado'] = FALSE;
+                        $result['mensaje'] = ApiWS::$TEXT_TARJETA_NO_VALIDA;
+                        $result['codigo'] = ApiWS::$CODIGO_TARJETA_NO_VALIDA;
+                    }
+                } else {
+                    $result['estado'] = FALSE;
+                    $result['mensaje'] = ApiWS::$TEXT_TERMINAL_INACTIVA;
+                    $result['codigo'] = ApiWS::$CODIGO_TERMINAL_INACTIVA;
+                }
+            } else {
+                $result['estado'] = FALSE;
+                $result['mensaje'] = ApiWS::$TEXT_TERMINAL_NO_EXISTE;
+                $result['codigo'] = ApiWS::$CODIGO_TERMINAL_NO_EXISTE;
+            }
+        } catch (\Exception $exception) {
+            $result['estado'] = FALSE;
+            $result['mensaje'] = ApiWS::$TEXT_ERROR_EJECUCION;
+            $result['codigo'] = ApiWS::$CODIGO_ERROR_EJECUCION;
+        }
+        return ['resultado' => $result];
+    }
+
+    /**
+     * metodo complementrario a la anulacion
+     * @param $request
+     * @return array
+     */
+    private function anulaTransaccion($request)
+    {
+        $result = [];
+        try {
+            $transaccion = Transaccion::where('numero_transaccion', $request->numero_transaccion)->first();
+            if ($transaccion != NULL) {
+                if ($transaccion->codigo_terminal == $request->codigo) {
+                    $fecha_hoy = Carbon::now()->format('Y-m-d');
+                    if (Carbon::createFromFormat('Y-m-d H:i:s',$transaccion->fecha)->toDateString() == $fecha_hoy) {
+                        $hestado = new HEstadoTransaccion();
+                        $hestado->transaccion_id = $transaccion->id;
+                        $hestado->estado = HEstadoTransaccion::$ESTADO_INACTIVO;
+                        $hestado->fecha = Carbon::now();
+                        $hestado->save();
+                        $result['estado'] = TRUE;
+                        $result['mensaje'] = 'Transaccion anulada';
+                    } else {
+                        $result['estado'] = FALSE;
+                        $result['mensaje'] = ApiWS::$TEXT_FECHA_INVALIDA;
+                        $result['codigo'] = ApiWS::$CODIGO_FECHA_INVALIDA;
+                    }
+                } else {
+                    $result['estado'] = FALSE;
+                    $result['mensaje'] = ApiWS::$TEXT_NUMERO_TRANSACCION_NO_CORRESPONDE;
+                    $result['codigo'] = ApiWS::$CODIGO_NUMERO_TRANSACCION_NO_CORRESPONDE;
+                }
+            } else {
+                $result['estado'] = FALSE;
+                $result['mensaje'] = ApiWS::$TEXT_NUMERO_TRANSACCION_INVALIDO;
+                $result['codigo'] = ApiWS::$CODIGO_NUMERO_TRANSACCION_INVALIDO;
+            }
+        } catch (\Exception $exception) {
+            $result['estado'] = FALSE;
+            $result['mensaje'] = ApiWS::$TEXT_ERROR_EJECUCION;
+            $result['codigo'] = ApiWS::$CODIGO_ERROR_EJECUCION;
+        }
+        return $result;
+    }
+
+
     /*
      * Funcion RECURSIVA que retorna listado DE productos DUPLICADO
      * la lista contiene los numero de tarjeta asociados
      */
-    public function consultarDuplicadoProductos($numproducto, $listado)
+    private function consultarDuplicadoProductos($numproducto, $listado)
     {
         //buscar si el producto tiene duppicado, si SI, agregar al array listado.
         $duplicado = DuplicadoProductos::where('newproducto', $numproducto)->first();
@@ -639,7 +758,7 @@ class WebApiController extends Controller
             return null;
     }
 
-    public function consultarDuplicados($numtarjeta, $listado)
+    private function consultarDuplicados($numtarjeta, $listado)
     {
         //buscar si la tarjeta tiene duppicado, si SI, agregar al array listado.
         $duplicado = Duplicado::where('newtarjeta', $numtarjeta)->first();
@@ -652,4 +771,6 @@ class WebApiController extends Controller
         } else
             return null;
     }
+
+
 }

@@ -27,6 +27,10 @@
                         <div class="col-lg-3 col-sm-6">
                             <div class="widget-inline-box">
                                 <form class="form-horizontal col-md-12" id="formu1">
+                                    <div class="form-group">
+                                        <label>Rango de fecha para la consulta</label>
+                                        <input class="form-control input-daterange-datepicker" type="text" id="daterange"/>
+                                    </div>
                                     <!-- { {Form::select("establecimiento[]",$establecimientos,null,['class'=>'select2 form-control', "tabindex"=>"2",'id'=>'establecimiento[]', "required"=>"required","multiple"=>"multiple"])}} -->
                                     <div class="form-group">
                                         <label>Establecimiento</label>
@@ -159,10 +163,11 @@
 
         function generarRespuesta() {
             var establecimientos = $('#establecimientos').val();
+            var rango = $('#daterange').val();
             /*if(establecimientos==null)
                 alert("Debe seleccionar al menos un establecimiento");
             else*/
-                $('#resultado').load('{{route('resultadotransaccionesxdatafono')}}',{establecimientos:establecimientos});
+                $('#resultado').load('{{route('resultadotransaccionesxdatafono')}}',{rango:rango,establecimientos:establecimientos});
         }
 
     </script>

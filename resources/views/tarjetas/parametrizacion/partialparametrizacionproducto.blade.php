@@ -320,7 +320,7 @@
                 {data: 'created_at', name: 'created_at'},
                 {data: 'updated_at', name: 'updated_at'},
             ],
-            "order": [[3, "desc"],[2,'asc']]
+            "order": [[3, "desc"]]
         });
 
     });
