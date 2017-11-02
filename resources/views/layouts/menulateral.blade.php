@@ -70,6 +70,7 @@
             <li><a href="{{route('reportes.datafonosxestablecimientos')}}"> Relación de Datafonos </a></li>
             <li><a href="{{route('reportes.saldotarjeta')}}"> Saldos de tarjeta </a></li>
             <li><a href="{{route('reportes.transaccionesxdatafono')}}"> Transacciones por datafono </a></li>
+            <li><a href="{{route('reportes.promedioxdatafono')}}"> Consumo promedio por datafono</a></li>
         </ul>
     </li>
 </ul>
