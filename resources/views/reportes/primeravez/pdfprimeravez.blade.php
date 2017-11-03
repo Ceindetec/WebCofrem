@@ -68,30 +68,74 @@
     </div>
     <br>
     <div class="table">
-        <table id="datatable" class="table table-striped table-bordered" width="100%">
-            <thead>
-            <tr>
-                <th>Numero tarjeta</th>
-                <th>Transacción</th>
-                <th>Valor</th>
-                <th>Sucursal</th>
-                <th>Terminal</th>
-                <th>Fecha</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach($transacciones as $transacione)
+        @if(count($transacciones["regalo"]["detproducto"])>0)
+            <h5>Regalo</h5>
+            <table id="datatable" class="table table-striped table-bordered datatable"
+                   width="100%">
+                <thead>
                 <tr>
-                    <td>{{$transacione->numero_tarjeta}}</td>
-                    <td>{{$transacione->numero_transaccion}}</td>
-                    <td>{{$transacione->valorTransacion[0]->total}}</td>
-                    <td>{{$transacione->getSucursal->nombre}}</td>
-                    <td>{{$transacione->codigo_terminal}}</td>
-                    <td>{{$transacione->fecha}}</td>
+                    <th>Numero tarjeta</th>
+                    <th>Monto inicial</th>
+                    <th>Factura</th>
+                    <th>No. transaccion</th>
+                    <th>Codigo terminal</th>
+                    <th>Sucursal</th>
+                    <th>Valor</th>
+                    <th>Fecha</th>
                 </tr>
-            @endforeach
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                @for($i=0; $i < count($transacciones["regalo"]["detproducto"]); $i++)
+                    <tr>
+                        <td>{{$transacciones["regalo"]["detproducto"][$i]->numero_tarjeta}}</td>
+                        <td>{{$transacciones["regalo"]["detproducto"][$i]->monto_inicial}}</td>
+                        <td>{{$transacciones["regalo"]["detproducto"][$i]->factura}}</td>
+                        <td>{{$transacciones["regalo"]["dettransa"][$i]->numero_transaccion}}</td>
+                        <td>{{$transacciones["regalo"]["dettransa"][$i]->codigo_terminal}}</td>
+                        <td>{{$transacciones["regalo"]["dettransa"][$i]->nombre}}</td>
+                        <td>{{$transacciones["regalo"]["dettransa"][$i]->valor}}</td>
+                        <td>{{$transacciones["regalo"]["dettransa"][$i]->fecha}}</td>
+                    </tr>
+                @endfor
+                </tbody>
+            </table>
+            <br>
+            <br>
+        @endif
+        @if(count($transacciones["bono"]["detproducto"])>0)
+            <h5>Bonos empresariales</h5>
+            <table id="datatable" class="table table-striped table-bordered datatable"
+                   width="100%">
+                <thead>
+                <tr>
+                    <th>Numero tarjeta</th>
+                    <th>Monto inicial</th>
+                    <th>No. Contrato</th>
+                    <th>No. transaccion</th>
+                    <th>Codigo terminal</th>
+                    <th>Sucursal</th>
+                    <th>Valor</th>
+                    <th>Fecha</th>
+                </tr>
+                </thead>
+                <tbody>
+                @for($i=0; $i < count($transacciones["bono"]["detproducto"]); $i++)
+                    <tr>
+                        <td>{{$transacciones["bono"]["detproducto"][$i]->numero_tarjeta}}</td>
+                        <td>{{$transacciones["bono"]["detproducto"][$i]->monto_inicial}}</td>
+                        <td>{{$transacciones["bono"]["detproducto"][$i]->getContrato->n_contrato}}</td>
+                        <td>{{$transacciones["bono"]["dettransa"][$i]->numero_transaccion}}</td>
+                        <td>{{$transacciones["bono"]["dettransa"][$i]->codigo_terminal}}</td>
+                        <td>{{$transacciones["bono"]["dettransa"][$i]->nombre}}</td>
+                        <td>{{$transacciones["bono"]["dettransa"][$i]->valor}}</td>
+                        <td>{{$transacciones["bono"]["dettransa"][$i]->fecha}}</td>
+                    </tr>
+                @endfor
+                </tbody>
+            </table>
+            <br>
+            <br>
+        @endif
     </div>
 </div>
 </body>
