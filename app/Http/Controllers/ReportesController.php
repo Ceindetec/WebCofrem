@@ -1348,6 +1348,7 @@ class ReportesController extends Controller
                 foreach ($terminales as $terminal) {
                     $totaltranx = Transaccion::where('codigo_terminal', $terminal->codigo)
                         ->whereBetween('fecha', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
+                        ->whereraw('"ID" NOT IN (select "TRANSACCION_ID" FROM "H_ESTADO_TRANSACCIONES" WHERE "ESTADO"=?)',[HEstadoTransaccion::$ESTADO_INACTIVO])
                         ->count();
                     if ($terminal->estado == Terminales::$ESTADO_TERMINAL_ACTIVA)
                         $name_estado = "Activo";
@@ -1514,6 +1515,14 @@ class ReportesController extends Controller
         $resultado = array();
         $resumen = array();
         $rangos = explode(" - ", $request->rango);
+        list($dia1,$mes1,$ano1) = explode("/",$rangos[0]);
+        $datetime1 = $ano1 . "-" . $mes1 . "-" .  $dia1;
+        list($dia2,$mes2,$ano2) = explode("/",$rangos[1]);
+        $datetime2 = $ano2 . "-" . $mes2 . "-" .  $dia2;
+        $datetime1 = strtotime($datetime1);
+        $datetime2 = strtotime($datetime2);
+        $interval=abs ($datetime2 - $datetime1);
+        $interval = $interval / (60 * 60 * 24 );
         $lista_esta = $request->establecimientos;
         if(sizeof($lista_esta)>0)
         {
@@ -1532,62 +1541,128 @@ class ReportesController extends Controller
         $sucursales = Sucursales::wherein('establecimiento_id', $lista_esta)
             ->orderby('nombre', 'asc')->get();
         if ($sucursales != null) {
-            foreach ($sucursales as $sucursale) {
-                $subtotal=0;
-                $terminales = Terminales::where('sucursal_id', $sucursale->id)
-                    ->orderBy('codigo', 'asc')
-                    ->get();
-
+            $lista_sucu = [];
+            foreach ($sucursales as $sucursale)
+            {
+                array_push($lista_sucu, $sucursale->id);
+            }
+            $terminales = Terminales::wherein('sucursal_id', $lista_sucu)
+                ->orderBy('codigo', 'asc')
+                ->get();
                 foreach ($terminales as $terminal) {
-                    $totaltranx=Transaccion::where('codigo_terminal',$terminal->codigo)
-                        ->whereBetween('fecha', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
-                        ->count();
+                    $subtotal = 0;
+                    $contdias = 0;
+                    $lasucursal = Sucursales::where('id',$terminal->sucursal_id)->first();
+                    $dtransacciones = DetalleTransaccion::join('h_estado_transacciones', 'detalle_transacciones.transaccion_id', 'h_estado_transacciones.transaccion_id')
+                        ->join('transacciones', 'detalle_transacciones.transaccion_id', 'transacciones.id')
+                        ->where('h_estado_transacciones.estado', '<>', HEstadoTransaccion::$ESTADO_INACTIVO)
+                        ->whereraw('"DETALLE_TRANSACCIONES"."TRANSACCION_ID" NOT IN (select "TRANSACCION_ID" FROM "H_ESTADO_TRANSACCIONES" WHERE "ESTADO"=?)',[HEstadoTransaccion::$ESTADO_INACTIVO])
+                        ->where('transacciones.codigo_terminal', $terminal->codigo)
+                        ->whereBetween('transacciones.fecha', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
+                        ->select('transacciones.fecha as fecha', DB::raw('SUM(detalle_transacciones.valor) as venta'))
+                        ->groupBy('detalle_transacciones.transaccion_id', 'transacciones.fecha', 'detalle_transacciones.valor')
+                        ->orderBy('transacciones.fecha', 'asc')
+                        ->get();
+                    $fechaanterior = "";
+                    $venta = 0;
+                    foreach ($dtransacciones as $dtransaccione) {
+                        $dt = Carbon::parse($dtransaccione->fecha);
+                        $fechaactual = $dt->year . "-" . $dt->month . "-" . $dt->day;
+                        if ($fechaanterior == "")
+                            $fechaanterior = $fechaactual;
+                        if ($fechaanterior != $fechaactual) {
+                            //insertar registro con valor de $venta
+                            $resultado[] = array('establecimiento' => $lasucursal->establecimiento_id,
+                                'sucursal' => $terminal->sucursal_id,
+                                'terminal' => $terminal->codigo,
+                                'fecha' => $fechaanterior,
+                                'venta' => $venta,
+                            );
+                            //tomar valores actuales
+                            $venta = 0 + ($dtransaccione->venta);
+                            $fechaanterior = $fechaactual;
+                            $contdias++;
+                            $subtotal+=$venta;
+                        } else {
+                            //sumar acumulado a $venta
+                            $venta += $dtransaccione->venta;
+                            //fechaanterior=actual
+                            $fechaanterior = $fechaactual;
+                        }
+                    }
+                    if($fechaanterior!="")
+                    {
+                        $resultado[] = array('establecimiento' => $lasucursal->establecimiento_id,
+                            'sucursal' => $terminal->sucursal_id,
+                            'terminal' => $terminal->codigo,
+                            'fecha' => $fechaanterior,
+                            'venta' => $venta,
+                        );
+                        $contdias++;
+                        $subtotal+=$venta;
+                    }
                     if($terminal->estado==Terminales::$ESTADO_TERMINAL_ACTIVA)
                         $name_estado="Activo";
                     else
                         $name_estado="Inactivo";
-                    $resultado[] = array('establecimiento' => $sucursale->establecimiento_id,
-                        'sucursal' => $sucursale->id,
+                    if($interval<1)
+                        $interval=1;
+                    $promedio = $subtotal / $interval; //$contdias
+                    $resumen[] = array('establecimiento' => $lasucursal->establecimiento_id,
+                        'sucursal' => $terminal->sucursal_id,
                         'terminal' => $terminal->codigo,
-                        'total' => $totaltranx,
                         'estado' => $name_estado,
+                        'promedio' => $promedio,
+                        'suma' => $subtotal,
+                        'totaldias' => $contdias,
                     );
-                    $subtotal+=$totaltranx;
                 }
-                $resumen[] = array('establecimiento' => $sucursale->establecimiento_id,
-                    'sucursal' => $sucursale->id,
-                    'total' => $subtotal,
-                );
-            }
         }
+        //dd($resultado);
         $rango = ['fecha1' => $rangos[0], 'fecha2' => $rangos[1]];
-        return view('reportes.promedioxdatafono.parcialresultadopxd', compact('resultado', 'lista_esta', 'establecimientos', 'sucursales', 'resumen','rango'));
+        return view('reportes.promedioxdatafono.parcialresultadopxd', compact('resultado', 'lista_esta', 'establecimientos', 'sucursales', 'resumen','rango','terminales'));
     }
     /*
     * FUNCION GENERAR PDF para promedio por datafonos por establecimiento
-    * Exporta a pdf, suma de tranx por datafonos por sucursal
+    * Exporta a pdf, promedio de ventas por datafonos por sucursal
     */
     public function pdfPromedioxDatafono(Request $request)
     {
         // dd($request->lista_esta);
         $establecimientos = Establecimientos::wherein('id', $request->lista_esta)->orderby('razon_social', 'asc')->get();
         $sucursales = Sucursales::wherein('establecimiento_id', $request->lista_esta)->orderby('nombre', 'asc')->get();
+        $lista_sucu = [];
+        foreach ($sucursales as $sucursale)
+        {
+            array_push($lista_sucu, $sucursale->id);
+        }
+        $terminales = Terminales::wherein('sucursal_id', $lista_sucu)
+               ->orderBy('codigo', 'asc')
+               ->get();
+
         //dd($establecimientos);
-        $data = ['resultado' => $request->resultado, 'establecimientos' => $establecimientos, 'sucursales' => $sucursales, 'resumen' => $request->resumen, 'rango' => $request->fecha1 . " - " . $request->fecha2];
-        $pdf = \PDF::loadView('reportes.promedioxdatafono.pdftxd', $data);
+        $data = ['resultado' => $request->resultado, 'establecimientos' => $establecimientos, 'sucursales' => $sucursales, 'terminales' => $terminales, 'resumen' => $request->resumen, 'rango' => $request->fecha1 . " - " . $request->fecha2];
+        $pdf = \PDF::loadView('reportes.promedioxdatafono.pdfpxd', $data);
         $pdf->setPaper('A4', 'landscape');
-        return $pdf->download('PromedioDatafonos.pdf');
+        return $pdf->download('PromedioConsumo.pdf');
     }
     /*
      * FUNCION GENERAR EXCEL para promedio por datafono por establecimiento
-     * Exporta a excel, suma de tranx de datafonos por sucursal
+     * Exporta a excel, promedio de ventas por datafono por sucursal
      */
     public function excelPromedioxDatafono(Request $request)
     {
         $establecimientos = Establecimientos::wherein('id', $request->lista_esta)->orderby('razon_social', 'asc')->get();
         $sucursales = Sucursales::wherein('establecimiento_id', $request->lista_esta)->orderby('nombre', 'asc')->get();
-
-        \Excel::create('ExcelPromDatafonos', function ($excel) use ($request, $establecimientos, $sucursales) {
+        $lista_sucu = [];
+        foreach ($sucursales as $sucursale)
+        {
+            array_push($lista_sucu, $sucursale->id);
+        }
+        $terminales = Terminales::wherein('sucursal_id', $lista_sucu)
+            ->orderBy('codigo', 'asc')
+            ->get();
+        \Excel::create('ExcelPromDatafonos', function ($excel) use ($request, $establecimientos, $sucursales, $terminales) {
             $resultado = $request->resultado;
             $resumen = $request->resumen;
             $rango = $request->fecha1 ." - ".$request->fecha2;
@@ -1596,9 +1671,9 @@ class ReportesController extends Controller
             if (sizeof($establecimientos) > 0) {
                 foreach ($establecimientos as $establecimiento) {
                     $num_esta++;
-                    //titulo <h5>Establecimiento: {{$establecimiento->razon_social}}</h5>
-                    $excel->sheet('Est' . $num_esta, function ($sheet) use ($resultado, $establecimiento, $sucursales, $resumen, $rango) {
+                    $excel->sheet('Est' . $num_esta, function ($sheet) use ($resultado, $establecimiento, $sucursales, $resumen, $rango, $terminales) {
                         $haysucursal = 0;
+                        $hayterminal=0;
                         $hoy = Carbon::now();
                         $objDrawing = new PHPExcel_Worksheet_Drawing;
                         $objDrawing->setPath(public_path('images/logo.png')); //your image path
@@ -1606,10 +1681,6 @@ class ReportesController extends Controller
                         $objDrawing->setCoordinates('A1');
                         $objDrawing->setWorksheet($sheet);
                         $objDrawing->setOffsetY(10);
-                        /*$objDrawing = new PHPExcel_Worksheet_Drawing;
-                        $objDrawing->setPath(public_path('images/logo_mini.png')); //your image path
-                        $objDrawing->setCoordinates('A1');
-                        $objDrawing->setWorksheet($sheet);*/
                         $sheet->setWidth(array(
                             'A' => 30,
                             'B' => 20,
@@ -1618,64 +1689,76 @@ class ReportesController extends Controller
                             'E' => 20,
                             'F' => 20,
                         ));
-
                         $sheet->setMergeColumn(array(
                             'columns' => array('A'),
                             'rows' => array(
                                 array(1, 4),
                             )
                         ));
-                        $sheet->row(1, array('', 'REPORTE DE TRANSACCIONES POR DATAFONO DEL ESTABLECIMIENTO: ' . $establecimiento->razon_social));
+                        $sheet->row(1, array('', 'REPORTE DE CONSUMO PROMEDIO POR DATAFONO DEL ESTABLECIMIENTO: ' . $establecimiento->razon_social));
                         $sheet->row(1, function ($row) {
                             $row->setBackground('#4CAF50');
                         });
                         $sheet->cells('A1:A4', function ($cells) {
                             $cells->setBackground('#FFFFFF');
                         });
-
                         $sheet->setBorder('A1:A4', 'thin');
-
                         $sheet->row(3, array('', 'Fecha:', $hoy, '', ''));
                         $sheet->row(4, array('', 'Rango:', $rango, '', ''));
                         $fila = 5;
                         foreach ($sucursales as $sucursale) {
-                            $cant = 0;
+                            //$cant = 0;
                             if ($sucursale->establecimiento_id == $establecimiento->id) {
                                 $haysucursal++;
-                                if (sizeof($resultado) > 0) {
+                               // if (sizeof($resultado) > 0) {
                                     $subtotal = 0;
                                     $sheet->row($fila, array('Sucursal: ' . $sucursale->nombre));
                                     $sheet->row($fila, function ($row) {
                                         $row->setBackground('#4CAF50');
                                     });
                                     $fila++;
-                                    $fila++;
-                                    $sheet->row($fila, array('Código del datafono', 'Estado Actual', 'No. de transacciones'));
-                                    $sheet->row($fila, function ($row) {
-                                        $row->setBackground('#f2f2f2');
-                                    });
-                                    $fila++;
-                                    foreach ($resultado as $miresul) {
-                                        if ($miresul["establecimiento"] == $establecimiento->id && $miresul["sucursal"] == $sucursale->id) {
-                                            $cant++;
-                                            $sheet->row($fila, array($miresul["terminal"], $miresul["estado"], $miresul["total"]));
+                                    foreach ($terminales as $terminale) {
+                                        $cant = 0;
+                                        if($sucursale->id == $terminale->sucursal_id) {
+                                            $hayterminal++;
+                                            $sheet->row($fila, array('Código del datafono: ' . $terminale->codigo));
+                                            $sheet->row($fila, function ($row) {
+                                                $row->setBackground('#4CAF50');
+                                            });
                                             $fila++;
-                                        }//cierra if
-                                    } //cierra foreach
-                                    $fila++;
-                                    foreach ($resumen as $resum) {
-                                        if ($resum['sucursal']== $sucursale->id) {
-                                            $sheet->row($fila, array('Total transacciones: ' , $resum['total']));
+                                            $fila++;
+                                            if (sizeof($resultado) > 0) {
+                                            $sheet->row($fila, array('Fecha', 'Total'));
                                             $sheet->row($fila, function ($row) {
                                                 $row->setBackground('#f2f2f2');
                                             });
                                             $fila++;
+                                            foreach ($resultado as $miresul) {
+                                                if ($miresul["establecimiento"] == $establecimiento->id && $miresul["sucursal"] == $sucursale->id && $miresul["terminal"]==$terminale->codigo) {
+                                                    $cant++;
+                                                    $sheet->row($fila, array($miresul["fecha"], $miresul["venta"]));
+                                                    $fila++;
+                                                }//cierra if
+                                            } //cierra foreach
+                                            if ($cant == 0)
+                                                $sheet->row($fila, array('No hay registros'));
                                             $fila++;
-                                        }
-                                    }
-                                }//cierra if
-                                if ($cant == 0)
-                                    $sheet->row($fila, array('No hay registros'));
+                                            foreach ($resumen as $resum) {
+                                                if ($resum['terminal'] == $terminale->codigo) {
+                                                    $sheet->row($fila, array('Estado actual: ', $resum['estado'],'Promedio diario: ', $resum['promedio']));
+                                                    $sheet->row($fila, function ($row) {
+                                                        $row->setBackground('#f2f2f2');
+                                                    });
+                                                    $fila++;
+                                                    $fila++;
+                                                }
+                                            }
+                                            }//cierra if
+
+                                        }//cierra if (terminal)
+                                    }//cierra for terminales
+                                if ($hayterminal == 0)
+                                    $sheet->row($fila, array('No existen datafonos'));
                             }//cierra if sucursal id
                         }//cierra foreach
                         if ($haysucursal == 0)
@@ -1686,6 +1769,6 @@ class ReportesController extends Controller
         })->export('xls');
     }
     /*
-     * FINALIZA REPORTE PROMEDIO X DATAFONO POR ESTABLECIMIENTO
+     * FINALIZA REPORTE CONSUMO PROMEDIO X DATAFONO POR ESTABLECIMIENTO
      */
 }
