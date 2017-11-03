@@ -5,6 +5,7 @@ namespace creditocofrem\Http\Controllers;
 use Carbon\Carbon;
 use creditocofrem\DetalleProdutos;
 use creditocofrem\Duplicado;
+use creditocofrem\DuplicadoProductos;
 use creditocofrem\Htarjetas;
 use creditocofrem\Motivo;
 use creditocofrem\Tarjetas;
@@ -498,6 +499,11 @@ class TarjetasController extends Controller
                 $newDetalleProducto = new DetalleProdutos($detallesProducto->toArray());
                 $newDetalleProducto->numero_tarjeta = $request->numero_tarjeta;
                 $newDetalleProducto->save();
+                $newDuplicadoDetalle = new DuplicadoProductos();
+                $newDuplicadoDetalle->oldproducto = $detallesProducto->id;
+                $newDuplicadoDetalle->newproducto = $newDetalleProducto->id;
+                $newDuplicadoDetalle->fecha = Carbon::now();
+                $newDuplicadoDetalle->save();
             }
             DetalleProdutos::where('numero_tarjeta',$oltarjeta->numero_tarjeta)->update(['estado'=>DetalleProdutos::$ESTADO_ANULADO]);
             $duplicadoTarjeta = Tarjetas::where('numero_tarjeta',$request->numero_tarjeta)->first();
