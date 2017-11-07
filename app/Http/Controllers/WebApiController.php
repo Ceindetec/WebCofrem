@@ -749,7 +749,7 @@ class WebApiController extends Controller
         } catch (\Exception $exception) {
             $result = [];
             $result['estado'] = FALSE;
-            $result['mensaje'] = ApiWS::$TEXT_ERROR_EJECUCION.' ->'.$exception->getMessage();
+            $result['mensaje'] = ApiWS::$TEXT_ERROR_EJECUCION;
             $result['codigo'] = ApiWS::$CODIGO_ERROR_EJECUCION;
         }
         return $result;
