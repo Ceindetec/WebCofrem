@@ -10,7 +10,7 @@
 
                 <div class="form-group">
                     <label for="estado">Numero de la nueva tarjeta</label>
-                    {{Form::text('numero_tarjeta',null,['class'=>'form-control', 'id'=>'numero_tarjeta', "data-parsley-type"=>"number", "required"])}}
+                    {{Form::text('numero_tarjeta',null,['class'=>'form-control', 'id'=>'numero_tarjeta', "data-parsley-type"=>"number","maxlength"=>"6", "required"])}}
                 </div>
                 <div class="form-group">
                     <label for="estado">Motivo</label>
