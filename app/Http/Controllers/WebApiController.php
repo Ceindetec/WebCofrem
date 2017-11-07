@@ -653,14 +653,15 @@ class WebApiController extends Controller
                                 if ($tarjeta->persona_id != NULL) {
                                     $persona = Personas::find($tarjeta->persona_id);
                                     if ($persona->documento == $request->documento) {
-                                        $result = $this->anulaTransaccion($request);
+                                        $nombre = $persona->nombres . " " . $persona->apellidos;
+                                        $result = $this->anulaTransaccion($request,$terminal->codigo,$tarjeta->numero_tarjeta,$persona->documento,$nombre);
                                     } else {
                                         $result['estado'] = FALSE;
                                         $result['mensaje'] = ApiWS::$TEXT_DOCUMENTIO_INCORRECTO;
                                         $result['codigo'] = ApiWS::$CODIGO_DOCUMENTIO_INCORRECTO;
                                     }
                                 } else {
-                                    $result = $this->anulaTransaccion($request);
+                                    $result = $this->anulaTransaccion($request,$terminal->codigo,$tarjeta->numero_tarjeta,"","");
                                 }
                             } else {
                                 $result['estado'] = FALSE;
@@ -700,7 +701,7 @@ class WebApiController extends Controller
      * @param $request
      * @return array
      */
-    private function anulaTransaccion($request)
+    private function anulaTransaccion($request,$codigo,$numero_tarjeta,$cedula, $nombres)
     {
         $result = [];
         try {
@@ -714,7 +715,21 @@ class WebApiController extends Controller
                         $hestado->estado = HEstadoTransaccion::$ESTADO_INACTIVO;
                         $hestado->fecha = Carbon::now();
                         $hestado->save();
+                        $dt = Carbon::now();
                         $result['estado'] = TRUE;
+                        $result['numero_transaccion'] = $transaccion->numero_transaccion;
+                        $result['fecha'] = $dt->toDateString();
+                        $result['hora'] = $dt->toTimeString();
+                        $result['codigoTerminal'] = $codigo;
+                        $result['numeroTarjeta'] = $numero_tarjeta;
+                        $result['tipoTransaccion'] = Transaccion::$TIPO_CONSUMO;
+                        $consumido  = DetalleTransaccion::where('transaccion_id',$transaccion->id)
+                            ->select([DB::raw('SUM(valor) as total')])
+                            ->groupBy('transaccion_id')->first();
+                        $result['valor'] = $consumido->total;// ----> esta dalo lo queme se nesecita el valor de la transaccion
+                        $result['detalleServicio'] = "R"; /// ---->> aun no se necesita para nasda pero nose si mas adelante si
+                        $result['nombres'] = $nombres;
+                        $result['cedula'] = $cedula;
                         $result['mensaje'] = 'Transaccion anulada';
                     } else {
                         $result['estado'] = FALSE;
@@ -732,6 +747,7 @@ class WebApiController extends Controller
                 $result['codigo'] = ApiWS::$CODIGO_NUMERO_TRANSACCION_INVALIDO;
             }
         } catch (\Exception $exception) {
+            $result = [];
             $result['estado'] = FALSE;
             $result['mensaje'] = ApiWS::$TEXT_ERROR_EJECUCION;
             $result['codigo'] = ApiWS::$CODIGO_ERROR_EJECUCION;
