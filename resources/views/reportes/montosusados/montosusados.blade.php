@@ -15,7 +15,7 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-12">
-                <h4 class="header-title m-t-0 m-b-20">Reporte de tarjetas con saldo vencido </h4>
+                <h4 class="header-title m-t-0 m-b-20">Reporte de montos usados </h4>
             </div>
         </div> <!-- end row -->
 
@@ -124,23 +124,15 @@
                     "firstDay": 1
                 }
             });
-
-            {{-- $('form').submit(function (e) {
-                e.preventDefault();
-                var rago = $('.input-daterange-datepicker').val()
-                $('#resultado').load('{{'resultadoprimeravez'}}',{rango:rago});
-            })--}}
             $("#formu1").submit(function (e) {
                 e.preventDefault();
                 generarRespuesta();
             });
         })
-
-
         function generarRespuesta() {
             var rango = $('#daterange').val();
             var tipo = $('#tiposervicio').val();
-            $('#resultado').load('{{route('resultadosaldosvencidos')}}', {rango: rango, tipo: tipo});
+            $('#resultado').load('{{route('resultadomontosusados')}}', {rango: rango, tipo: tipo});
         }
     </script>
 @endsection
