@@ -98,4 +98,12 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('reportes/promedioxdatafono/exportarexcel','ReportesController@excelPromedioxDatafono')->name('excelpromedioxdatafono');
     /*FINALIZA REPORTE PROMEDIO POR DATAFONO*/
 
+    /*INICIA REPORTE MONTOS USADOS*/
+    Route::get('reportes/montosusados/consulta','ReportesController@viewMontosUsados')->name('reportes.montosusados');
+    Route::get('select/establecimientos',"ReportesController@selectestablecimientos")->name('selectestablecimientos');
+    Route::post('reportes/montosusados/resultadoconsulta','ReportesController@consultarMontosUsados')->name('resultadomontosusados');
+    Route::get('reportes/montosusados/exportarpdf','ReportesController@pdfMontosUsados')->name('pdfmontosusados');
+    Route::get('reportes/montosusados/exportarexcel','ReportesController@excelMontosUsados')->name('excelmontosusados');
+    /*FINALIZA REPORTE MONTOS USADOS*/
+
 });

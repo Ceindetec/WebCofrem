@@ -1800,7 +1800,8 @@ function consultarPromedioxDatafono(Request $request)
                                             foreach ($resultado as $miresul) {
                                                 if ($miresul["establecimiento"] == $establecimiento->id && $miresul["sucursal"] == $sucursale->id && $miresul["terminal"]==$terminale->codigo) {
                                                     $cant++;
-                                                    $sheet->row($fila, array($miresul["fecha"], $miresul["venta"]));
+                                                    $venta_name = '$ '.number_format( $miresul["venta"], 2, ',', '.');
+                                                    $sheet->row($fila, array($miresul["fecha"], $venta_name));
                                                     $fila++;
                                                 }//cierra if
                                             } //cierra foreach
@@ -1809,7 +1810,8 @@ function consultarPromedioxDatafono(Request $request)
                                             $fila++;
                                             foreach ($resumen as $resum) {
                                                 if ($resum['terminal'] == $terminale->codigo) {
-                                                    $sheet->row($fila, array('Estado actual: ', $resum['estado'],'Promedio diario: ', $resum['promedio']));
+                                                    $prom_name = '$ '.number_format( $resum["promedio"], 2, ',', '.');
+                                                    $sheet->row($fila, array('Estado actual: ', $resum['estado'],'Promedio diario: ', $prom_name));
                                                     $sheet->row($fila, function ($row) {
                                                         $row->setBackground('#f2f2f2');
                                                     });
@@ -1834,5 +1836,247 @@ function consultarPromedioxDatafono(Request $request)
     }
     /*
      * FINALIZA REPORTE CONSUMO PROMEDIO X DATAFONO POR ESTABLECIMIENTO
+     */
+    /*
+     * INICIA REPORTE DE MONTOS USADOS
+     */
+    public function viewMontosUsados()
+    {
+        //$establecimientos = Establecimientos::pluck('razon_social', 'id');
+        return view('reportes.montosusados.montosusados');
+    }
+    /*
+     * Funcion consultar montos usados
+     * - consultar productos de tarjetas que registran transacciones  dentro del rango de fecha seleccionado
+     * -
+     */
+    public function consultarMontosUsados(Request $request)
+    {
+        $rangos = explode(" - ", $request->rango);
+        $tiposervicio = $request->tipo;
+        $resultadob = array();
+        $resultador = array();
+        $resumen = array();
+        $subtotalb = 0;
+        $subtotalr = 0;
+        $total = 0;
+
+        if ($tiposervicio == "B" || $tiposervicio == "T") {
+            $detallesb = DetalleProdutos::where('contrato_emprs_id','<>',null)
+                ->whereRaw('id IN (SELECT detalle_producto_id FROM detalle_transacciones WHERE transaccion_id IN (SELECT id FROM transacciones WHERE fecha between ? and ?) )',[Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
+                ->where('estado', '<>', 'N')
+                ->get();
+            foreach ($detallesb as $detalle) {
+                $gasto = 0;
+                //buscar Duplicados
+                $listado = [];
+                array_push($listado, $detalle->id);
+                $respuesta = $this->consultarDuplicadoProductos($detalle->id, $listado);
+                if ($respuesta != null)
+                    $listado = $respuesta;
+                $dtransacciones = DetalleTransaccion::join('transacciones', 'detalle_transacciones.transaccion_id', 'transacciones.id')
+                    ->wherein('detalle_transacciones.detalle_producto_id', $listado)
+                    ->whereBetween('transacciones.fecha', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
+                    ->get();
+                foreach ($dtransacciones as $dtransaccione) {
+                    $htransaccion = DB::table('h_estado_transacciones')->where('transaccion_id', $dtransaccione->transaccion_id)->orderBy('id', 'desc')->first();
+                    if ($htransaccion->estado == HEstadoTransaccion::$ESTADO_ACTIVO)
+                        $gasto += $dtransaccione->valor;
+                }
+                    $sobrante = $detalle->monto_inicial - $gasto;
+                    if ($detalle->estado == DetalleProdutos::$ESTADO_ACTIVO)
+                        $name_estado = "Activa";
+                    else
+                        $name_estado = "Inactiva";
+                    $resultadob[] = array('numero_tarjeta' => $detalle->numero_tarjeta,
+                        'monto' => $detalle->monto_inicial,
+                        'gasto' => $gasto,
+                        'saldo' => $sobrante,
+                        'vencimiento' => $detalle->fecha_vencimiento,
+                        'estado' => $name_estado,
+                    );
+                    $subtotalb++;
+            }
+        }
+        if ($tiposervicio == "R" || $tiposervicio == "T") {
+            $detallesr = DetalleProdutos::where('factura','<>',null)
+                ->whereRaw('id IN (SELECT detalle_producto_id FROM detalle_transacciones WHERE transaccion_id IN (SELECT id FROM transacciones WHERE fecha between ? and ?) )',[Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
+                ->where('estado', '<>', 'N')
+                ->get();
+            foreach ($detallesr as $detalle) {
+                $gasto = 0;
+                //buscar Duplicados
+                $listado = [];
+                array_push($listado, $detalle->id);
+                $respuesta = $this->consultarDuplicadoProductos($detalle->id, $listado);
+                if ($respuesta != null)
+                    $listado = $respuesta;
+                $dtransacciones = DetalleTransaccion::join('transacciones', 'detalle_transacciones.transaccion_id', 'transacciones.id')
+                    ->wherein('detalle_transacciones.detalle_producto_id', $listado)
+                    ->whereBetween('transacciones.fecha', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
+                    ->get();
+                foreach ($dtransacciones as $dtransaccione) {
+                    $htransaccion = DB::table('h_estado_transacciones')->where('transaccion_id', $dtransaccione->transaccion_id)->orderBy('id', 'desc')->first();
+                    if ($htransaccion->estado == HEstadoTransaccion::$ESTADO_ACTIVO)
+                        $gasto += $dtransaccione->valor;
+                }
+                    $sobrante = $detalle->monto_inicial - $gasto;
+                    if ($detalle->estado == DetalleProdutos::$ESTADO_ACTIVO)
+                        $name_estado = "Activa";
+                    else
+                        $name_estado = "Inactiva";
+                    $resultador[] = array('numero_tarjeta' => $detalle->numero_tarjeta,
+                        'monto' => $detalle->monto_inicial,
+                        'gasto' => $gasto,
+                        'saldo' => $sobrante,
+                        'vencimiento' => $detalle->fecha_vencimiento,
+                        'estado' => $name_estado,
+                    );
+                    $subtotalr++;
+            }
+        }
+        $total = $subtotalb + $subtotalr;
+        $resumen[] = array('totalr' => $subtotalr,
+            'totalb' => $subtotalb,
+            'total' => $total,
+        );
+        $rango = ['fecha1' => $rangos[0], 'fecha2' => $rangos[1]];
+        return view('reportes.montosusados.parcialresultadomontosusados', compact('resultadob', 'resultador', 'rango', 'tiposervicio', 'resumen'));
+    }
+    /*
+     * FUNCION GENERAR PDF para montos Usados
+     * Exporta en formato pdf, los resultados
+     * de productos de tarjetas que tuvieron transacciones en un rango de fecha
+     */
+    public function pdfMontosUsados(Request $request)
+    {
+        $data = ['resultadob' => $request->resultadob, 'resultador' => $request->resultador, 'tiposervicio' => $request->tiposervicio, 'rango' => $request->fecha1 . " - " . $request->fecha2, 'resumen' => $request->resumen];
+        $pdf = \PDF::loadView('reportes.montosusados.pdfmontosusados', $data);
+
+        $pdf->setPaper('A4', 'landscape');
+        return $pdf->download('montosusados.pdf');
+    }
+
+    /*
+     * FUNCION GENERAR EXCEL para Montos Usados
+     * Exporta a excel, los resultados de las tarjetas (los productos)
+     *  que tuvieron transacciones en un rango de fecha seleccionado
+     */
+    public function excelMontosUsados(Request $request)
+    {
+        \Excel::create('ExcelMontosUsados', function ($excel) use ($request) {
+            $resultadob = $request->resultadob;
+            $resultador = $request->resultador;
+            $resumen = $request->resumen;
+            $fecha1 = $request->fecha1;
+            $fecha2 = $request->fecha2;
+            $rango = $fecha1 . " - " . $fecha2;
+            $tiposervicio = $request->tiposervicio;
+
+            $excel->sheet('MontosUsados', function ($sheet) use ($resultadob, $resultador, $rango, $tiposervicio, $resumen) {
+                $hoy = Carbon::now();
+                $objDrawing = new PHPExcel_Worksheet_Drawing;
+                $objDrawing->setPath(public_path('images/logo.png')); //your image path
+                $objDrawing->setHeight(50);
+                $objDrawing->setCoordinates('A1');
+                $objDrawing->setWorksheet($sheet);
+                $objDrawing->setOffsetY(10);
+                $sheet->setWidth(array(
+                    'A' => 30,
+                    'B' => 20,
+                    'C' => 20,
+                    'D' => 20,
+                    'E' => 20,
+                    'F' => 20,
+                ));
+                $sheet->setMergeColumn(array(
+                    'columns' => array('A'),
+                    'rows' => array(
+                        array(1, 4),
+                    )
+                ));
+                $sheet->row(2, array('', 'REPORTE DE MONTOS USADOS'));
+                $sheet->row(2, function ($row) {
+                    $row->setBackground('#4CAF50');
+                });
+                $sheet->cells('A1:A4', function ($cells) {
+                    $cells->setBackground('#FFFFFF');
+                });
+                $sheet->setBorder('A1:A4', 'thin');
+                $sheet->row(3, array('', 'Rango:', $rango, '', ''));
+                $sheet->row(4, array('', 'Fecha:', $hoy, '', ''));
+                if ($tiposervicio != "R") {
+                    $sheet->row(6, array('TARJETAS BONO'));
+                    $sheet->row(6, function ($row) {
+                        $row->setBackground('#4CAF50');
+                    });
+                    $fila = 8;
+                    if (sizeof($resultadob) > 0) {
+                        $sheet->row(7, array('Número tarjeta', 'Monto inicial', 'Monto usado', 'Saldo', 'Fecha vencimiento', 'Estado'));
+                        $sheet->row(7, function ($row) {
+                            $row->setBackground('#f2f2f2');
+                        });
+                        foreach ($resultadob as $miresul) {
+                            $monto_name = '$ '.number_format( $miresul["monto"], 2, ',', '.');
+                            $gasto_name = '$ '.number_format( $miresul["gasto"], 2, ',', '.');
+                            $saldo_name = '$ '.number_format( $miresul["saldo"], 2, ',', '.');
+                            $sheet->row($fila, array($miresul["numero_tarjeta"], $monto_name, $gasto_name, $saldo_name, $miresul["vencimiento"], $miresul["estado"]));
+                            $fila++;
+                        }
+                    } else
+                        $sheet->row($fila, array('No hay resultados'));
+                    $fila++;
+                    foreach($resumen as $resum) {
+                        $sheet->row($fila, array("Total productos de tarjeta bono:", $resum["totalb"]));
+                        $sheet->row($fila, function ($row) {
+                            $row->setBackground('#f2f2f2');
+                        });
+                    }
+                    $fila++;
+                    $fila++;
+                } else
+                    $fila = 6;
+                if ($tiposervicio != "B") {
+                    $sheet->row($fila, array('TARJETAS REGALO'));
+                    $sheet->row($fila, function ($row) {
+                        $row->setBackground('#4CAF50');
+                    });
+                    $fila++;
+                    if (sizeof($resultador) > 0) {
+                        $sheet->row($fila, array('Número tarjeta', 'Monto inicial', 'Monto usado', 'Saldo', 'Fecha vencimiento', 'Estado'));
+                        $sheet->row($fila, function ($row) {
+                            $row->setBackground('#f2f2f2');
+                        });
+                        $fila++;
+                        foreach ($resultador as $miresul) {
+                            $monto_name = '$ '.number_format( $miresul["monto"], 2, ',', '.');
+                            $gasto_name = '$ '.number_format( $miresul["gasto"], 2, ',', '.');
+                            $saldo_name = '$ '.number_format( $miresul["saldo"], 2, ',', '.');
+                            $sheet->row($fila, array($miresul["numero_tarjeta"], $monto_name, $gasto_name, $saldo_name, $miresul["vencimiento"], $miresul["estado"]));
+                            $fila++;
+                        }
+                    } else
+                        $sheet->row($fila, array('No hay resultados'));
+                    $fila++;
+                    foreach($resumen as $resum) {
+                        $sheet->row($fila, array("Total productos de tarjeta regalo:", $resum["totalr"]));
+                        $sheet->row($fila, function ($row) {
+                            $row->setBackground('#f2f2f2');
+                        });
+                    }
+                    $fila++;
+                    $fila++;
+                }
+                foreach($resumen as $resum) {
+                    $sheet->row($fila, array("Total productos encontrados:", $resum["total"]));
+                    $sheet->row($fila, function ($row) {
+                        $row->setBackground('#f2f2f2');
+                    });
+                }
+            });
+        })->export('xls');
+    }
+    /*
+     * FINALIZA REPORTES MONTOS USADOS
      */
 }

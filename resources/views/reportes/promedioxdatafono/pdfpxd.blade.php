@@ -93,10 +93,11 @@
                                         <tbody>
                                         @foreach($resultado as $miresul)
                                             @if($miresul["establecimiento"]==$establecimiento->id && $miresul["sucursal"]==$sucursale->id && $miresul["terminal"]==$terminale->codigo)
-                                                <?php $cant++; ?>
+                                                <?php $cant++;
+                                                $venta_name = '$ '.number_format( $miresul["venta"], 2, ',', '.');?>
                                                 <tr>
                                                     <td>{{$miresul["fecha"]}}</td>
-                                                    <td>{{$miresul["venta"]}}</td>
+                                                    <td>{{$venta_name}}</td>
                                                 </tr>
                                             @endif
                                         @endforeach
@@ -107,8 +108,9 @@
                                     @endif
                                     @foreach ($resumen as $resum)
                                         @if($resum['terminal']== $terminale->codigo)
+                                           <?php    $prom_name = '$ '.number_format( $resum["promedio"], 2, ',', '.');?>
                                             <table id="datatable" class="table table-striped table-bordered" width="100%">
-                                                <tr><td>Estado actual: </td><td>{{$resum['estado']}}</td><td>Promedio diario: </td><td>{{$resum['promedio']}}</td></tr>
+                                                <tr><td>Estado actual: </td><td>{{$resum['estado']}}</td><td>Promedio diario: </td><td>{{$prom_name}}</td></tr>
                                             </table>
                                         @endif
                                     @endforeach
