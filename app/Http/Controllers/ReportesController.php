@@ -2160,8 +2160,9 @@ function consultarPromedioxDatafono(Request $request)
     {
         $establecimientos = Establecimientos::wherein('id', $request->lista_esta)->orderby('razon_social', 'asc')->get();
         $sucursales = Sucursales::wherein('establecimiento_id', $request->lista_esta)->orderby('nombre', 'asc')->get();
-
-        \Excel::create('ExcelVentasxSucursal', function ($excel) use ($request, $establecimientos, $sucursales) {
+        $canttotal = 5;
+        $ventatotal = 0;
+        \Excel::create('ExcelVentasxSucursal', function ($excel) use ($request, $establecimientos, $sucursales, $canttotal, $ventatotal) {
             $resultado = $request->resultado;
             $fecha1 = $request->fecha1;
             $fecha2 = $request->fecha2;
@@ -2169,8 +2170,7 @@ function consultarPromedioxDatafono(Request $request)
             $num_esta = 0;
             //FOR ESTABLECIMIENTOS POR CADA UNO CREAR UNA PESTAÑA
             if (sizeof($establecimientos) > 0) {
-                $canttotal = 0;
-                $ventatotal = 0;
+
                 foreach ($establecimientos as $establecimiento) {
                     $num_esta++;
                     //titulo <h5>Establecimiento: {{$establecimiento->razon_social}}</h5>
@@ -2216,12 +2216,6 @@ function consultarPromedioxDatafono(Request $request)
                                 $haysucursal++;
                                 if (sizeof($resultado) > 0) {
                                     $subtotal = 0;
-                                    /*$sheet->row($fila, array('Sucursal: ' . $sucursale->nombre));
-                                    $sheet->row($fila, function ($row) {
-                                        $row->setBackground('#4CAF50');
-                                    });
-                                    $fila++;
-                                    $fila++;     */
                                     $sheet->row($fila, array('Sucursal','Cantidad de transacciones', 'Monto'));
                                     $sheet->row($fila, function ($row) {
                                         $row->setBackground('#f2f2f2');
@@ -2238,8 +2232,8 @@ function consultarPromedioxDatafono(Request $request)
                                         }//cierra if
                                     } //cierra foreach
                                     $ventaest_name = '$ '.number_format( $ventaest, 2, ',', '.');
-                                    $canttotal += $cantest;
-                                    $ventatotal += $ventaest;
+                                    $canttotal = $canttotal + $cantest;
+                                    $ventatotal = $ventatotal + $ventaest;
                                     $sheet->row($fila, array('Total', $cantest, $ventaest_name));
                                     $fila++;
                                     $fila++;
@@ -2254,14 +2248,14 @@ function consultarPromedioxDatafono(Request $request)
                         /// mostrar No existen sucursales
                     });        //CIERRA PESTAÑA
                 } //finaliza foreach
-                $excel->sheet('Resumen', function ($sheet) use ($resultado, $establecimiento, $sucursales, $rango, $canttotal, $ventatotal, $establecimientos) {
+                /*$excel->sheet('Resumen', function ($sheet) use ($resultado, $establecimiento, $sucursales, $rango, $canttotal, $ventatotal, $establecimientos) {
                 $ventatotal_name = '$ '.number_format( $ventatotal, 2, ',', '.');
                 $sheet->row(4, array('Total establecimientos','Total sucursales','Cantidad de transacciones', 'Monto'));
                 $sheet->row(4, function ($row) {
                     $row->setBackground('#f2f2f2');
                 });
                     $sheet->row(5, array(sizeof($establecimientos),sizeof($sucursales),$canttotal, $ventatotal_name));
-                });        //CIERRA PESTAÑA
+                });        //CIERRA PESTAÑA*/
             } //finaliza if
         })->export('xls');
     }
