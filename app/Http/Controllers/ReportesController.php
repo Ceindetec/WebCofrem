@@ -2259,9 +2259,171 @@ function consultarPromedioxDatafono(Request $request)
             } //finaliza if
         })->export('xls');
     }
-
     /*
      * FINALIZA REPORTE VENTAS POR SUCURSAL
      */
 
+    /*
+    * INICIA REPORTE VENTAS POR ESTABLECIMIENTO
+    */
+    public function viewVentasxEstablecimiento()
+    {
+        $establecimientos = Establecimientos::pluck('razon_social', 'id');
+        return view('reportes.ventasxestablecimiento.ventasxestablecimiento', compact('establecimientos'));
+    }
+    /*
+     * Funcion consultar ventas x establecimiento
+     * -
+     */
+    public function consultarVentasxEstablecimiento(Request $request)
+    {
+        $rangos = explode(" - ", $request->rango);
+        $resultado = array();
+        $lista_esta = $request->establecimientos;
+        if (sizeof($lista_esta) > 0) {
+            $establecimientos = Establecimientos::wherein('id', $request->establecimientos)
+                ->orderby('razon_social', 'asc')->get();
+        } else {
+            $establecimientos = Establecimientos::orderby('razon_social', 'asc')->get();
+            $lista_esta = [];
+            foreach ($establecimientos as $establecimiento) {
+                array_push($lista_esta, $establecimiento->id);
+            }
+        }
+        foreach ($establecimientos as $establecimiento) {
+            $sucursales = Sucursales::where('establecimiento_id', $establecimiento->id)
+                ->orderby('nombre', 'asc')->get();//$request->establecimientos
+            $venta = 0;
+            $cantidad = 0;
+            if ($sucursales != null) {
+                foreach ($sucursales as $sucursale) {
+                    $dtransacciones = DetalleTransaccion::join('h_estado_transacciones', 'detalle_transacciones.transaccion_id', 'h_estado_transacciones.transaccion_id')
+                        ->join('transacciones', 'detalle_transacciones.transaccion_id', 'transacciones.id')
+                        ->where('h_estado_transacciones.estado', '<>', HEstadoTransaccion::$ESTADO_INACTIVO)
+                        ->whereraw('"DETALLE_TRANSACCIONES"."TRANSACCION_ID" NOT IN (select "TRANSACCION_ID" FROM "H_ESTADO_TRANSACCIONES" WHERE "ESTADO"=?)', [HEstadoTransaccion::$ESTADO_INACTIVO])
+                        ->where('transacciones.sucursal_id', $sucursale->id)
+                        ->whereBetween('transacciones.fecha', [Carbon::createFromFormat("d/m/Y", $rangos[0]), Carbon::createFromFormat("d/m/Y", $rangos[1])])
+                        ->select('transacciones.fecha as fecha', DB::raw('SUM(detalle_transacciones.valor) as venta'))
+                        ->groupBy('detalle_transacciones.transaccion_id', 'transacciones.fecha', 'detalle_transacciones.valor')
+                        ->orderBy('transacciones.fecha', 'asc')
+                        ->get();
+                    foreach ($dtransacciones as $dtransaccione) {
+                        $cantidad++;
+                        $venta += $dtransaccione->venta;
+                    }
+                }
+            }
+            $resultado[] = array('establecimiento' => $establecimiento->id,
+                'cantidad' => $cantidad,
+                'venta' => $venta,
+            );
+        }
+        // dd($resultado);
+        $rango = ['fecha1' => $rangos[0], 'fecha2' => $rangos[1]];
+        return view('reportes.ventasxestablecimiento.parcialventasxestablecimiento', compact('resultado', 'rango', 'lista_esta', 'establecimientos'));
+    }
+    /*
+    * FUNCION GENERAR PDF para ventas por establecimiento
+    * Exporta a pdf, los resultados de las ventas por establecimiento
+    */
+    public function pdfVentasxEstablecimiento(Request $request)
+    {
+        $establecimientos = Establecimientos::wherein('id', $request->lista_esta)->orderby('razon_social', 'asc')->get();
+        $data = ['resultado' => $request->resultado, 'establecimientos' => $establecimientos, 'rango' => $request->fecha1 . " - " . $request->fecha2];
+        $pdf = \PDF::loadView('reportes.ventasxestablecimiento.pdfventasxestablecimiento', $data);
+        $pdf->setPaper('A4', 'landscape');
+        return $pdf->download('ventasxestablecimiento.pdf');
+    }
+    /*
+     * FUNCION GENERAR EXCEL para ventas por establecimiento
+     * Exporta a excel, los resultados de las ventas por establecimiento
+     */
+    public function excelVentasxEstablecimiento(Request $request)
+    {
+        $establecimientos = Establecimientos::wherein('id', $request->lista_esta)->orderby('razon_social', 'asc')->get();
+        \Excel::create('ExcelVentasxEstablecimiento', function ($excel) use ($request, $establecimientos) {
+            $resultado = $request->resultado;
+            $fecha1 = $request->fecha1;
+            $fecha2 = $request->fecha2;
+            $rango = $fecha1 . " - " . $fecha2;
+            $num_esta = 0;
+            //FOR ESTABLECIMIENTOS POR CADA UNO CREAR UNA PESTAÑA
+            if (sizeof($establecimientos) > 0) {
+                $canttotal = 0;
+                $ventatotal = 0;
+                    //titulo <h5>Establecimiento: {{$establecimiento->razon_social}}</h5>
+                $excel->sheet('Reporte', function ($sheet) use ($resultado, $establecimientos, $rango, $canttotal, $ventatotal) {
+                        $hoy = Carbon::now();
+                        $objDrawing = new PHPExcel_Worksheet_Drawing;
+                        $objDrawing->setPath(public_path('images/logo.png')); //your image path
+                        $objDrawing->setHeight(50);
+                        $objDrawing->setCoordinates('A1');
+                        $objDrawing->setWorksheet($sheet);
+                        $objDrawing->setOffsetY(10);
+                        $sheet->setWidth(array(
+                            'A' => 30,
+                            'B' => 20,
+                            'C' => 20,
+                            'D' => 20,
+                            'E' => 20,
+                            'F' => 20,
+                        ));
+                        $sheet->setMergeColumn(array(
+                            'columns' => array('A'),
+                            'rows' => array(
+                                array(1, 4),
+                            )
+                        ));
+                        $sheet->row(2, array('', 'REPORTE DE VENTAS PARA ESTABLECIMIENTO '));
+                        $sheet->row(2, function ($row) {
+                            $row->setBackground('#4CAF50');
+                        });
+                        $sheet->cells('A1:A4', function ($cells) {
+                            $cells->setBackground('#FFFFFF');
+                        });
+                        $sheet->setBorder('A1:A4', 'thin');
+                        $sheet->row(3, array('', 'Rango:', $rango, '', ''));
+                        $sheet->row(4, array('', 'Fecha:', $hoy, '', ''));
+                        $fila = 6;
+                            $cant = 0;
+                    $sheet->row($fila, array('Establecimiento','Nit','Cantidad de transacciones', 'Monto'));
+                    $sheet->row($fila, function ($row) {
+                        $row->setBackground('#f2f2f2');
+                    });
+                    $fila++;
+                    foreach ($establecimientos as $establecimiento) {
+                                if (sizeof($resultado) > 0) {
+                                    //$subtotal = 0;
+
+                                    foreach ($resultado as $miresul) {
+                                        if ($miresul["establecimiento"] == $establecimiento->id) {
+                                            $cant++;
+                                            $venta_name = '$ ' . number_format($miresul["venta"], 2, ',', '.');
+                                            $sheet->row($fila, array($establecimiento->razon_social, $establecimiento->nit, $miresul["cantidad"], $venta_name));
+                                            $fila++;
+                                            $canttotal += $miresul["cantidad"];
+                                            $ventatotal += $miresul["venta"];
+                                        }//cierra if
+                                    } //cierra foreach
+                                    //finaliza tabla
+                                }//cierra if
+                                if ($cant == 0)
+                                    $sheet->row($fila, array('No hay registros'));
+                    } //finaliza foreach
+                    $fila++;
+                        $ventatotal_name = '$ '.number_format( $ventatotal, 2, ',', '.');
+                        $sheet->row($fila, array('Total establecimientos','Cantidad de transacciones', 'Monto'));
+                        $sheet->row($fila, function ($row) {
+                            $row->setBackground('#f2f2f2');
+                        });
+                        $fila++;
+                        $sheet->row($fila, array(sizeof($establecimientos),$canttotal, $ventatotal_name));
+
+                });        //CIERRA PESTAÑA
+            } //finaliza if
+        })->export('xls');
+    }
+    /*
+     * FINALIZA REPORTE VENTAS POR ESTABLECIMIENTO
+     */
 }

@@ -73,6 +73,7 @@
             <li><a href="{{route('reportes.promedioxdatafono')}}"> Consumo promedio por datafono</a></li>
             <li><a href="{{route('reportes.montosusados')}}"> Montos usados</a></li>
             <li><a href="{{route('reportes.ventasxsucursal')}}"> Ventas por sucursal</a></li>
+            <li><a href="{{route('reportes.ventasxestablecimiento')}}"> Ventas por establecimiento</a></li>
         </ul>
     </li>
 </ul>
