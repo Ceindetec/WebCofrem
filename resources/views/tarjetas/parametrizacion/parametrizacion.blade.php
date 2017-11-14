@@ -21,7 +21,7 @@
 
 
         <div class="card-box">
-            <h4 class="m-t-0">Valor del plastico</h4>
+            <h4 class="m-t-0">Valor del plástico</h4>
             <br>
             {{Form::open(['route'=>['tarjeta.parametro.valor'], 'class'=>'form-inline', 'id'=>'parametrovalor'])}}
             <div class="form-group">
@@ -43,14 +43,12 @@
                     <tr>
                         <th>Valor</th>
                         <th>Estado</th>
-                        <th>Fecha creacion</th>
+                        <th>Fecha creación</th>
                     </tr>
                     </thead>
                 </table>
             </div>
         </div>
-
-
 
 
         <div class="row">

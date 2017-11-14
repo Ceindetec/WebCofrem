@@ -19,7 +19,7 @@
 
         <div class="row">
             <div class="col-sm-12">
-                <h5>Filtros de busqueda</h5>
+                <h5>Filtros de búsqueda</h5>
                 <div class="card-box widget-inline">
                     <div class="row">
                         <div class="col-lg-3 col-sm-6">

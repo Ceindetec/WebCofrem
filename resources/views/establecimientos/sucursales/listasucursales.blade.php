@@ -21,7 +21,7 @@
         </div> <!-- end row -->
 
         <div class="card-box">
-            <h4>Informacion del establecimiento</h4>
+            <h4>Información del establecimiento</h4>
             <p>&nbsp;</p>
             <div class="row">
                 <div class="col-sm-12">
@@ -31,13 +31,13 @@
                     </div>
                 </div>
                 <div class="col-sm-12">
-                    <label class="col-sm-2">Rozon social:</label>
+                    <label class="col-sm-2">Razón social:</label>
                     <div class="col-sm-10">
                         {{$establecimiento->razon_social}}
                     </div>
                 </div>
                 <div class="col-sm-12">
-                    <label class="col-sm-2">Estado</label>
+                    <label class="col-sm-2">Estado:</label>
                     <div class="col-sm-10">
                         {{$establecimiento->estado=='A'?'Activo':'Inactivo'}}
                     </div>
@@ -79,9 +79,9 @@
                         <tr>
                             <th>Nombre</th>
                             <th>Ciudad</th>
-                            <th>Direccion</th>
+                            <th>Dirección</th>
                             <th>Email</th>
-                            <th>Telefono</th>
+                            <th>Teléfono</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>

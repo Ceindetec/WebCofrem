@@ -35,10 +35,10 @@
                                     <table id="datatable" class="table table-striped table-bordered" width="100%">
                                         <thead>
                                         <tr>
-                                            <th>Numero tarjeta</th>
+                                            <th>Número tarjeta</th>
                                     <th>Monto inicial</th>
                                     <th>Sobrante</th>
-                                    <th>Fecha activacion</th>
+                                    <th>Fecha activación</th>
                                     <th>Fecha vencimiento</th>
                                 </tr>
                                 </thead>
@@ -75,10 +75,10 @@
                             <table id="datatable" class="table table-striped table-bordered" width="100%">
                                 <thead>
                                 <tr>
-                                    <th>Numero tarjeta</th>
-                                    <th>Monto incial</th>
+                                    <th>Número tarjeta</th>
+                                    <th>Monto inicial</th>
                                     <th>Sobrante</th>
-                                    <th>Fecha activacion</th>
+                                    <th>Fecha activación</th>
                                     <th>Fecha vencimiento</th>
                                 </tr>
                                 </thead>

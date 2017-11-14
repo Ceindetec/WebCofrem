@@ -91,7 +91,7 @@
             </div>
 
             <div class="form-group">
-                <label class="col-md-2 control-label">Porcentaje Administracion</label>
+                <label class="col-md-2 control-label">Porcentaje Administración</label>
                 <div class="col-md-4">
                     {{Form::select("adminis_tarjeta_id",$administracion,null,['class'=>'form-control', "tabindex"=>"10", 'id'=>'administracion'])}}
                 </div>

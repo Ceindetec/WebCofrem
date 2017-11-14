@@ -42,7 +42,7 @@
                                                 <table id="datatable" class="table table-striped table-bordered" width="100%">
                                                     <thead>
                                                     <tr>
-                                                        <th>Codigo del datafono</th>
+                                                        <th>Código del datafono</th>
                                                         <th>Estado actual</th>
                                                         <th>No. de transacciones</th>
                                                     </tr>

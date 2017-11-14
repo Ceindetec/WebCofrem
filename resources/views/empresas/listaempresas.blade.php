@@ -41,14 +41,14 @@
                         <thead>
                         <tr>
                             <th>Nit</th>
-                            <th>Razon social</th>
+                            <th>Razón social</th>
                             <th>Representante Legal</th>
                             <th>Departamento</th>
                             <th>Municipio</th>
                             <th>Email</th>
-                            <th>Telefono</th>
+                            <th>Teléfono</th>
                             <th>Celular</th>
-                            <th>Direccion</th>
+                            <th>Dirección</th>
                             <th>Tipo</th>
                             <th>Acciones</th>
                         </tr>
@@ -56,7 +56,7 @@
                         <tfoot>
                         <tr>
                             <th>Nit</th>
-                            <th>Razon social</th>
+                            <th>Razón social</th>
                             <th>Representante Legal</th>
                             <th></th>
                             <th></th>

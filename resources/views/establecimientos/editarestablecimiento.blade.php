@@ -31,7 +31,7 @@
         </div> <!-- end row -->
 
         <div class="card-box">
-            <h4 class="m-t-0">Informacion establecimiento @can('editar.establecimiento')<span class="pull-right">Editar <input type="checkbox"
+            <h4 class="m-t-0">Información establecimiento @can('editar.establecimiento')<span class="pull-right">Editar <input type="checkbox"
                                                                                                  id="editarcheck"
                                                                                                  data-plugin="switchery"
                                                                                                  data-color="#1bb99a"
@@ -47,7 +47,7 @@
             </div>
 
             <div class="form-group">
-                <label class="col-md-2 control-label">Razon social</label>
+                <label class="col-md-2 control-label">Razón social</label>
                 <div class="col-md-10">
                     {{Form::text('razon_social', null ,['class'=>'form-control', "id"=>"razon_social", "required", "maxlength"=>"40","data-parsley-pattern"=>"^[a-zA-Z0-9]+(\s*[a-zA-Z0-9]*)*[a-zA-Z0-9]+$","disabled" ])}}
                 </div>
@@ -61,7 +61,7 @@
             </div>
 
             <div class="form-group">
-                <label class="col-md-2 control-label">Telefono</label>
+                <label class="col-md-2 control-label">Teléfono</label>
                 <div class="col-md-10">
                     {{Form::text('telefono', null ,['class'=>'form-control',"id"=>"telefono", "required", "data-parsley-type"=>"number", "maxlength"=>"10", "disabled"])}}
                 </div>
@@ -115,10 +115,10 @@
                 <table id="datatable" class="table table-striped table-bordered" width="100%">
                     <thead>
                     <tr>
-                        <th>Numero de convenio</th>
+                        <th>Número de convenio</th>
                         <th>Fecha de inicio</th>
                         <th>Fecha de finalización</th>
-                        <th>estado</th>
+                        <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                     </thead>

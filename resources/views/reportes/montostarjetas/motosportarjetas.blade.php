@@ -18,14 +18,14 @@
 
         <div class="row">
             <div class="col-sm-12">
-                <h4 class="header-title m-t-0 m-b-20">Reporte de activacion de servicios(tarjetas) discriminados por monto </h4>
+                <h4 class="header-title m-t-0 m-b-20">Reporte de activación de servicios(tarjetas) discriminados por monto </h4>
             </div>
         </div> <!-- end row -->
 
 
         <div class="row">
             <div class="col-sm-12">
-                <h5>Filtros de busqueda</h5>
+                <h5>Filtros de búsqueda</h5>
                 <div class="card-box widget-inline">
                     <div class="row">
                         <div class="col-lg-3 col-sm-6">
@@ -121,7 +121,7 @@
                         "Julio",
                         "Agosto",
                         "Septiembre",
-                        "Ocutbre",
+                        "Octubre",
                         "Noviembre",
                         "Diciembre"
                     ],

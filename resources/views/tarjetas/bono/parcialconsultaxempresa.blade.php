@@ -2,10 +2,10 @@
     <table id="datatable" class="table table-striped table-bordered" width="100%">
         <thead>
         <tr>
-            <th>Numero de contrato</th>
+            <th>Número de contrato</th>
             <th>Valor</th>
             <th>Fecha creación</th>
-            <th>Accion</th>
+            <th>Acción</th>
         </tr>
         </thead>
         <tbody>

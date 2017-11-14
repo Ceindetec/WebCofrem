@@ -17,7 +17,7 @@
 
 
         <div class="form-group">
-            <label class="col-md-2 control-label">Razon social</label>
+            <label class="col-md-2 control-label">Razón social</label>
             <div class="col-md-10">
                 {{Form::text('razon_social', null ,['class'=>'form-control', "id"=>"razon_social", "required", "maxlength"=>"40", "data-parsley-pattern"=>"^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]+(\s*[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]*)*[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]+$"])}}
             </div>
@@ -55,7 +55,7 @@
 
 
         <div class="form-group">
-            <label class="col-md-2 control-label">Telefono</label>
+            <label class="col-md-2 control-label">Teléfono</label>
             <div class="col-md-10">
                 {{Form::text('telefono', null ,['class'=>'form-control', "required", "data-parsley-type"=>"number", "maxlength"=>"10"])}}
             </div>
@@ -71,7 +71,7 @@
 
 
         <div class="form-group">
-            <label class="col-md-2 control-label">Direccion</label>
+            <label class="col-md-2 control-label">Dirección</label>
             <div class="col-md-10">
                 {{Form::text('direccion', null ,['class'=>'form-control', "required", "maxlength"=>"40"])}}
             </div>

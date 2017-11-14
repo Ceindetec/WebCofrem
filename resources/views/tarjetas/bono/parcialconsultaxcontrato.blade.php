@@ -12,8 +12,8 @@
     <table id="datatable" class="table table-striped table-bordered" width="100%">
         <thead>
         <tr>
-            <th>Numero tarjeta</th>
-            <th>Numero contrato</th>
+            <th>Número tarjeta</th>
+            <th>Número contrato</th>
             <th>Monto</th>
             <th>Estado</th>
         </tr>
