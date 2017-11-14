@@ -106,4 +106,18 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('reportes/montosusados/exportarexcel','ReportesController@excelMontosUsados')->name('excelmontosusados');
     /*FINALIZA REPORTE MONTOS USADOS*/
 
+    /*INICIA REPORTE VENTAS POR SUCURSAL*/
+    Route::get('reportes/ventasxsucursal/consulta','ReportesController@viewVentasxSucursal')->name('reportes.ventasxsucursal');
+    Route::post('reportes/ventasxsucursal/resultadoconsulta','ReportesController@consultarVentasxSucursal')->name('resultadoventasxsucursal');
+    Route::get('reportes/ventasxsucursal/exportarpdf','ReportesController@pdfVentasxSucursal')->name('pdfventasxsucursal');
+    Route::get('reportes/ventasxsucursal/exportarexcel','ReportesController@excelVentasxSucursal')->name('excelventasxsucursal');
+    /*FINALIZA REPORTE VENTAS POR SUCURSAL*/
+
+    /*INICIA REPORTE VENTAS POR ESTABLECIMIENTO*/
+    Route::get('reportes/ventasxestablecimiento/consulta','ReportesController@viewVentasxEstablecimiento')->name('reportes.ventasxestablecimiento');
+    Route::post('reportes/ventasxestablecimiento/resultadoconsulta','ReportesController@consultarVentasxEstablecimiento')->name('resultadoventasxestablecimiento');
+    Route::get('reportes/ventasxestablecimiento/exportarpdf','ReportesController@pdfVentasxEstablecimiento')->name('pdfventasxestablecimiento');
+    Route::get('reportes/ventasxestablecimiento/exportarexcel','ReportesController@excelVentasxEstablecimiento')->name('excelventasxestablecimiento');
+    /*FINALIZA REPORTE VENTAS POR ESTABLECIMIENTO*/
+
 });
