@@ -16,7 +16,7 @@
         <a href="javascript: void(0);" aria-expanded="true"><i class="ti-layout"></i> Establecimientos <span
                     class="fa arrow"></span></a>
         <ul class="nav-second-level nav collapse" aria-expanded="true" style="">
-            <li><a href="{{route('establecimientos')}}">Establecimeintos</a></li>
+            <li><a href="{{route('establecimientos')}}">Establecimientos</a></li>
             @can('trasladar.terminal')
                 <li><a href="{{route('traladoterminal')}}">Trasladar terminal</a></li>
             @endcan
@@ -37,7 +37,7 @@
                     class="fa arrow"></span></a>
         <ul class="nav-second-level nav collapse in" aria-expanded="true" style="">
             @can('parametrizar.producto')
-                <li><a href="{{route('tarjetas.parametros')}}">Parametrizacion</a></li>
+                <li><a href="{{route('tarjetas.parametros')}}">Parametrización</a></li>
             @endcan
             <li><a href="{{route('tarjetas')}}">Inventario</a></li>
             @can('duplicar.tarjeta')
@@ -65,9 +65,9 @@
         <ul class="nav-second-level nav collapse" aria-expanded="true" style="">
             <li><a href="{{route('rprimeravez')}}"> Tarjetas usadas por primera vez </a></li>
             <li><a href="{{route('reportes.saldosvencidos')}}"> Saldos vencidos </a></li>
-            <li><a href="{{route('reportes.montostarjetas')}}"> Activacion por montos </a></li>
+            <li><a href="{{route('reportes.montostarjetas')}}"> Activación por montos </a></li>
             <li><a href="{{route('reportes.ventasdiarias')}}"> Ventas diarias </a></li>
-            <li><a href="{{route('reportes.datafonosxestablecimientos')}}"> Relación de Datafonos </a></li>
+            <li><a href="{{route('reportes.datafonosxestablecimientos')}}"> Relación de datafonos </a></li>
             <li><a href="{{route('reportes.saldotarjeta')}}"> Saldos de tarjeta </a></li>
             <li><a href="{{route('reportes.transaccionesxdatafono')}}"> Transacciones por datafono </a></li>
             <li><a href="{{route('reportes.promedioxdatafono')}}"> Consumo promedio por datafono</a></li>

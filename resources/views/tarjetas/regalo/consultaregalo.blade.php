@@ -26,7 +26,7 @@
                     <table id="datatable" class="table table-striped table-bordered" width="100%">
                         <thead>
                         <tr>
-                            <th>Numero tarjeta</th>
+                            <th>Número tarjeta</th>
                             <th>Factura</th>
                             <th>Monto</th>
                             <th>Estado</th>
@@ -35,7 +35,7 @@
                         </thead>
                         <tfoot>
                         <tr>
-                            <th>Numero tarjeta</th>
+                            <th>Número tarjeta</th>
                             <th>Factura</th>
                             <th></th>
                             <th></th>

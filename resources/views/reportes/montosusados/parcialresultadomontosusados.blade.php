@@ -35,7 +35,7 @@
                                     <table id="datatable" class="table table-striped table-bordered" width="100%">
                                         <thead>
                                         <tr>
-                                            <th>Numero tarjeta</th>
+                                            <th>Número tarjeta</th>
                                             <th>Monto inicial</th>
                                             <th>Monto usado</th>
                                             <th>Saldo</th>
@@ -85,7 +85,7 @@
                                     <table id="datatable2" class="table table-striped table-bordered" width="100%">
                                         <thead>
                                         <tr>
-                                            <th>Numero tarjeta</th>
+                                            <th>Número tarjeta</th>
                                             <th>Monto inicial</th>
                                             <th>Monto usado</th>
                                             <th>Saldo</th>

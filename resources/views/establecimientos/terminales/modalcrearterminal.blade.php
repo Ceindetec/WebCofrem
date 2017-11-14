@@ -7,7 +7,7 @@
     <div class="modal-body">
         <div class="row">
             <div class="form-group">
-                <label class="col-md-2 control-label">Numero activo</label>
+                <label class="col-md-2 control-label">Número activo</label>
                 <div class="col-md-10">
                     {{Form::text('numero_activo', null ,['class'=>'form-control', "required", "maxlength"=>"10", "data-parsley-type"=>"number"])}}
                 </div>

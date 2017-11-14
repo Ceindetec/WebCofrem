@@ -59,7 +59,7 @@
                             <div class="widget-inline-box">
                                 <a href="{{route('tarjetas.crearbloque')}}" data-modal
                                    class="btn btn-custom waves-effect waves-light" data-toggle="modal"
-                                   data-target="#modalrol">Agregar Tarjetas en bloque</a>
+                                   data-target="#modalrol">Agregar Tarjetas en Bloque</a>
                             </div>
                         </div>
                     </div>
@@ -73,9 +73,9 @@
                     <table id="datatable" class="table table-striped table-bordered" width="100%">
                         <thead>
                         <tr>
-                            <th>Numero de tarjeta</th>
+                            <th>Número de tarjeta</th>
                             <th>Tipo</th>
-                            <th>Cambio Clave</th>
+                            <th>Cambio clave</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
