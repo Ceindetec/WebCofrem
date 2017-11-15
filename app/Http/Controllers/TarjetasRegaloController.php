@@ -219,7 +219,7 @@ class TarjetasRegaloController extends Controller
         //TODO: en este punto es necesario consultar la factura para saber el monto
 
         // array que simula el modelo de la factura que llegaria del WS
-        $factura = ["numero_factura" => "02", "monto" => "200000"];
+        $factura = ["numero_factura" => "02", "monto" => "2000000"];
 
         if ($montoInicialTotal <= $factura["monto"]) {
             $collectionDetallesProducto = DetalleProdutos::where("factura", $request->numero_factura)
