@@ -66,7 +66,7 @@ class WebApiController extends Controller
                 $data['estado_sucursal'] = $sucursal->estado;
                 $data['estado_terminal'] = $terminal->estado;
                 $data['codigo_terminal'] = $terminal->codigo;
-                $data['ip1'] = "192.168.0.244";
+                $data['ip1'] = "192.168.0.43";
                 $result['estado'] = TRUE;
                 $result['mensaje'] = ApiWS::$TEXT_VALIDACION_EXITOSA;
                 $result['data'] = $data;
@@ -257,7 +257,7 @@ class WebApiController extends Controller
         $servicios = TarjetaServicios::join('servicios', 'tarjeta_servicios.servicio_codigo', 'servicios.codigo')
             ->where('numero_tarjeta', $tarjeta->numero_tarjeta)
             ->where('estado', TarjetaServicios::$ESTADO_ACTIVO)
-            ->select('servicios.descripcion', 'servicios.codigo')
+            ->select('servicios.descripcion', 'servicios.codigo as codigo_servicio')
             ->get();
         $result['estado'] = TRUE;
         $result['mensaje'] = ApiWS::$TEXT_TRANSACCION_EXITOSA;
@@ -428,6 +428,54 @@ class WebApiController extends Controller
                                             $detalleProdutos = DetalleProdutos::where('numero_tarjeta', $request->numero_tarjeta)
                                                 ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
                                                 ->where('factura', '<>', NULL)
+                                                ->whereDate('fecha_vencimiento', '>', Carbon::now())
+                                                ->orderBy('fecha_vencimiento', 'asc')
+                                                ->get();
+                                            foreach ($detalleProdutos as $detalleProduto) {
+                                                $transaciones = Transaccion::join('h_estado_transacciones', 'transacciones.id', 'h_estado_transacciones.transaccion_id')
+                                                    ->join('detalle_transacciones', 'transacciones.id', 'detalle_transacciones.transaccion_id')
+                                                    ->where('transacciones.numero_tarjeta', $request->numero_tarjeta)
+                                                    ->where('detalle_transacciones.detalle_producto_id', $detalleProduto->id)
+                                                    ->where('h_estado_transacciones.estado', 'A')
+                                                    ->groupBy('transacciones.numero_tarjeta')
+                                                    ->select(\DB::raw('SUM(valor) as total'))
+                                                    ->get();
+                                                $porconsumir = $detalleProduto->monto_inicial - $transaciones[0]->total;
+                                                if ($porconsumir > 0) {
+                                                    $consumir = $porconsumir - $valorConsumir;
+                                                    if ($consumir < 0) {
+                                                        $newDetalle = new DetalleTransaccion();
+                                                        $newDetalle->transaccion_id = $newTransaccion->id;
+                                                        $newDetalle->detalle_producto_id = $detalleProduto->id;
+                                                        $newDetalle->valor = $porconsumir;
+                                                        $newDetalle->descripcion = DetalleTransaccion::$DESCRIPCION_CONSUMO;
+                                                        $newDetalle->save();
+                                                        $detalleProduto->estado = DetalleProdutos::$ESTADO_INACTIVO;
+                                                        $detalleProduto->save();
+                                                        $historico = new Htarjetas();
+                                                        $historico->estado = 'I';
+                                                        $historico->motivo = 'Consumido el servicio';
+                                                        $historico->fecha = Carbon::now();
+                                                        $historico->user_id = '1';
+                                                        $historico->tarjetas_id = $tarjeta->id;
+                                                        $historico->servicio_codigo = $servicio;
+                                                        $historico->save();
+                                                        $valorConsumir = $valorConsumir - $porconsumir;
+                                                    } else {
+                                                        $newDetalle = new DetalleTransaccion();
+                                                        $newDetalle->transaccion_id = $newTransaccion->id;
+                                                        $newDetalle->detalle_producto_id = $detalleProduto->id;
+                                                        $newDetalle->valor = $valorConsumir;
+                                                        $newDetalle->descripcion = DetalleTransaccion::$DESCRIPCION_CONSUMO;
+                                                        $newDetalle->save();
+                                                        $valorConsumir = 0;
+                                                    }
+                                                }
+                                            }
+                                        } else if ($servicio == Tarjetas::$CODIGO_SERVICIO_BONO) {
+                                            $detalleProdutos = DetalleProdutos::where('numero_tarjeta', $request->numero_tarjeta)
+                                                ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
+                                                ->where('CONTRATO_EMPRS_ID', '<>', NULL)
                                                 ->whereDate('fecha_vencimiento', '>', Carbon::now())
                                                 ->orderBy('fecha_vencimiento', 'asc')
                                                 ->get();
@@ -654,14 +702,14 @@ class WebApiController extends Controller
                                     $persona = Personas::find($tarjeta->persona_id);
                                     if ($persona->documento == $request->documento) {
                                         $nombre = $persona->nombres . " " . $persona->apellidos;
-                                        $result = $this->anulaTransaccion($request,$terminal->codigo,$tarjeta->numero_tarjeta,$persona->documento,$nombre);
+                                        $result = $this->anulaTransaccion($request, $terminal->codigo, $tarjeta->numero_tarjeta, $persona->identificacion, $nombre);
                                     } else {
                                         $result['estado'] = FALSE;
                                         $result['mensaje'] = ApiWS::$TEXT_DOCUMENTIO_INCORRECTO;
                                         $result['codigo'] = ApiWS::$CODIGO_DOCUMENTIO_INCORRECTO;
                                     }
                                 } else {
-                                    $result = $this->anulaTransaccion($request,$terminal->codigo,$tarjeta->numero_tarjeta,"","");
+                                    $result = $this->anulaTransaccion($request, $terminal->codigo, $tarjeta->numero_tarjeta, "", "");
                                 }
                             } else {
                                 $result['estado'] = FALSE;
@@ -701,7 +749,7 @@ class WebApiController extends Controller
      * @param $request
      * @return array
      */
-    private function anulaTransaccion($request,$codigo,$numero_tarjeta,$cedula, $nombres)
+    private function anulaTransaccion($request, $codigo, $numero_tarjeta, $cedula, $nombres)
     {
         $result = [];
         try {
@@ -709,7 +757,7 @@ class WebApiController extends Controller
             if ($transaccion != NULL) {
                 if ($transaccion->codigo_terminal == $request->codigo) {
                     $fecha_hoy = Carbon::now()->format('Y-m-d');
-                    if (Carbon::createFromFormat('Y-m-d H:i:s',$transaccion->fecha)->toDateString() == $fecha_hoy) {
+                    if (Carbon::createFromFormat('Y-m-d H:i:s', $transaccion->fecha)->toDateString() == $fecha_hoy) {
                         $hestado = new HEstadoTransaccion();
                         $hestado->transaccion_id = $transaccion->id;
                         $hestado->estado = HEstadoTransaccion::$ESTADO_INACTIVO;
@@ -723,7 +771,7 @@ class WebApiController extends Controller
                         $result['codigoTerminal'] = $codigo;
                         $result['numeroTarjeta'] = $numero_tarjeta;
                         $result['tipoTransaccion'] = Transaccion::$TIPO_CONSUMO;
-                        $consumido  = DetalleTransaccion::where('transaccion_id',$transaccion->id)
+                        $consumido = DetalleTransaccion::where('transaccion_id', $transaccion->id)
                             ->select([DB::raw('SUM(valor) as total')])
                             ->groupBy('transaccion_id')->first();
                         $result['valor'] = $consumido->total;// ----> esta dalo lo queme se nesecita el valor de la transaccion
