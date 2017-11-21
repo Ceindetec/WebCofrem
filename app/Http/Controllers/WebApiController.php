@@ -66,7 +66,7 @@ class WebApiController extends Controller
                 $data['estado_sucursal'] = $sucursal->estado;
                 $data['estado_terminal'] = $terminal->estado;
                 $data['codigo_terminal'] = $terminal->codigo;
-                $data['ip1'] = "192.168.0.43";
+                $data['ip1'] = "192.168.0.26";
                 $result['estado'] = TRUE;
                 $result['mensaje'] = ApiWS::$TEXT_VALIDACION_EXITOSA;
                 $result['data'] = $data;
@@ -254,14 +254,58 @@ class WebApiController extends Controller
     private function retornaServicios($tarjeta, $request)
     {
         $result = [];
-        $servicios = TarjetaServicios::join('servicios', 'tarjeta_servicios.servicio_codigo', 'servicios.codigo')
+        /*$servicios = TarjetaServicios::join('servicios', 'tarjeta_servicios.servicio_codigo', 'servicios.codigo')
             ->where('numero_tarjeta', $tarjeta->numero_tarjeta)
             ->where('estado', TarjetaServicios::$ESTADO_ACTIVO)
             ->select('servicios.descripcion', 'servicios.codigo as codigo_servicio')
             ->get();
         $result['estado'] = TRUE;
         $result['mensaje'] = ApiWS::$TEXT_TRANSACCION_EXITOSA;
-        $result['servicios'] = $servicios;
+        $result['servicios'] = $servicios;*/
+
+
+        $numero_tarjeta = $request->numero_tarjeta;
+        $resultado = array();
+        $listado = [];
+        array_push($listado, $numero_tarjeta);
+        $respuesta = $this->consultarDuplicados($numero_tarjeta, $listado);
+        if ($respuesta != null)
+            $listado = $respuesta;
+        $detalles = DetalleProdutos::wherein('numero_tarjeta', $listado)
+            ->where('estado', DetalleProdutos::$ESTADO_ACTIVO)
+            ->get();
+        foreach ($detalles as $detalle) {
+            $gasto = 0;
+            $listadod = [];
+            array_push($listadod, $detalle->id);
+            $respuesta = $this->consultarDuplicadoProductos($detalle->id, $listadod);
+            if ($respuesta != null)
+                $listadod = $respuesta;
+            $dtransacciones = DetalleTransaccion::wherein('detalle_producto_id', $listadod)->get();//$detalle->id
+            foreach ($dtransacciones as $dtransaccione) {
+                $htransaccion = DB::table('h_estado_transacciones')->where('transaccion_id', $dtransaccione->transaccion_id)->orderBy('id', 'desc')->first();
+                if ($htransaccion->estado == HEstadoTransaccion::$ESTADO_ACTIVO)
+                    $gasto += $dtransaccione->valor;
+            }
+            $sobrante = $detalle->monto_inicial - $gasto;
+            $sobrante = number_format($sobrante, 2, ',', '.');
+            if ($detalle->contrato_emprs_id == null) {
+                $codigo_servicio = Tarjetas::$CODIGO_SERVICIO_REGALO;
+                $servicio = 'Regalo';
+            } else {
+                $codigo_servicio = Tarjetas::$CODIGO_SERVICIO_BONO;
+                $servicio = 'Bono empresarial';
+            }
+            $resultado[] = array(
+                'codigo_servicio' => $codigo_servicio,
+                'descripcion' => $servicio,
+                'saldo' => $sobrante,
+            );
+        }
+
+        $result['estado'] = TRUE;
+        $result['mensaje'] = ApiWS::$TEXT_TRANSACCION_EXITOSA;
+        $result['servicios'] = $resultado;
         return $result;
     }
 
