@@ -700,9 +700,13 @@ class TarjetasRegaloController extends Controller
             $detalle->fecha_vencimiento = Carbon::now()->addYear();
             $detalle->estado = DetalleProdutos::$ESTADO_ACTIVO;
             $detalle->save();
-            $tarjeta_servicio = TarjetaServicios::where('numero_tarjeta', $detalle->numero_tarjeta)->first();
-            $tarjeta_servicio->estado = TarjetaServicios::$ESTADO_ACTIVO;
-            $tarjeta_servicio->save();
+            $tarjeta_servicios = TarjetaServicios::where('numero_tarjeta', $detalle->numero_tarjeta)->get();
+            foreach ($tarjeta_servicios as $servicio){
+                if($servicio->servicio_codigo == Tarjetas::$CODIGO_SERVICIO_REGALO){
+                    $servicio->estado = TarjetaServicios::$ESTADO_ACTIVO;
+                    $servicio->save();
+                }
+            }
             $tarjeta = Tarjetas::where('numero_tarjeta',$detalle->numero_tarjeta)->first();
             $tarjeta->estado = Tarjetas::$ESTADO_TARJETA_ACTIVA;
             $tarjeta->save();
