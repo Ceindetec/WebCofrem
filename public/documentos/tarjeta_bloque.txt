@@ -1,0 +1,7 @@
+1111;nina;ramirEz;10000
+2222;valeria;dominguez;20000
+3333;sandy;rabanne;15000
+
+Cada linea corresponde a una tarjeta bono y tiene el siguiente formato:
+
+documento de la persona;nombres;apellidos;monto

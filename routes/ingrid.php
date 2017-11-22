@@ -120,4 +120,13 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('reportes/ventasxestablecimiento/exportarexcel','ReportesController@excelVentasxEstablecimiento')->name('excelventasxestablecimiento');
     /*FINALIZA REPORTE VENTAS POR ESTABLECIMIENTO*/
 
+    /*INICIA CONVENIOS EMPRESAS*/
+    route::get('empresas/convenios/principal/{id}', 'ConveniosEmpresasController@index')->name('empresas.convenios');
+    route::get('empresas/convenios/consulta/{id}', 'ConveniosEmpresasController@gridConvenios')->name('gridconvenios');
+    route::get('empresas/convenios/crear', 'ConveniosEmpresasController@viewCrearConvenio')->name('empresas.convenio.crear');
+    route::post('empresas/convenios/crear/{id}', 'ConveniosEmpresasController@CrearConvenio')->name('empresas.convenio.crearp');
+    route::get('empresas/convenios/editar', 'ConveniosEmpresasController@viewEditarConvenio')->name('empresas.convenio.editar');
+    route::post('empresas/convenios/editar/{id}', 'ConveniosEmpresasController@EditarConvenio')->name('empresas.convenio.editarp');
+    /*FINALIZA CONVENIOS EMPRESAS*/
+
 });
