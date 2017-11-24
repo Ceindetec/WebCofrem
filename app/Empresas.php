@@ -11,7 +11,7 @@ class Empresas extends Model implements AuditableContract
     //
     use Auditable;
     protected $fillable = [
-        'nit', 'razon_social', 'representante_legal', 'municipio_codigo', 'email', 'telefono','celular','direccion','tipo',
+        'nit', 'razon_social', 'representante_legal', 'municipio_codigo', 'email', 'telefono','celular','direccion','tipo','tipo_documento'
     ];
 
 
@@ -23,5 +23,9 @@ class Empresas extends Model implements AuditableContract
     public function getEstablecimiento()
     {
         return $this->belongsTo('creditocofrem\Establecimientos', 'establecimiento_id','id');
+    }
+    public function getTipoDocumento()
+    {
+        return $this->belongsTo('creditocofrem\TipoDocumento','tipo_documento','tip_codi');
     }
 }// se relaciona es con el modelo municipios
