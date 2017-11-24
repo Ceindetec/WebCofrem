@@ -71,9 +71,9 @@
                     <table id="datatable" class="table table-striped table-bordered" width="100%">
                         <thead>
                         <tr>
-                            <th>Codigo</th>
+                            <th>Código</th>
                             <th>Celular</th>
-                            <th>Numero activo</th>
+                            <th>Número activo</th>
                             <th>Establecimiento</th>
                             <th>Sucursal</th>
                             <th>Estado</th>
@@ -82,9 +82,9 @@
                         </thead>
                         <tfoot>
                         <tr>
-                            <th>Codigo</th>
+                            <th>Código</th>
                             <th>Celular</th>
-                            <th>Numero activo</th>
+                            <th>Número activo</th>
                             <th>Establecimiento</th>
                             <th>Sucursal</th>
                             <th></th>
@@ -95,10 +95,7 @@
                 </div>
             </div>
         </div>
-
     </div>
-
-
 
 @endsection
 
@@ -121,8 +118,6 @@
     <script>
         var table;
         $(function () {
-
-
 
             table = $('#datatable').DataTable({
                 processing: true,

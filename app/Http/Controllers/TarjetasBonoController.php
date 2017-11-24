@@ -74,7 +74,6 @@ class TarjetasBonoController extends Controller
                 //$tservicio = TarjetaServicios::where("numero_tarjeta",$num_tarjeta)->where("servicio_codigo",Tarjetas::$CODIGO_SERVICIO_BONO)->first();
                 //dd("valor de resultado tservicio ".$tservicio);
 
-                $tarjeta = Tarjetas::where("numero_tarjeta", $num_tarjeta)->first();
                 $result = $this->crearTarjeta($num_tarjeta, Tarjetas::$ESTADO_TARJETA_CREADA, Tarjetas::$CODIGO_SERVICIO_BONO);
 
                 /*if($tarjeta==null) //no existe la tarjeta
@@ -87,6 +86,9 @@ class TarjetasBonoController extends Controller
                 {
                     $result = $this->crearPersona($request->identificacion, $request->nombres, $request->apellidos);
                 }
+                $persona = Personas::where("identificacion", $request->identificacion)->first();
+                $tarjeta = Tarjetas::where("numero_tarjeta", $num_tarjeta)->update(['persona_id' => $persona->id]);
+
                 $monto = str_replace(".", "", $request->monto);
                 //insertar el detalle del producto
                 $result = $this->crearDetalleProd($num_tarjeta, $monto, $contrato->id, Tarjetas::$ESTADO_TARJETA_INACTIVA);
@@ -420,6 +422,8 @@ class TarjetasBonoController extends Controller
                                         {
                                             $result = $this->crearPersona($identificacion, $nombres, $apellidos);
                                         }
+                                        $persona = Personas::where("identificacion", $identificacion)->first();
+                                        $tarjeta = Tarjetas::where("numero_tarjeta", $num_tarjeta)->update(['persona_id' => $persona->id]);
                                         $monto = str_replace(".", "", $monto);
                                         //insertar el detalle del producto
                                         $result = $this->crearDetalleProd($num_tarjeta, $monto, $contrato->id, DetalleProdutos::$ESTADO_INACTIVO);
@@ -603,9 +607,13 @@ class TarjetasBonoController extends Controller
             $detalle->fecha_vencimiento = Carbon::now()->addYear();
             $detalle->estado = DetalleProdutos::$ESTADO_ACTIVO;
             $detalle->save();
-            $tarjeta_servicio = TarjetaServicios::where('numero_tarjeta', $detalle->numero_tarjeta)->first();
-            $tarjeta_servicio->estado = TarjetaServicios::$ESTADO_ACTIVO;
-            $tarjeta_servicio->save();
+            $tarjeta_servicios = TarjetaServicios::where('numero_tarjeta', $detalle->numero_tarjeta)->get();
+            foreach ($tarjeta_servicios as $servicio){
+                if($servicio->servicio_codigo == Tarjetas::$CODIGO_SERVICIO_BONO){
+                    $servicio->estado = TarjetaServicios::$ESTADO_ACTIVO;
+                    $servicio->save();
+                }
+            }
             $tarjeta = Tarjetas::where('numero_tarjeta', $detalle->numero_tarjeta)->first();
             $tarjeta->estado = Tarjetas::$ESTADO_TARJETA_ACTIVA;
             $tarjeta->save();

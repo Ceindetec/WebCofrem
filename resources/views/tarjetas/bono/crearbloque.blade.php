@@ -39,6 +39,7 @@
                                 <div class="col-sm-7">
                                     {{Form::file('archivo',['class'=>'filestyle', "data-buttontext"=>"Buscar archivo", "required"=>"true", "tabindex"=>"4",'id'=>'archivo','accept'=>'.txt'])}}
                                 </div>
+                                <a href="{{url("documentos/tarjeta_bloque.txt")}}" target="_blank">Ver ejemplo</a>
                             </div>
                             <div class="form-group">
                                 <div class="col-sm-offset-3 col-sm-9">

@@ -98,4 +98,35 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('reportes/promedioxdatafono/exportarexcel','ReportesController@excelPromedioxDatafono')->name('excelpromedioxdatafono');
     /*FINALIZA REPORTE PROMEDIO POR DATAFONO*/
 
+    /*INICIA REPORTE MONTOS USADOS*/
+    Route::get('reportes/montosusados/consulta','ReportesController@viewMontosUsados')->name('reportes.montosusados');
+    Route::get('select/establecimientos',"ReportesController@selectestablecimientos")->name('selectestablecimientos');
+    Route::post('reportes/montosusados/resultadoconsulta','ReportesController@consultarMontosUsados')->name('resultadomontosusados');
+    Route::get('reportes/montosusados/exportarpdf','ReportesController@pdfMontosUsados')->name('pdfmontosusados');
+    Route::get('reportes/montosusados/exportarexcel','ReportesController@excelMontosUsados')->name('excelmontosusados');
+    /*FINALIZA REPORTE MONTOS USADOS*/
+
+    /*INICIA REPORTE VENTAS POR SUCURSAL*/
+    Route::get('reportes/ventasxsucursal/consulta','ReportesController@viewVentasxSucursal')->name('reportes.ventasxsucursal');
+    Route::post('reportes/ventasxsucursal/resultadoconsulta','ReportesController@consultarVentasxSucursal')->name('resultadoventasxsucursal');
+    Route::get('reportes/ventasxsucursal/exportarpdf','ReportesController@pdfVentasxSucursal')->name('pdfventasxsucursal');
+    Route::get('reportes/ventasxsucursal/exportarexcel','ReportesController@excelVentasxSucursal')->name('excelventasxsucursal');
+    /*FINALIZA REPORTE VENTAS POR SUCURSAL*/
+
+    /*INICIA REPORTE VENTAS POR ESTABLECIMIENTO*/
+    Route::get('reportes/ventasxestablecimiento/consulta','ReportesController@viewVentasxEstablecimiento')->name('reportes.ventasxestablecimiento');
+    Route::post('reportes/ventasxestablecimiento/resultadoconsulta','ReportesController@consultarVentasxEstablecimiento')->name('resultadoventasxestablecimiento');
+    Route::get('reportes/ventasxestablecimiento/exportarpdf','ReportesController@pdfVentasxEstablecimiento')->name('pdfventasxestablecimiento');
+    Route::get('reportes/ventasxestablecimiento/exportarexcel','ReportesController@excelVentasxEstablecimiento')->name('excelventasxestablecimiento');
+    /*FINALIZA REPORTE VENTAS POR ESTABLECIMIENTO*/
+
+    /*INICIA CONVENIOS EMPRESAS*/
+    route::get('empresas/convenios/principal/{id}', 'ConveniosEmpresasController@index')->name('empresas.convenios');
+    route::get('empresas/convenios/consulta/{id}', 'ConveniosEmpresasController@gridConvenios')->name('gridconvenios');
+    route::get('empresas/convenios/crear', 'ConveniosEmpresasController@viewCrearConvenio')->name('empresas.convenio.crear');
+    route::post('empresas/convenios/crear/{id}', 'ConveniosEmpresasController@CrearConvenio')->name('empresas.convenio.crearp');
+    route::get('empresas/convenios/editar', 'ConveniosEmpresasController@viewEditarConvenio')->name('empresas.convenio.editar');
+    route::post('empresas/convenios/editar/{id}', 'ConveniosEmpresasController@EditarConvenio')->name('empresas.convenio.editarp');
+    /*FINALIZA CONVENIOS EMPRESAS*/
+
 });

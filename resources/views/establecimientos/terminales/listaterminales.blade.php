@@ -23,7 +23,7 @@
         </div> <!-- end row -->
 
         <div class="card-box">
-            <h4>Informacion del establecimiento</h4>
+            <h4>Información del establecimiento</h4>
             <p>&nbsp;</p>
             <div class="row">
                 <div class="col-sm-12">
@@ -33,7 +33,7 @@
                     </div>
                 </div>
                 <div class="col-sm-12">
-                    <label class="col-sm-2">Rozon social:</label>
+                    <label class="col-sm-2">Razón social:</label>
                     <div class="col-sm-10">
                         {{$sucursal->getEstablecimiento->razon_social}}
                     </div>
@@ -78,24 +78,24 @@
                     <table id="datatable" class="table table-striped table-bordered" width="100%">
                         <thead>
                         <tr>
-                            <th>Codigo</th>
+                            <th>Código</th>
                             <th>uid</th>
                             <th>mac</th>
                             <th>Imei</th>
                             <th>Celular</th>
-                            <th>Numero activo</th>
+                            <th>Número activo</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                         </thead>
                         <tfoot>
                         <tr>
-                            <th>Codigo</th>
+                            <th>Código</th>
                             <th>uid</th>
                             <th>mac</th>
                             <th>Imei</th>
                             <th>Celular</th>
-                            <th>Numero activo</th>
+                            <th>Número activo</th>
                             <th></th>
                             <th></th>
                         </tr>

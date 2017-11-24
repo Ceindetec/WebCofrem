@@ -36,6 +36,10 @@ class EmpresasController extends Controller
             ->addColumn('action', function ($empresas) {
                 $acciones = '<div class="btn-group">';
                 $acciones = $acciones . '<a href="' . route("empresa.editar", ["id" => $empresas->id]) . '" data-modal class="btn btn-xs btn-custom" ><i class="ti-pencil-alt"></i> Editar</a>';
+                if($empresas->tipo == "A")
+                {
+                    $acciones = $acciones . '<a href="' . route("empresas.convenios", ["id" => $empresas->id]) . '" class="btn btn-xs btn-custom" ><i class="ti-layers-alt">Convenios</i> </a>'; //data-modal class="btn btn-xs btn-custom"
+                }
                 //$acciones = $acciones . '<a class="btn btn-xs btn-primary" href="' . route("listsucursales", [$establecimientos->id]) . '"><i class="ti-layers-alt"></i> Sucursales</a>';
                 $acciones = $acciones . '</div>';
                 return $acciones;

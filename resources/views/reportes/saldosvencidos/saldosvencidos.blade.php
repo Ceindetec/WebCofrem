@@ -117,7 +117,7 @@
                         "Julio",
                         "Agosto",
                         "Septiembre",
-                        "Ocutbre",
+                        "Octubre",
                         "Noviembre",
                         "Diciembre"
                     ],

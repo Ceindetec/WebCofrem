@@ -43,7 +43,7 @@
                         <thead>
                         <tr>
                             <th>Nit</th>
-                            <th>Razon social</th>
+                            <th>Razón social</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
@@ -51,7 +51,7 @@
                         <tfoot>
                         <tr>
                             <th>Nit</th>
-                            <th>Razon social</th>
+                            <th>Razón social</th>
                             <th></th>
                             <th></th>
                         </tr>

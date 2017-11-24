@@ -1,5 +1,5 @@
 <div class="card-box">
-    <h4 class="m-t-0">Paga plastico</h4>
+    <h4 class="m-t-0">Paga plástico</h4>
     <br>
     {{Form::open(['route'=>['tarjeta.parametro.pagaplastico',$servicio->codigo], 'class'=>'form-inline', 'id'=>'prametropagaplastico'])}}
     <div class="form-group">
@@ -27,10 +27,10 @@
         <table id="datatablepagaplastico" class="table table-striped table-bordered" width="100%">
             <thead>
             <tr>
-                <th>Paga Plastico</th>
+                <th>Paga Plástico</th>
                 <th>Estado</th>
-                <th>Creacion</th>
-                <th>Actualizacion</th>
+                <th>Creación</th>
+                <th>Actualización</th>
             </tr>
             </thead>
         </table>
@@ -39,11 +39,11 @@
 
 
 <div class="card-box">
-    <h4 class="m-t-0">Procentaje de administracion</h4>
+    <h4 class="m-t-0">Porcentaje de administración</h4>
     <br>
     {{Form::open(['route'=>['tarjeta.parametro.administracion', $servicio->codigo], 'class'=>'form-inline', 'id'=>'parametroadministracion'])}}
     <div class="form-group">
-        <label for="valor">Administracion: </label>
+        <label for="valor">Administración: </label>
         <div class="input-group">
             <input type="number" name="porcentaje" class="form-control" required maxlength="2"
                    data-parsley-type="number"
@@ -64,9 +64,9 @@
             <tr>
                 <th>Administación</th>
                 <th>Estado</th>
-                <th>Creacion</th>
-                <th>Actualizacion</th>
-                <th>accion</th>
+                <th>Creación</th>
+                <th>Actualización</th>
+                <th>Acción</th>
             </tr>
             </thead>
         </table>
@@ -74,7 +74,7 @@
 </div>
 
 <div class="card-box col-md-12">
-    <h4 class="m-t-0">Ceuntas contables</h4>
+    <h4 class="m-t-0">Cuentas contables</h4>
     <br>
     @if($servicio->codigo!='A')
         {{Form::open(['route'=>['tarjeta.parametro.cuentaRB', $servicio->codigo], 'class'=>'form-inline', 'id'=>'parametrocuentacontable'])}}
@@ -97,8 +97,8 @@
                 <tr>
                     <th>Cuenta</th>
                     <th>Estado</th>
-                    <th>Creacion</th>
-                    <th>Actualizacion</th>
+                    <th>Creación</th>
+                    <th>Actualización</th>
                 </tr>
                 </thead>
             </table>
@@ -141,8 +141,8 @@
                         <th>Municipio</th>
                     @endif
                     <th>Estado</th>
-                    <th>Creacion</th>
-                    <th>Actualizacion</th>
+                    <th>Creación</th>
+                    <th>Actualización</th>
                 </tr>
                 </thead>
             </table>

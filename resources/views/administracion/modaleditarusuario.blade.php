@@ -6,7 +6,7 @@
     <div class="modal-body">
         <div class="row">
             <div class="col-md-12">
-                <h4 class="m-t-0 header-title"><b>Inforación básica</b></h4>
+                <h4 class="m-t-0 header-title"><b>Información básica</b></h4>
                 {{Form::model($user,['route'=>['usuario.editarp',$user->id], 'class'=>'form-horizontal', 'id'=>'ediusuariol'])}}
                 <div class="form-group">
                     <label class="col-md-2 control-label">Nombre</label>
@@ -52,10 +52,10 @@
                         <table id="datatableroles" class="table table-striped table-bordered">
                             <thead>
                             <tr>
-                                <th>id</th>
+                                <th>Id</th>
                                 <th>Nombre</th>
-                                <th>Descripcion</th>
-                                <th>Accion</th>
+                                <th>Descripción</th>
+                                <th>Acción</th>
                             </tr>
                             </thead>
                         </table>

@@ -12,7 +12,7 @@ class TipoTarjetasSeed extends Seeder
     public function run()
     {
         DB::table('servicios')->insert([
-            ["id" => "1", "codigo" => 'A', "descripcion" => 'AFILIADO'],
+            ["id" => "1", "codigo" => 'A', "descripcion" => 'CUPO ROTATIVO'],
             ["id" => "2", "codigo" => 'R', "descripcion" => 'REGALO'],
             ["id" => "3", "codigo" => 'B', "descripcion" => 'BONO EMPRESARIAL']
             ]
