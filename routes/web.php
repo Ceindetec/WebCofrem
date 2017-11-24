@@ -199,3 +199,15 @@ Route::get('/', function () {
 Route::get('jsonpermisos', function (){
    return \DB::table('permissions')->select('name','slug','description')->get();
 });
+
+
+Route::get('pruebawebservi', function (){
+    $url = "http://192.168.0.188/WebServices4/WConsultasCajas.asmx?wsdl";
+    try {
+        $client = new SoapClient($url, array("trace" => 1, "exception" => 0));
+        $result = $client->ConsultaAportante( [ "emp_codi" => 406, "tip_codi" => 1, "apo_coda" => "892000146" ] );
+       return dd($result->ConsultaAportanteResult->Aportante->TOAportante);
+    } catch ( SoapFault $e ) {
+        echo $e->getMessage();
+    }
+});
