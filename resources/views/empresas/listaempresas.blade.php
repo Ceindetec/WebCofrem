@@ -40,7 +40,8 @@
                     <table id="datatable" class="table table-striped table-bordered" width="100%">
                         <thead>
                         <tr>
-                            <th>Nit</th>
+                            <th>Tipo</th>
+                            <th>Número</th>
                             <th>Razón social</th>
                             <th>Representante Legal</th>
                             <th>Departamento</th>
@@ -55,7 +56,8 @@
                         </thead>
                         <tfoot>
                         <tr>
-                            <th>Nit</th>
+                            <th>Tipo</th>
+                            <th>Número</th>
                             <th>Razón social</th>
                             <th>Representante Legal</th>
                             <th></th>
@@ -108,6 +110,7 @@
                     "type": "get"
                 },
                 columns: [
+                    {data: 'get_tipo_documento.equivalente', name: 'tipo_documento'},
                     {data: 'nit', name: 'nit'},
                     {data: 'razon_social', name: 'razon_social'},
                     {data: 'representante_legal', name: 'representante_legal'},

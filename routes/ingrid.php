@@ -129,4 +129,8 @@ Route::group(['middleware' => 'auth'], function () {
     route::post('empresas/convenios/editar/{id}', 'ConveniosEmpresasController@EditarConvenio')->name('empresas.convenio.editarp');
     /*FINALIZA CONVENIOS EMPRESAS*/
 
+    /*INICIA CONSULTA WS PARA EMPRESAS*/
+    Route::get('empresas/consultaaportante','EmpresasController@consultarAportante')->name('consultaraportante');
+    /*FIN CONSULTA WS PARA EMPRESAS*/
+
 });
