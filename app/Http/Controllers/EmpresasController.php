@@ -9,6 +9,8 @@ use Yajra\Datatables\Datatables;
 use creditocofrem\Empresas;
 use creditocofrem\Departamentos;
 use creditocofrem\TipoDocumento;
+use SoapClient;
+
 
 class EmpresasController extends Controller
 {
@@ -78,6 +80,11 @@ class EmpresasController extends Controller
                 return $validator->errors()->all();
             }
             $empresa = new Empresas($request->all());
+            //dd("empresa razon:  ".$empresa);
+            if($empresa->tipo=="Afiliado")
+                $empresa->tipo="A";
+            else
+                $empresa->tipo="T";
             $empresa->razon_social = strtoupper($empresa->razon_social);
             $empresa->save();
             $result['estado'] = true;
@@ -136,8 +143,11 @@ class EmpresasController extends Controller
                     return $validator->errors()->all();
                 }
             }
-
             $empresa->update($request->all());
+            if($request->tipo_name=="Afiliado")
+                $empresa->tipo="A";
+            else
+                $empresa->tipo="T";
             $empresa->razon_social = strtoupper($empresa->razon_social);
             $empresa->save();
             $result['estado'] = true;
@@ -148,6 +158,56 @@ class EmpresasController extends Controller
             $result['mensaje'] = 'No fue posible editar la empresa. ' . $exception->getMessage();
         }
         return $result;
+    }
+    /**
+     * METODO para consultar datos de aportante con WS de SevenAs
+     * @return mixed returna una objeto de tipo empresa, con los datos consultados (si existe) o vacia (si no la encontro)
+     */
+    public function consultarAportante(Request $request)
+    {
+        $empresa = new Empresas();
+        $url = "http://192.168.0.188/WebServices4/WConsultasCajas.asmx?wsdl";
+        try {
+            $client = new SoapClient($url, array("trace" => 1, "exception" => 0));
+            $result = $client->ConsultaAportante( [ "emp_codi" => 406, "tip_codi" => $request->tipo, "apo_coda" => $request->num ] );// 2  "41676254"
+            if(isset($result->ConsultaAportanteResult->Aportante->TOAportante))
+            {
+                //dd("existe");
+                $empresa->razon_social=$result->ConsultaAportanteResult->Aportante->TOAportante->Apo_razs;
+                $empresa->representante_legal=$result->ConsultaAportanteResult->Aportante->TOAportante->Ter_noco;
+                $municipio_name = $result->ConsultaAportanteResult->Aportante->TOAportante->Mun_nomb;
+                $depto_name = $result->ConsultaAportanteResult->Aportante->TOAportante->Dep_nomb;
+                $empresa->email=$result->ConsultaAportanteResult->Aportante->TOAportante->Dsu_mail;
+                $empresa->telefono=$result->ConsultaAportanteResult->Aportante->TOAportante->Dsu_tele;
+                $empresa->celular=$result->ConsultaAportanteResult->Aportante->TOAportante->Dsu_celu;
+                $empresa->direccion=$result->ConsultaAportanteResult->Aportante->TOAportante->Dsu_dire;
+                $empresa->tipo="A";
+                //buscar departamento
+                $depto = Departamentos::where("descripcion", $depto_name)->first();
+                //dd($depto);
+                if($depto != null) {
+                    $muni = Municipios::where("descripcion", $municipio_name)->where("departamento_codigo", $depto->codigo)->first();
+                    $empresa->municipio_codigo = (string) $muni->codigo;
+                    $empresa->departamento_codigo = $depto->codigo;
+                }
+                else
+                {
+                   /* $muni = Municipios::where("descripcion", "VILLAVICENCIO")->where("departamento_codigo", $depto->codigo);
+                    $empresa->municipio_codigo = $muni->codigo;
+                    $empresa->departamento_codigo = $muni->departamento_codigo;*/
+                }
+                //buscar municipio
+            }
+            else
+            {
+                //dd("NO existe");
+                $empresa->tipo="T";
+            }
+
+        } catch ( SoapFault $e ) {
+            echo $e->getMessage();
+        }
+        return $empresa; //->razon_social
     }
 
 }
