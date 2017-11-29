@@ -7,11 +7,16 @@
     </div>
     <div class="modal-body">
 
-
         <div class="form-group">
-            <label class="col-md-2 control-label">Nit</label>
+            <label class="col-md-2 control-label">Tipo de documento</label>
+            <div class="col-md-4">
+                {{Form::select("tipo_documento",$tipoDocu,null,['class'=>'form-control', "tabindex"=>"1", 'id'=>'tipo_documento'])}}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label">Número de documento</label>
             <div class="col-md-10">
-                {{Form::text('nit', null ,['class'=>'form-control', "id"=>"nit", "required", "tabindex"=>"1","maxlength"=>"10", "data-parsley-type"=>"number"])}}
+                {{Form::text('nit', null ,['class'=>'form-control', "id"=>"nit", "required", "tabindex"=>"1","maxlength"=>"10", "tabindex"=>"2"])}} <!-- , "data-parsley-type"=>"number" -->
             </div>
         </div>
 
@@ -19,72 +24,58 @@
         <div class="form-group">
             <label class="col-md-2 control-label">Razón social</label>
             <div class="col-md-10">
-                {{Form::text('razon_social', null ,['class'=>'form-control', "id"=>"razon_social", "required", "maxlength"=>"40", "data-parsley-pattern"=>"^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]+(\s*[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]*)*[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]+$"])}}
+                {{Form::text('razon_social', null ,['class'=>'form-control', "id"=>"razon_social", "required", "maxlength"=>"40", "data-parsley-pattern"=>"^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]+(\s*[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]*)*[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]+$", "tabindex"=>"3"])}}
             </div>
         </div>
 
         <div class="form-group">
             <label class="col-md-2 control-label">Representante Legal</label>
             <div class="col-md-10">
-                {{Form::text('representante_legal', null ,['class'=>'form-control', "id"=>"razon_social", "required", "maxlength"=>"40", "data-parsley-pattern"=>"^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]+(\s*[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]*)*[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]+$"])}}
+                {{Form::text('representante_legal', null ,['class'=>'form-control', "id"=>"razon_social", "required", "maxlength"=>"40", "data-parsley-pattern"=>"^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]+(\s*[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]*)*[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ]+$", "tabindex"=>"4"])}}
             </div>
         </div>
-
-
-
         <div class="form-group">
             <label class="col-md-2 control-label">Departamento</label>
             <div class="col-md-4">
-                {{Form::select("departamento_codigo",$departamentos,null,['class'=>'form-control', "tabindex"=>"2", 'id'=>'departamento'])}}
+                {{Form::select("departamento_codigo",$departamentos,null,['class'=>'form-control', "tabindex"=>"5", 'id'=>'departamento'])}}
             </div>
             <label class="col-md-2 control-label">Ciudad</label>
             <div class="col-md-4">
-                <select name="municipio_codigo" id="municipio" tabindex="3" class="form-control">
+                <select name="municipio_codigo" id="municipio" tabindex="6" class="form-control">
                     <option>Seleccione...</option>
                 </select>
             </div>
         </div>
-
-
         <div class="form-group">
             <label class="col-md-2 control-label">E-mail</label>
             <div class="col-md-10">
-                {{Form::email('email', null ,['class'=>'form-control', "required"])}}
+                {{Form::email('email', null ,['class'=>'form-control', "required", "tabindex"=>"7"])}}
             </div>
         </div>
-
-
         <div class="form-group">
             <label class="col-md-2 control-label">Teléfono</label>
             <div class="col-md-10">
-                {{Form::text('telefono', null ,['class'=>'form-control', "required", "data-parsley-type"=>"number", "maxlength"=>"10"])}}
+                {{Form::text('telefono', null ,['class'=>'form-control', "required", "data-parsley-type"=>"number", "maxlength"=>"10", "tabindex"=>"8"])}}
             </div>
         </div>
-
-
         <div class="form-group">
             <label class="col-md-2 control-label">Celular</label>
             <div class="col-md-10">
-                {{Form::text('celular', null ,['class'=>'form-control', "required", "data-parsley-type"=>"number", "maxlength"=>"10"])}}
+                {{Form::text('celular', null ,['class'=>'form-control', "required", "data-parsley-type"=>"number", "maxlength"=>"10", "tabindex"=>"9"])}}
             </div>
         </div>
-
-
         <div class="form-group">
             <label class="col-md-2 control-label">Dirección</label>
             <div class="col-md-10">
-                {{Form::text('direccion', null ,['class'=>'form-control', "required", "maxlength"=>"40"])}}
+                {{Form::text('direccion', null ,['class'=>'form-control', "required", "maxlength"=>"40", "tabindex"=>"10"])}}
             </div>
         </div>
-
         <div class="form-group">
             <label class="col-md-2 control-label">Tipo</label>
             <div class="col-md-10">
-                {{Form::select('tipo', ['T' => 'Tercero', 'A' => 'Afiliado'], 'T', ['class'=>'form-control', "tabindex"=>"2", "required"])}}
+                {{Form::select('tipo', ['T' => 'Tercero', 'A' => 'Afiliado'], 'T', ['class'=>'form-control', "tabindex"=>"11", "required"])}}
             </div>
         </div>
-
-
 
     </div>
     <div class="modal-footer">

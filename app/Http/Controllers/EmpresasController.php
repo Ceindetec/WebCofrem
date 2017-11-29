@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 use creditocofrem\Empresas;
 use creditocofrem\Departamentos;
+use creditocofrem\TipoDocumento;
 
 class EmpresasController extends Controller
 {
@@ -29,6 +30,7 @@ class EmpresasController extends Controller
         $empresas = Empresas::all();
         foreach ($empresas as $emp) {
             $emp->getMunicipio->getDepartamento;
+            $emp->getTipoDocumento;
         }
         // dd($empresas);
 //
@@ -54,7 +56,8 @@ class EmpresasController extends Controller
     public function viewCrearEmpresa()
     {
         $departamentos = Departamentos::pluck('descripcion', 'codigo');
-        return view('empresas.modalcrearempresas', compact(['departamentos']));
+        $tipoDocu = TipoDocumento::pluck('equivalente', 'tip_codi');
+        return view('empresas.modalcrearempresas', compact(['departamentos', 'tipoDocu']));
     }
 
     /**
@@ -92,7 +95,8 @@ class EmpresasController extends Controller
         $empresa = Empresas::find($request->id);
         $depar = Municipios::find($empresa->municipio_codigo)->getDepartamento;
         $departamentos = Departamentos::pluck('descripcion', 'codigo');
-        return view('empresas.editarempresa', compact(['empresa', 'departamentos', 'depar']));
+        $tipoDocu = TipoDocumento::pluck('equivalente', 'tip_codi');
+        return view('empresas.editarempresa', compact(['empresa', 'departamentos', 'depar','tipoDocu']));
     }
 
     /**
