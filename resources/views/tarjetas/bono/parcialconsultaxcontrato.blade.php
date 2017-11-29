@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-lg-3 col-sm-6">
             <div class="widget-inline-box">
-                <button type="button" id="activar" class="btn btn-custom waves-effect waves-light" onclick="activar({{$contrato->n_contrato}})">Activar todas</button>
+                <button type="button" id="activar" class="btn btn-custom waves-effect waves-light" onclick="activar('{{$contrato->n_contrato}}')">Activar todas</button>
             </div>
         </div>
     </div>
