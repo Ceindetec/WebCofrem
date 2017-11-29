@@ -136,6 +136,7 @@ class SucursalesController extends Controller
             $sucursal->direccion = trim($request->vp) . ' ' . trim($request->nv) . ' #' . trim($request->n1) . '-' . trim($request->n2) . ' ' . trim($request->complemento);
             $sucursal->email = strtolower($request->email);
             $sucursal->telefono = $request->telefono;
+            $sucursal->contacto = $request->contacto;
             $establecimiento = Establecimientos::find($sucursal->establecimiento_id);
             if($request->estado == 'A'){
                 if($establecimiento->estado == 'I'){
