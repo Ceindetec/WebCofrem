@@ -11,7 +11,7 @@ class Sucursales extends Model implements AuditableContract
     use Auditable;
 
     protected $fillable = [
-        'nombre', 'latitud', 'longitud','municipio_codigo','email','telefono'
+        'nombre', 'latitud', 'longitud','municipio_codigo','email','telefono', 'contacto'
     ];
 
     public function getMunicipio()

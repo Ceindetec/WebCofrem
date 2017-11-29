@@ -17,5 +17,6 @@ class DatabaseSeeder extends Seeder
          $this->call(TipoTarjetasSeed::class);
          $this->call(PermisosSeeder::class);
          $this->call(MotivoSeed::class);
+         $this->call(TipoDocumentos::class);
     }
 }
