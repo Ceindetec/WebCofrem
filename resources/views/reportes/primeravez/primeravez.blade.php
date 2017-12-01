@@ -132,8 +132,11 @@
         })
 
         function generarRespuesta() {
+            cargando();
             var rango = $('#daterange').val();
-            $('#resultado').load('{{route('resultadoprimeravez')}}',{rango:rango});
+            $('#resultado').load('{{route('resultadoprimeravez')}}',{rango:rango}, function () {
+                fincarga();
+            });
         }
     </script>
 @endsection

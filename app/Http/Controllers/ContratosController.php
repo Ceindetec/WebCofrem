@@ -4,6 +4,7 @@ namespace creditocofrem\Http\Controllers;
 
 use creditocofrem\AdminisTarjetas;
 use creditocofrem\Contratos_empr;
+use creditocofrem\Tarjetas;
 use Illuminate\Http\Request;
 use creditocofrem\Establecimientos;
 use Yajra\Datatables\Datatables;
@@ -51,7 +52,7 @@ class ContratosController extends Controller
      */
     public function viewCrearContrato()
     {
-        $administracion = AdminisTarjetas::pluck('porcentaje', 'id');
+        $administracion = AdminisTarjetas::where('servicio_codigo', Tarjetas::$CODIGO_SERVICIO_BONO)->where('estado','A')->pluck('porcentaje', 'id');
         return view('empresas.contratos.modalcrearcontratos', compact(['administracion']));
 
     }

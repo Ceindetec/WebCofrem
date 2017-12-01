@@ -82,6 +82,13 @@
         </div>
 
         <div class="form-group">
+            <label class="col-md-2 control-label">Contacto</label>
+            <div class="col-md-10">
+                {{Form::text('contacto', null ,['class'=>'form-control', "id"=>"nombre", "required", "tabindex"=>"9","maxlength"=>"60", "data-parsley-pattern"=>"^[a-zA-Z0-9]+(\s*[a-zA-Z0-9]*)*[a-zA-Z0-9]+$"])}}
+            </div>
+        </div>
+
+        <div class="form-group">
             <label class="col-md-2 control-label">Email</label>
             <div class="col-md-10">
                 {{Form::text('email', null ,['class'=>'form-control', "id"=>"nombre", "required", "tabindex"=>"9","maxlength"=>"60", "data-parsley-type"=>"email"])}}

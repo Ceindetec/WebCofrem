@@ -733,7 +733,7 @@ class TarjetasBonoController extends Controller
                     \DB::commit();
                 }
             } else {
-                return "<p align='center'>No se encontraron resultados</p>";
+                //return "<p align='center'>No se encontraron resultados</p>";
                 $result['estado'] = false;
                 $result['mensaje'] = 'No hay tarjetas para activar';
                 \DB::rollBack();

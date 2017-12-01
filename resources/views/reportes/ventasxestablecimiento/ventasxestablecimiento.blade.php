@@ -156,7 +156,10 @@
         function generarRespuesta() {
             var rango = $('#daterange').val();
             var establecimientos = $('#establecimientos').val();
-            $('#resultado').load('{{route('resultadoventasxestablecimiento')}}',{rango:rango,establecimientos:establecimientos});
+            cargando();
+            $('#resultado').load('{{route('resultadoventasxestablecimiento')}}',{rango:rango,establecimientos:establecimientos}, function () {
+                fincarga();
+            });
         }
 
     </script>
