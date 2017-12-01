@@ -160,7 +160,10 @@
             /*if(establecimientos==null)
              alert("debe seleccionar al menos un establecimiento");
              else*/
-            $('#resultado').load('{{route('resultadoventasxsucursal')}}',{rango:rango,establecimientos:establecimientos});
+            cargando();
+            $('#resultado').load('{{route('resultadoventasxsucursal')}}',{rango:rango,establecimientos:establecimientos}, function () {
+                fincarga();
+            });
         }
 
     </script>

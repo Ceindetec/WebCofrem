@@ -132,7 +132,10 @@
         function generarRespuesta() {
             var rango = $('#daterange').val();
             var tipo = $('#tiposervicio').val();
-            $('#resultado').load('{{route('resultadomontosusados')}}', {rango: rango, tipo: tipo});
+            cargando();
+            $('#resultado').load('{{route('resultadomontosusados')}}', {rango: rango, tipo: tipo}, function () {
+                fincarga();
+            });
         }
     </script>
 @endsection
