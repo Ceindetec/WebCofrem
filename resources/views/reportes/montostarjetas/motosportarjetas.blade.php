@@ -135,7 +135,10 @@
         function generarRespuesta() {
             var rango = $('#daterange').val();
             var tipoServicio = $('#tiposervicio').val();
-            $('#resultado').load('{{route('reportes.resultadomotostarjetas')}}',{rango:rango,servicios:tipoServicio});
+            cargando();
+            $('#resultado').load('{{route('reportes.resultadomotostarjetas')}}',{rango:rango,servicios:tipoServicio}, function () {
+                fincarga();
+            });
         }
     </script>
 @endsection

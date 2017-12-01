@@ -34,7 +34,9 @@
                                     <!-- <select class="select2 form-control" multiple="multiple" name="establecimientos[]" required="required" data-placeholder="Seleccione ..." style="width: 100%" id="establecimientos" ></select> -->
                                     </div>
                                     <div class="form-group">
-                                        <button type="button" class="btn btn-custom" onclick="generarRespuesta()" >Generar</button>
+                                        <button type="button" class="btn btn-custom" onclick="generarRespuesta()">
+                                            Generar
+                                        </button>
                                     </div>
                                 </form>
                             </div>
@@ -69,7 +71,8 @@
     <script src="{{asset('plugins/datatables/dataTables.fixedColumns.min.js')}}"></script>
     <script src="{{asset('plugins/moment/moment.js')}}"></script>
     <script src="{{asset('plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js')}}"></script>
-    <script src="{{asset('plugins/bootstrap-datepicker/locale/bootstrap-datepicker.es.min.js')}}" charset="UTF-8"></script>
+    <script src="{{asset('plugins/bootstrap-datepicker/locale/bootstrap-datepicker.es.min.js')}}"
+            charset="UTF-8"></script>
     <script src="{{asset('plugins/bootstrap-daterangepicker/daterangepicker.js')}}"></script>
     <script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment-with-locales.min.js"></script>
     <script>
@@ -155,10 +158,10 @@
 
         function generarRespuesta() {
             var establecimientos = $('#establecimientos').val();
-           /* if(establecimientos==null)
-                alert("Debe seleccionar al menos un establecimiento");
-            else*/
-                $('#resultado').load('{{route('resultadodatafonosxestablecimientos')}}',{establecimientos:establecimientos});
+            cargando();
+            $('#resultado').load('{{route('resultadodatafonosxestablecimientos')}}', {establecimientos: establecimientos}, function () {
+                fincarga();
+            });
         }
 
     </script>

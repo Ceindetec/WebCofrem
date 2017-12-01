@@ -29,16 +29,19 @@
                                 <form class="form-horizontal col-md-12">
                                     <div class="form-group">
                                         <label>Rango de fecha para la consulta</label>
-                                        <input class="form-control input-daterange-datepicker" type="text" id="daterange"/>
+                                        <input class="form-control input-daterange-datepicker" type="text"
+                                               id="daterange"/>
                                     </div>
                                     <!-- { {Form::select("establecimiento[]",$establecimientos,null,['class'=>'select2 form-control', "tabindex"=>"2",'id'=>'establecimiento[]', "required"=>"required","multiple"=>"multiple"])}} -->
                                     <div class="form-group">
                                         <label>Establecimiento</label>
-                                        {{Form::select("establecimientos[]",$establecimientos,null,['class'=>'select2 form-control', "tabindex"=>"2",'id'=>'establecimientos', "required"=>"required","multiple"=>"multiple","data-placeholder"=>"Seleccione ..." ])}}
-                                        <!-- <select class="select2 form-control" multiple="multiple" name="establecimientos[]" required="required" data-placeholder="Seleccione ..." style="width: 100%" id="establecimientos" ></select> -->
+                                    {{Form::select("establecimientos[]",$establecimientos,null,['class'=>'select2 form-control', "tabindex"=>"2",'id'=>'establecimientos', "required"=>"required","multiple"=>"multiple","data-placeholder"=>"Seleccione ..." ])}}
+                                    <!-- <select class="select2 form-control" multiple="multiple" name="establecimientos[]" required="required" data-placeholder="Seleccione ..." style="width: 100%" id="establecimientos" ></select> -->
                                     </div>
                                     <div class="form-group">
-                                        <button type="button" class="btn btn-custom" onclick="generarRespuesta()" >Generar</button>
+                                        <button type="button" class="btn btn-custom" onclick="generarRespuesta()">
+                                            Generar
+                                        </button>
                                     </div>
                                 </form>
                             </div>
@@ -73,7 +76,8 @@
     <script src="{{asset('plugins/datatables/dataTables.fixedColumns.min.js')}}"></script>
     <script src="{{asset('plugins/moment/moment.js')}}"></script>
     <script src="{{asset('plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js')}}"></script>
-    <script src="{{asset('plugins/bootstrap-datepicker/locale/bootstrap-datepicker.es.min.js')}}" charset="UTF-8"></script>
+    <script src="{{asset('plugins/bootstrap-datepicker/locale/bootstrap-datepicker.es.min.js')}}"
+            charset="UTF-8"></script>
     <script src="{{asset('plugins/bootstrap-daterangepicker/daterangepicker.js')}}"></script>
     <script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment-with-locales.min.js"></script>
     <script>
@@ -168,7 +172,13 @@
             /*if(establecimientos==null)
                 alert("debe seleccionar al menos un establecimiento");
             else*/
-                $('#resultado').load('{{route('resultadoventasdiarias')}}',{rango:rango,establecimientos:establecimientos});
+            cargando();
+            $('#resultado').load('{{route('resultadoventasdiarias')}}', {
+                rango: rango,
+                establecimientos: establecimientos
+            }, function () {
+                fincarga();
+            });
         }
 
     </script>

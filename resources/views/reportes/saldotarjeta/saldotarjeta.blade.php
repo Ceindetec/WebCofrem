@@ -70,12 +70,19 @@
                 generarRespuesta();
             });
         });
+
         function generarRespuesta() {
             var numero_tarjeta = $('#numero_tarjeta').val();
-            if(numero_tarjeta != null)
-                $('#resultado').load('{{route('resultadosaldotarjeta')}}', {numero_tarjeta: numero_tarjeta});
-            else
+            if (numero_tarjeta != null) {
+                cargando();
+                $('#resultado').load('{{route('resultadosaldotarjeta')}}', {numero_tarjeta: numero_tarjeta}, function () {
+                    fincarga();
+                });
+            }
+            else {
                 sweetAlert("Debe ingresar un numero de tarjeta");
+            }
+
         }
     </script>
 @endsection
