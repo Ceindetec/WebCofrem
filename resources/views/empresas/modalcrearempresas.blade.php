@@ -52,7 +52,7 @@
             </div>
 
             <div class="form-group">
-                <label class="col-md-2 control-label">Direccion</label>
+                <label class="col-md-2 control-label">Dirección</label>
                 <div class="col-md-10">
                     {{Form::text('direccion', null ,['id'=>'direccion', 'class'=>'form-control', "required", "maxlength"=>"40", "tabindex"=>"7"])}}
                 </div>
@@ -67,7 +67,7 @@
 
 
                 <div class="form-group">
-                    <label class="col-md-2 control-label">Telefono</label>
+                    <label class="col-md-2 control-label">Teléfono</label>
                     <div class="col-md-10">
                         {{Form::text('telefono', null ,['id'=>'telefono', 'class'=>'form-control', "required", "data-parsley-type"=>"number", "maxlength"=>"10", "tabindex"=>"9"])}}
                     </div>

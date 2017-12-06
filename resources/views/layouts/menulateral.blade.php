@@ -58,6 +58,11 @@
                     <li><a href="{{route('bono.consultaxcontrato')}}">Consulta inteligente</a></li>
                 </ul>
             </li>
+                <li><a href="javascript: void(0);" aria-expanded="true">Cupo Rotativo <span class="fa arrow"></span></a>
+                    <ul class="nav-third-level nav collapse" aria-expanded="false">
+                        <li><a href="{{route('rotativo.viewcrearindividual')}}">Individualmente</a></li>
+                    </ul>
+                </li>
         </ul>
     </li>
     <li>
