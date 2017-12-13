@@ -82,6 +82,8 @@ class ConveniosEmpresasController extends Controller
             $extension = end($extensiones);
             if ($extension == "pdf") {
                 if(copy($_FILES['archivo']['tmp_name'], $new_name)) {
+                    //inactivar los demas convenios que existan
+                    ConveniosEmp::where('empresa_id', $request->id)->where('estado', '<>', ConveniosEmp::$ESTADO_CONVENIO_INACTIVO)->update(['estado' => ConveniosEmp::$ESTADO_CONVENIO_INACTIVO]);
 
                     $convenioemp->pdf=$new_name;
                     $convenioemp->empresa_id=$request->id;
