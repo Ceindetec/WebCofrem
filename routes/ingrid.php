@@ -133,4 +133,17 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('empresas/consultaaportante','EmpresasController@consultarAportante')->name('consultaraportante');
     /*FIN CONSULTA WS PARA EMPRESAS*/
 
+    /* INICIA CREACION TARJETAS CUPO ROTATIVO */
+    route::get('tarjetas/rotativo/crear', 'TarjetasCupoController@viewCrearTarjetaIndividual')->name('rotativo.viewcrearindividual');
+    route::post('tarjetas/rotativo/crear', 'TarjetasCupoController@CrearTarjetaIndividual')->name('rotativo.crearindividual');
+    //route::get('autoCompleNumContrato', 'TarjetasRotativoController@autoCompleNumContrato')->name('autoCompleNumContrato');
+    route::get('tarjetas/rotativo/getNombre', 'TarjetasCupoController@getNombre')->name('getNombre');
+   /* route::get('creartarjetasCupoBloque', 'TarjetasRotativoController@viewCrearTarjetaBloque')->name('creartarjetasCupoBloque');
+    route::post('cupo.crearbloque', 'TarjetasRotativoController@CrearTarjetaBloque')->name('rotativo.crearbloque');*/
+    /*FINALIZA CREACION TARJETAS CUPO ROTATIVO */
+
+    /*INICIA CONSULTA WS PARA PERSONA AFILIADA*/
+    Route::get('tarjetas/rotativo/consultaaportante','TarjetasCupoController@consultarTrabajador')->name('consultartrabajador');
+    /*FIN CONSULTA WS PARA PERSONA AFILIADA*/
+
 });

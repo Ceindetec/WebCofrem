@@ -15,14 +15,23 @@
                 <div class="col-sm-12">
                     <div class="card-box widget-inline">
                         <div class="row">
-                        {{Form::open(['route'=>['bono.crearbloque'],'files'=>'true' ,'class'=>'form-horizontal', 'id'=>'creartarjetabonob', 'target'=>"_blank",'role'=>'form','method'=>'POST'])}}
+                            <div class="col-md-12">
+                                <div class="alert alert-success alert-dismissable">
+                                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                    <strong>Para la carga en bloque es necesario que el archivo plano tenga la
+                                        estructura que se muestra en en el archivo de ejemplo!</strong> <a
+                                            href="{{url("documentos/tarjeta_bloque.txt")}}" target="_blank">Ver
+                                        ejemplo</a>.
+                                </div>
+                            </div>
+                            {{Form::open(['route'=>['bono.crearbloque'],'files'=>'true' ,'class'=>'form-horizontal', 'id'=>'creartarjetabonob', 'target'=>"_blank",'role'=>'form','method'=>'POST'])}}
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">Número de contrato</label>
                                 <div class="col-sm-7">
                                 {{Form::text('numero_contrato', null ,['class'=>'form-control', "required", "tabindex"=>"1",'id'=>'numero_contrato'])}} <!-- "data-parsley-type"=>"number"] -->
                                 </div>
                             </div>
-                           <!-- <div class="form-group">
+                        <!-- <div class="form-group">
                                 <label class="col-sm-3 control-label">Cantidad</label>
                                 <div class="col-sm-7">
                                     {{Form::number('cantidad', null ,['class'=>'form-control', "required", "data-parsley-type"=>"number", "min"=>"1","tabindex"=>"2",'id'=>'cantidad'])}}
@@ -39,14 +48,15 @@
                                 <div class="col-sm-7">
                                     {{Form::file('archivo',['class'=>'filestyle', "data-buttontext"=>"Buscar archivo", "required"=>"true", "tabindex"=>"4",'id'=>'archivo','accept'=>'.txt'])}}
                                 </div>
-                                <a href="{{url("documentos/tarjeta_bloque.txt")}}" target="_blank">Ver ejemplo</a>
                             </div>
                             <div class="form-group">
                                 <div class="col-sm-offset-3 col-sm-9">
-                                    <button type="submit" id="CrearB" class="btn btn-custom waves-effect waves-light">Crear</button>
+                                    <button type="submit" id="CrearB" class="btn btn-custom waves-effect waves-light">
+                                        Crear
+                                    </button>
                                 </div>
                             </div>
-                        {{Form::close()}}
+                            {{Form::close()}}
                         </div>
                     </div>
                 </div>
@@ -75,7 +85,7 @@
                 var form = $(this);
 
                 var formData = new FormData(form[0]);
-                formData.append( 'archivo', $( '#archivo' )[0].files[0] );
+                formData.append('archivo', $('#archivo')[0].files[0]);
 
                 $.ajax({
                     type: "POST",
