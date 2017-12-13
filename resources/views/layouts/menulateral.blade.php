@@ -48,6 +48,7 @@
                     <li><a href="{{route('crearTarjetaRegalo')}}">Individualmente</a></li>
                     <li><a href="{{route('crearTarjetaBloque')}}">En Bloque</a></li>
                     <li><a href="{{route('consultaregalo')}}">Consulta</a></li>
+                    <li><a href="{{route('consultaavan')}}">Consulta por factura</a></li>
                 </ul>
             </li>
             <li><a href="javascript: void(0);" aria-expanded="true">Bono Empresarial <span class="fa arrow"></span></a>
