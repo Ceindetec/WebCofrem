@@ -254,16 +254,6 @@ class WebApiController extends Controller
     private function retornaServicios($tarjeta, $request)
     {
         $result = [];
-        /*$servicios = TarjetaServicios::join('servicios', 'tarjeta_servicios.servicio_codigo', 'servicios.codigo')
-            ->where('numero_tarjeta', $tarjeta->numero_tarjeta)
-            ->where('estado', TarjetaServicios::$ESTADO_ACTIVO)
-            ->select('servicios.descripcion', 'servicios.codigo as codigo_servicio')
-            ->get();
-        $result['estado'] = TRUE;
-        $result['mensaje'] = ApiWS::$TEXT_TRANSACCION_EXITOSA;
-        $result['servicios'] = $servicios;*/
-
-
         $numero_tarjeta = $request->numero_tarjeta;
         $resultado = array();
         $listado = [];
