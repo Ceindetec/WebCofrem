@@ -15,11 +15,11 @@ class Contratos_empr extends Model
 
     public function getAdministracion()
     {
-        return $this->belongsTo('creditocofrem\administarjetas','adminis_tarjeta_id','id');
+        return $this->belongsTo('creditocofrem\Administarjetas','adminis_tarjeta_id','id');
     }
 
     public function getEmpresa()
     {
-        return $this->belongsTo('creditocofrem\empresas','empresa_id','id');
+        return $this->belongsTo('creditocofrem\Empresas','empresa_id','id');
     }
 }
