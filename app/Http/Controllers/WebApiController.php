@@ -288,7 +288,7 @@ class WebApiController extends Controller
                     $gasto += $dtransaccione->valor;
             }
             $sobrante = $detalle->monto_inicial - $gasto;
-            $sobrante = number_format($sobrante, 2, ',', '.');
+            $sobrante = number_format($sobrante, 0, ',', '.');
             if ($detalle->contrato_emprs_id == null) {
                 $codigo_servicio = Tarjetas::$CODIGO_SERVICIO_REGALO;
                 $servicio = 'Regalo';
