@@ -66,7 +66,7 @@ class WebApiController extends Controller
                 $data['estado_sucursal'] = $sucursal->estado;
                 $data['estado_terminal'] = $terminal->estado;
                 $data['codigo_terminal'] = $terminal->codigo;
-                $data['ip1'] = "192.168.0.26";
+                $data['ip1'] = "190.159.199.209";
                 $result['estado'] = TRUE;
                 $result['mensaje'] = ApiWS::$TEXT_VALIDACION_EXITOSA;
                 $result['data'] = $data;
@@ -278,7 +278,7 @@ class WebApiController extends Controller
                     $gasto += $dtransaccione->valor;
             }
             $sobrante = $detalle->monto_inicial - $gasto;
-            $sobrante = number_format($sobrante, 2, ',', '.');
+            $sobrante = number_format($sobrante, 0, ',', '.');
             if ($detalle->contrato_emprs_id == null) {
                 $codigo_servicio = Tarjetas::$CODIGO_SERVICIO_REGALO;
                 $servicio = 'Regalo';
