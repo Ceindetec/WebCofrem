@@ -47,4 +47,11 @@ class Tarjetas extends Model
     public function getDetalleProductoRegalo(){
         return $this->hasMany('creditocofrem\DetalleProdutos','numero_tarjeta','numero_tarjeta')->where('factura','<>',null);
     }
+
+    public function tarjetasRegalo(){
+        return $this->hasMany(DetalleProdutos::class,"numero_tarjeta","numero_tarjeta")->where("factura","<>",null);
+    }
+
+
+
 }

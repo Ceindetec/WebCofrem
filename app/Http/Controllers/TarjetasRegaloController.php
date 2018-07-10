@@ -56,7 +56,8 @@ class TarjetasRegaloController extends Controller
      */
     public function autoCompleNumTarjeta(Request $request)
     {
-        $tarjetas = Tarjetas::where("numero_tarjeta", "like", "%" . $request->numero_tarjeta . "%")->get();
+        $tarjetas = Tarjetas::where("numero_tarjeta", "like", "%" . $request["query"] . "%")->get();
+
         if (count($tarjetas) == 0) {
             $data["query"] = "Unit";
             $data["suggestions"] = [];
@@ -611,24 +612,19 @@ class TarjetasRegaloController extends Controller
      */
     public function gridConsulaTarjetaRegalo()
     {
-        $tarjetas = Tarjetas::join('tarjeta_servicios', 'tarjetas.numero_tarjeta', 'tarjeta_servicios.numero_tarjeta')
-            ->join('detalle_produtos', 'tarjetas.numero_tarjeta', 'detalle_produtos.numero_tarjeta')
-            ->where('tarjeta_servicios.servicio_codigo', Tarjetas::$CODIGO_SERVICIO_REGALO)
-            ->where('tarjeta_servicios.estado', '<>', TarjetaServicios::$ESTADO_ANULADA)
-            ->where('detalle_produtos.factura', '<>', null)
-            ->select(['detalle_produtos.monto_inicial', 'detalle_produtos.factura as fa', 'detalle_produtos.id as deta_id', 'detalle_produtos.estado as estadopro', 'tarjetas.*'])
-            ->get();
+
+        $tarjetas = DetalleProdutos::with("tarjeta")->where("factura","<>",null)->get();
 
         return Datatables::of($tarjetas)
             ->addColumn('action', function ($tarjetas) {
                 $acciones = "";
                 $acciones .= '<div class="btn-group">';
-                $acciones .= '<a data-modal href="' . route('gestionarTarjeta', $tarjetas->deta_id) . '" type="button" class="btn btn-custom btn-xs">Gestionar</a>';
+                $acciones .= '<a data-modal href="' . route('gestionarTarjeta', $tarjetas->tarjeta->id) . '" type="button" class="btn btn-custom btn-xs">Gestionar</a>';
                 if (Shinobi::can('editar.monto.regalo')) {
-                    $acciones .= '<a data-modal href="' . route('regalo.editar', $tarjetas->deta_id) . '" type="button" class="btn btn-custom btn-xs">Editar</a>';
+                    $acciones .= '<a data-modal href="' . route('regalo.editar', $tarjetas->tarjeta->id) . '" type="button" class="btn btn-custom btn-xs">Editar</a>';
                 }
                 if ($tarjetas->estadopro == 'I') {
-                    $acciones .= '<button type="button" class="btn btn-custom btn-xs" onclick="activar(' . $tarjetas->deta_id . ')">Activar</button>';
+                    $acciones .= '<button type="button" class="btn btn-custom btn-xs" onclick="activar(' . $tarjetas->tarjeta->id . ')">Activar</button>';
                 }
                 $acciones .= '</div>';
                 return $acciones;
