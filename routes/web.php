@@ -11,6 +11,10 @@
 |
 */
 
+//DB::listen(function ($query){
+//    echo "<pre>{$query->sql}</pre>";
+//});
+
 
 
 Auth::routes();
@@ -135,14 +139,6 @@ Route::group(['middleware' => 'auth'], function () {
 
     /*FINALIZA PARAMETRIZACION TARJETAS*/
 
-
-    /*INICIA CONSULTA TARJETA REGALO*/
-    Route::get('tarjetas/regalo/consulta', 'TarjetasRegaloController@consultaTarjetasRegalo')->name('consultaregalo');
-    Route::get('tarjetas/regalo/gridconsultatarjetaregalo', 'TarjetasRegaloController@gridConsulaTarjetaRegalo')->name('gridconsultatarjetaregalo');
-    Route::get('tarjetas/regalo/editar/{id}','TarjetasRegaloController@viewEditarRegalo')->name('regalo.editar')->middleware('permissionshinobi:editar.monto.regalo');
-    Route::post('tarjetas/regalo/editar/{id}','TarjetasRegaloController@editarRegalo')->middleware('permissionshinobi:editar.monto.regalo');
-    Route::post('tarjetas/regalo/activar','TarjetasRegaloController@activarTarjetaRegalo')->name('tarjeta.regalo.activar');
-    /*FINALIZA CONSULTA TARJETA REGALO*/
 
     /*INICIA GESTION DE TAARJETA*/
     Route::get('targetas/gestionar/{id}','TarjetasController@gestionarTarjeta')->name('gestionarTarjeta');

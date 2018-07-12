@@ -86,7 +86,7 @@
                 },
                 columns: [
                     {data: 'numero_tarjeta', name: 'numero_tarjeta'},
-                    {data: 'fa', name: 'fa'},
+                    {data: 'factura', name: 'factura'},
                     {
                         data: 'monto_inicial',
                         name: 'monto_inicial',
@@ -95,19 +95,9 @@
                         }
                     },
                     {
-                        data: 'estadopro',
-                        name: 'estadopro',
-                        render: function (data) {
-                            if (data == 'A') {
-                                return 'Activo';
-                            }
-                            else if (data == 'I') {
-                                return 'Inactivo';
-                            } else {
-                                return 'Pendiente'
-                            }
-                        },
-                        searchable: false
+                        data: 'estado',
+                        name: 'estado'
+
                     },
                     {data: 'action', name: 'action', orderable: false, searchable: false}
                 ],

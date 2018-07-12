@@ -30,12 +30,8 @@ class ContratosController extends Controller
      */
     public function gridContratos()
     {
-        $contratos = Contratos_empr::all();
-        foreach ($contratos as $contr) {
-            $contr->getEmpresa;
-            // }
-            // dd($empresas);
-        }
+        $contratos = Contratos_empr::with("getEmpresa")->get();
+
         return Datatables::of($contratos)
             ->addColumn('action', function ($contratos) {
                 $acciones = '<div class="btn-group">';

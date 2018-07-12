@@ -22,7 +22,7 @@
                             <div class="form-group">
                                 <label for="nit" class="col-sm-3 control-label">NIT</label>
                                 <div class="col-sm-7">
-                                    {{Form::text('nit', null ,['class'=>'form-control', "required", "required","placeholder"=>"NIT", "maxlength"=>"15", "onkeypress"=>"return justNumbers(event)"])}}
+                                    {{Form::text('nit', null ,['class'=>'form-control', "required", "required","placeholder"=>"NIT o Documento", "maxlength"=>"15", "onkeypress"=>"return justNumbers(event)"])}}
                                 </div>
                             </div>
                             <div class="form-group">

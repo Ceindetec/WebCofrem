@@ -215,10 +215,8 @@ class TerminalesController extends Controller
      */
     public function gridTerminalesTraslado()
     {
-        $terminales = Terminales::all();
-        foreach ($terminales as $terminale) {
-            $terminale->getSucursal->getEstablecimiento;
-        }
+        $terminales = Terminales::with("getSucursal","getSucursal.getEstablecimiento")->get();
+
         return Datatables::of($terminales)->addColumn('action', function ($terminales) {
             return '<a href="' . route("viewtrasladoterminal", $terminales->id) . '" data-modal="" class="btn btn-custom btn-xs"><i class="fa fa-exchange" aria-hidden="true"></i> Trasladar</a>';
         })->make(true);

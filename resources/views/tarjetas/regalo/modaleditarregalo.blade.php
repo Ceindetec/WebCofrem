@@ -21,7 +21,7 @@
             <div class="form-group">
                 <label class="col-md-2 control-label">Monto</label>
                 <div class="col-md-10">
-                {{Form::text('monto_inicial', null ,['class'=>'form-control money', "required", "maxlength"=>"10", "data-parsley-type"=>"number", "tabindex"=>"1",'id'=>'monto', "onkeypress"=>"return justNumbers(event)"])}} <!-- "data-parsley-type"=>"number"] -->
+                {{Form::text('monto_inicial', null ,['class'=>'form-control money', "required", "maxlength"=>"10", "tabindex"=>"1",'id'=>'monto', "onkeypress"=>"return justNumbers(event)"])}} <!-- "data-parsley-type"=>"number"] -->
                 </div>
             </div>
 

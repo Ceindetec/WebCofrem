@@ -109,9 +109,12 @@
     <script src="{{asset('plugins/parsleyjs/idioma/es.js')}}"></script>
 
     <script>
+
+
         var table;
+
         $(function () {
-            console.log();
+            console.log(" hola mundo ");
             table = $('#datatable').DataTable({
                 processing: true,
                 serverSide: true,
