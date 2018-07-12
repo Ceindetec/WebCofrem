@@ -53,5 +53,9 @@ class Tarjetas extends Model
     }
 
 
+    public function servicios(){
+        return $this->belongsToMany(Servicios::class,'tarjeta_servicios','numero_tarjeta','servicio_codigo');
+    }
+
 
 }

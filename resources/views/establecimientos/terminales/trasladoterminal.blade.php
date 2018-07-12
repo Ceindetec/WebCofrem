@@ -133,8 +133,8 @@
                     {data: 'codigo', name: 'codigo'},
                     {data: 'celular', name: 'celular'},
                     {data: 'numero_activo', name: 'numero_activo'},
-                    {data: 'get_sucursal.get_establecimiento.razon_social', name: 'Establecimiento'},
-                    {data: 'get_sucursal.nombre', name: 'Sucursal'},
+                    {data: 'get_sucursal.get_establecimiento.razon_social', name: 'get_sucursal.get_establecimiento.razon_social'},
+                    {data: 'get_sucursal.nombre', name: 'get_sucursal.nombre'},
                     {
                         data: 'estado',
                         name: 'estado',

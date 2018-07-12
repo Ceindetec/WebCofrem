@@ -17,6 +17,6 @@ class TarjetaServicios extends Model
 
     public function getServicio()
     {
-        return $this->belongsTo('creditocofrem\Servicios','servicio_codigo','codigo');
+        return $this->belongsTo(Servicios::class,'servicio_codigo','codigo');
     }
 }
