@@ -9,6 +9,14 @@
     <link href="{{asset('plugins/datatables/dataTables.bootstrap.min.css')}}" rel="stylesheet" type="text/css"/>
     <link href="{{asset('plugins/datatables/fixedColumns.dataTables.min.css')}}" rel="stylesheet" type="text/css"/>
     <link href="{{asset('plugins/bootstrap-datepicker/css/bootstrap-datepicker.min.css')}}" rel="stylesheet">
+
+    <style>
+        .width100{
+            width:100%;
+        }
+    </style>
+
+
 @endsection
 
 @section('contenido')
@@ -104,9 +112,12 @@
                 },
                 columns: [
                     {data: 'n_contrato', name: 'n_contrato'},
-                    {data: 'get_empresa.nit', name: 'nit'},
-                    {data: 'get_empresa.razon_social', name: 'razon_social'},
-                    {data: 'valor_contrato', name: 'valor_contrato'},
+                    {data: 'get_empresa.nit', name: 'get_empresa.nit'},
+                    {data: 'get_empresa.razon_social', name: 'get_empresa.razon_social'},
+                    {data: 'valor_contrato', name: 'valor_contrato',
+                        render: function (data) {
+                            return "$ "+enmascarar(data);
+                        }},
                     {data: 'fecha', name: 'fecha'},
                     {data: 'action', name: 'action', orderable: false, searchable: false}
                 ],
@@ -115,6 +126,9 @@
                         var column = this;
                         if(column.footer().innerHTML != ""){
                             var input = document.createElement("input");
+                            var att = document.createAttribute("class");
+                            att.value = "width100";
+                            input.setAttributeNode(att);
                             $(input).appendTo($(column.footer()).empty())
                                 .on('keyup', function () {
                                     column.search($(this).val(), false, false, true).draw();
