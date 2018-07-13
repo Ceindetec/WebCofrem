@@ -17,6 +17,10 @@ class CreateEstablecimientosTable extends Migration
             $table->bigIncrements('id')->nocache();
             $table->string('nit')->unique();
             $table->string('razon_social');
+            $table->string('email')->nullable();
+            $table->string('telefono')->nullable();
+            $table->string('celular')->nullable();
+            $table->enum('estado', ['A','I'])->default('A');
             $table->timestamps();
         });
     }

@@ -16,14 +16,16 @@ class CreateHContratosTable extends Migration
         Schema::create('h_contratos', function (Blueprint $table) {
             $table->bigIncrements('id')->nocache();
             $table->bigInteger('contrato_id')->unsigned();
-            $table->foreign('contrato_id')->references('id')->on('contratos_emprs')->onDelete('cascade');
+            $table->integer('usuario_id')->unsigned();
             $table->date('fecha');
             $table->string('motivo')->nullable();
             $table->enum('estado',['A','I']);//activo o inactivo
             $table->time('hora');
-            $table->integer('usuario_id')->unsigned();
-            $table->foreign('usuario_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
+
+
+            $table->foreign('contrato_id')->references('id')->on('contratos_emprs')->onDelete('cascade');
+            $table->foreign('usuario_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

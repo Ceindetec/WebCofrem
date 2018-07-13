@@ -27,5 +27,15 @@ class UsuarioAdmin extends Seeder
             "role_id"=>$roleId,
             "user_id"=>$userId
         ]);
+
+        $permisos = \Caffeinated\Shinobi\Models\Permission::all()->pluck("id")->toArray();
+
+
+
+        $rol = \Caffeinated\Shinobi\Models\Role::find($roleId);
+
+        $rol->syncPermissions($permisos);
+
+
     }
 }

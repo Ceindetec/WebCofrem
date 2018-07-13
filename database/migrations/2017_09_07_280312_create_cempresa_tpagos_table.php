@@ -16,10 +16,11 @@ class CreateCempresaTpagosTable extends Migration
         Schema::create('cempresa_tpagos', function (Blueprint $table) {
             $table->bigIncrements('id')->nocache();
             $table->Integer('tiempo_pagos_id')->unsigned();
-            $table->foreign('tiempo_pagos_id')->references('id')->on('tiempo_pagos')->onDelete('cascade');
             $table->bigInteger('contrato_empresas_id')->unsigned();
-            $table->foreign('contrato_empresas_id')->references('id')->on('contratos_emprs')->onDelete('cascade');
             $table->timestamps();
+
+            $table->foreign('tiempo_pagos_id')->references('id')->on('tiempo_pagos')->onDelete('cascade');
+            $table->foreign('contrato_empresas_id')->references('id')->on('contratos_emprs')->onDelete('cascade');
         });
     }
 

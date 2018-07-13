@@ -16,10 +16,12 @@ class CreateTarjetaServiciosTable extends Migration
         Schema::create('tarjeta_servicios', function (Blueprint $table) {
             $table->increments('id')->nocache();
             $table->string('numero_tarjeta')->index();
-            $table->foreign('numero_tarjeta')->references('numero_tarjeta')->on('tarjetas')->onDelete('cascade');
             $table->string('servicio_codigo')->index();
-            $table->foreign('servicio_codigo')->references('codigo')->on('servicios')->onDelete('cascade');
+            $table->enum('estado',['A','I','N'])->default('I');
             $table->timestamps();
+
+            $table->foreign('numero_tarjeta')->references('numero_tarjeta')->on('tarjetas')->onDelete('cascade');
+            $table->foreign('servicio_codigo')->references('codigo')->on('servicios')->onDelete('cascade');
         });
     }
 

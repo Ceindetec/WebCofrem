@@ -15,16 +15,20 @@ class CreateEmpresasTable extends Migration
     {
         Schema::create('empresas', function (Blueprint $table) {
             $table->bigIncrements('id')->nocache();
+            $table->integer('tipo_documento')->unsigned()->nullable();
             $table->string('nit')->unique();
             $table->string('razon_social');
             $table->string('representante_legal');
             $table->string('municipio_codigo')->index();
-            $table->foreign('municipio_codigo')->references('codigo')->on('municipios')->onDelete('cascade');
             $table->string('email')->unique();
             $table->string('telefono');
             $table->string('celular')->nullable();
             $table->string('direccion');
+            $table->enum('tipo', ['A', 'T'])->defaul('T');
             $table->timestamps();
+
+            $table->foreign('tipo_documento')->references('tip_codi')->on('tipo_documentos')->onDelete('cascade');
+            $table->foreign('municipio_codigo')->references('codigo')->on('municipios')->onDelete('cascade');
         });
     }
 

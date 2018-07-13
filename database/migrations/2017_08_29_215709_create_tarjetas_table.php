@@ -16,11 +16,14 @@ class CreateTarjetasTable extends Migration
         Schema::create('tarjetas', function (Blueprint $table) {
             $table->bigIncrements('id')->nocache();
             $table->primary('id');
-            $table->string('numero_tarjeta')->unique();
-            $table->enum('tipo',['A','R','B']);
+            $table->bigInteger('persona_id')->nullable()->unsigned();
+            $table->string('numero_tarjeta')->unique()->index();
             $table->boolean('cambioclave')->default(false);
             $table->string('password');
+            $table->enum('estado',['A','I','C','N'])->default('C');
             $table->timestamps();
+
+            $table->foreign('persona_id')->references('id')->on('personas')->onDelete('cascade');
         });
     }
 

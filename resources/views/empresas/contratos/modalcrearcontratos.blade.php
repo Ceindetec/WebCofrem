@@ -7,67 +7,67 @@
     <div class="modal-body">
         <div class="row">
             <div class="form-group">
-                <label class="col-md-2 control-label">Nit empresa</label>
-                <div class="col-md-10">
+                <label class="col-md-4 control-label">Nit empresa</label>
+                <div class="col-md-8">
                     {{Form::text('nit', null, ['class'=>'form-control', "required", "tabindex"=>"1", "maxlength"=>"10", "data-parsley-type"=>"number", 'id'=>'nit'])}}
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="col-md-2 control-label">Número de contrato</label>
-                <div class="col-md-10">
+                <label class="col-md-4 control-label">Número de contrato</label>
+                <div class="col-md-8">
                     {{Form::text('n_contrato', null ,['class'=>'form-control', "required", "tabindex"=>"2", 'id'=>'n_contrato'])}}
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="col-md-2 control-label">Valor contrato</label>
-                <div class="col-md-10">
+                <label class="col-md-4 control-label">Valor contrato</label>
+                <div class="col-md-8">
                     {{Form::text('valor_contrato', null ,['class'=>'form-control money', "required", "tabindex"=>"3",'id'=>'valor_contrato'])}}
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="col-md-2 control-label">Valor del impuesto</label>
-                <div class="col-md-10">
+                <label class="col-md-4 control-label">Valor del impuesto</label>
+                <div class="col-md-8">
                     {{Form::text('valor_impuesto', null ,['class'=>'form-control money', "required", "tabindex"=>"4",'id'=>'impuesto'])}}
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="col-md-2 control-label">Fecha</label>
-                <div class="col-md-10">
+                <label class="col-md-4 control-label">Fecha</label>
+                <div class="col-md-8">
                     {{Form::text("fecha", null,['class'=>'form-control', "required", "tabindex"=>"5", 'id'=>'fecha'])}}
                 </div>
             </div>
 
 
             <div class="form-group">
-                <label class="col-md-2 control-label">Número de tarjetas</label>
-                <div class="col-md-10">
+                <label class="col-md-4 control-label">Número de tarjetas</label>
+                <div class="col-md-8">
                     {{Form::text('n_tarjetas', null ,['class'=>'form-control', "required", "data-parsley-type"=>"number", "maxlength"=>"3", "tabindex"=>"6", 'id'=>'n_tarjetas'])}}
                 </div>
             </div>
 
 
             <div class="form-group">
-                <label class="col-md-2 control-label">Forma de pago</label>
-                <div class="col-md-10">
+                <label class="col-md-4 control-label">Forma de pago</label>
+                <div class="col-md-8">
                     {{Form::select('forma_pago', ['E' => 'Efectivo', 'C' => 'Consumo'], 'E',['class'=>'form-control', "tabindex"=>"7", "required", 'id'=>'forma_pago'])}}
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="col-md-2 control-label">Documentos</label>
-                <div class="col-md-10">
+                <label class="col-md-4 control-label">Documentos</label>
+                <div class="col-md-8">
                     {{Form::file('pdf', ['class'=>'filestyle', "data-buttontext"=>"Buscar archivo", "tabindex"=>"8", 'id'=>'pdf'])}}
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="control-label col-md-2">Consumo</label>
+                <label class="control-label col-md-4">Consumo</label>
                 <br>
-                <div class="col-md-10">
+                <div class="col-md-8">
                     <div class="radio radio-custom form-check form-check-inline" style="display: inline">
 
                         {{Form::radio('consumo', '1', true)}}
@@ -84,14 +84,14 @@
             </div>
 
             <div class="form-group">
-                <label class="col-md-2 control-label">Días Consumo</label>
-                <div class="col-md-10">
+                <label class="col-md-4 control-label">Días Consumo</label>
+                <div class="col-md-8">
                     {{Form::text('dias_consumo', null ,['class'=>'form-control', "data-parsley-type"=>"number", "tabindex"=>"9", "maxlength"=>"3", 'id'=>'dias_consumo'])}}
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="col-md-2 control-label">Porcentaje Administración</label>
+                <label class="col-md-4 control-label">Porcentaje Administración</label>
                 <div class="col-md-4">
                     {{Form::select("adminis_tarjeta_id",$administracion,null,['class'=>'form-control', "tabindex"=>"10", 'id'=>'administracion'])}}
                 </div>
