@@ -19,6 +19,10 @@ class CreateDuplicadosTable extends Migration
             $table->string('newtarjeta');
             $table->date('fecha');
             $table->timestamps();
+
+            $table->foreign('oldtarjeta')->references('numero_tarjeta')->on('tarjetas')->onDelete('cascade');
+            $table->foreign('newtarjeta')->references('numero_tarjeta')->on('tarjetas')->onDelete('cascade');
+
         });
     }
 

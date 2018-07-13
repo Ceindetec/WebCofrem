@@ -15,12 +15,14 @@ class CreateCuenContaTarjetasTable extends Migration
     {
         Schema::create('cuen_conta_tarjetas', function (Blueprint $table) {
             $table->increments('id')->nochece();
-            $table->string('tarjeta_codigo',1)->index();
-            $table->foreign('tarjeta_codigo')->references('codigo')->on('tipo_tarjetas')->onDelete('cascade');
+            $table->string('servicio_codigo',10)->index();
             $table->string('municipio_codigo')->index();
-            $table->foreign('municipio_codigo')->references('codigo')->on('municipios')->onDelete('cascade');
             $table->integer('cuenta');
+            $table->enum('estado',['A','I'])->default('I');
             $table->timestamps();
+
+            $table->foreign('servicio_codigo')->references('codigo')->on('servicios')->onDelete('cascade');
+            $table->foreign('municipio_codigo')->references('codigo')->on('municipios')->onDelete('cascade');
         });
     }
 

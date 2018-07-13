@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AlterTablePersonasAddCampos extends Migration
+class CreatePersonasTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,27 @@ class AlterTablePersonasAddCampos extends Migration
      */
     public function up()
     {
-        Schema::table('personas', function (Blueprint $table) {
+        Schema::create('personas', function (Blueprint $table) {
+            $table->bigIncrements('id')->nocache();
+            $table->primary('id');
+            $table->string('identificacion')-> unique();
+            $table->string('nombres');
+            $table->string('apellidos');
+            $table->string('email')->nullable();
+            $table->string('telefono')->nullable();
+            $table->string('celular')->nullable();
             $table->string('direccion')->nullable();
             $table->string('latitud')->nullable();
             $table->string('longitud')->nullable();
             $table->enum('sexo',['M','F'])->default('M');
             $table->date('fecha_nacimiento')->nullable();
-            $table->enum('tipo_perosna',['A','T'])->default('T');
-            $table->bigInteger('padre_id')->nullable();
+            $table->enum('tipo_persona',['A','T'])->default('T');
             $table->string('municipio_codigo')->nullable()->index();
+            $table->bigInteger('padre_id')->nullable();
+            $table->timestamps();
+
             $table->foreign('municipio_codigo')->references('codigo')->on('municipios')->onDelete('cascade');
+            $table->foreign('padre_id')->references('id')->on('personas')->onDelete('cascade');
         });
     }
 
@@ -33,15 +44,6 @@ class AlterTablePersonasAddCampos extends Migration
      */
     public function down()
     {
-        Schema::table('personas', function (Blueprint $table) {
-            $table->dropColumn('direccion');
-            $table->dropColumn('latitud');
-            $table->dropColumn('longitud');
-            $table->dropColumn('sexo');
-            $table->dropColumn('fecha_nacimiento');
-            $table->dropColumn('padre_id');
-            $table->dropColumn('municipio_codigo');
-            $table->dropColumn('tipo_perosna');
-        });
+        Schema::dropIfExists('personas');
     }
 }

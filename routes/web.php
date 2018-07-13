@@ -16,6 +16,13 @@
 //});
 
 
+Route::get("permi",function (){
+    $permisos = \Caffeinated\Shinobi\Models\Permission::all()->pluck("id");
+
+    return $permisos;
+});
+
+
 
 Auth::routes();
 

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTercerosTable extends Migration
+class CreateServiciosTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,11 @@ class CreateTercerosTable extends Migration
      */
     public function up()
     {
-        Schema::create('terceros', function (Blueprint $table) {
-            $table->bigIncrements('id')->nocache();
-            $table->primary('id');
-            $table->string('identificacion')-> unique();
-            $table->string('nombres');
-            $table->string('apellidos');
+        Schema::create('servicios', function (Blueprint $table) {
+            $table->increments('id')->nocache();
+            $table->string('codigo',10)->unique();
+            $table->string('descripcion',20);
+            $table->enum('tipo',['P','S'])->default('P');
             $table->timestamps();
         });
     }
@@ -30,6 +29,6 @@ class CreateTercerosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('terceros');
+        Schema::dropIfExists('servicios');
     }
 }
