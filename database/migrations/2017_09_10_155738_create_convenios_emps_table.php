@@ -19,11 +19,12 @@ class CreateConveniosEmpsTable extends Migration
             $table->date('fecha_inicio');
             $table->date('fecha_fin')->nullable();
             $table->bigInteger('empresa_id')->unsigned();
-            $table->foreign('empresa_id')->references('id')->on('empresas')->onDelete('cascade');
             $table->enum("estado", ["A","I","P"]); // A -> Activo , Inactivo, pendiente
             $table->string('pdf');
             $table->enum("tipo", ["L","C","A"]); // L -> libre inversion , C ->cupo rotativo, A -> ambos (L y C)
             $table->timestamps();
+
+            $table->foreign('empresa_id')->references('id')->on('empresas')->onDelete('cascade');
         });
     }
 

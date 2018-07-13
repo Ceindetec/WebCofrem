@@ -19,6 +19,9 @@ class CreateDuplicadoProductosTable extends Migration
             $table->string('newproducto');
             $table->date('fecha');
             $table->timestamps();
+
+            $table->foreign('oldproducto')->references('numero_tarjeta')->on('tarjetas')->onDelete('cascade');
+            $table->foreign('newproducto')->references('numero_tarjeta')->on('tarjetas')->onDelete('cascade');
         });
     }
 

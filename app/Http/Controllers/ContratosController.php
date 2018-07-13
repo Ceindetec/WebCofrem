@@ -48,7 +48,10 @@ class ContratosController extends Controller
      */
     public function viewCrearContrato()
     {
-        $administracion = AdminisTarjetas::where('servicio_codigo', Tarjetas::$CODIGO_SERVICIO_BONO)->where('estado','A')->pluck('porcentaje', 'id');
+        $administracion = AdminisTarjetas::where('servicio_codigo', Tarjetas::$CODIGO_SERVICIO_BONO)
+            ->where('estado','A')
+            ->orderBy("porcentaje","asc")
+            ->pluck('porcentaje', 'id');
         return view('empresas.contratos.modalcrearcontratos', compact(['administracion']));
 
     }

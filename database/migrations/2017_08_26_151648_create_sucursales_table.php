@@ -15,8 +15,11 @@ class CreateSucursalesTable extends Migration
     {
         Schema::create('sucursales', function (Blueprint $table) {
             $table->bigIncrements('id')->nocache();
-            $table->bigInteger('establecimieto_id')->unsigned();
+            $table->bigInteger('establecimiento_id')->unsigned();
             $table->string('nombre');
+            $table->string('contacto')->nullable();
+            $table->string('telefono')->nullable();
+            $table->string('email')->nullable();
             $table->string('direccion');
             $table->string('latitud');
             $table->string('longitud');
@@ -24,7 +27,7 @@ class CreateSucursalesTable extends Migration
             $table->enum('estado' ,['A','I']);
             $table->string('municipio_codigo')->index();
             $table->foreign('municipio_codigo')->references('codigo')->on('municipios')->onDelete('cascade');
-            $table->foreign('establecimieto_id')->references('id')->on('establecimientos')->onDelete('cascade');
+            $table->foreign('establecimiento_id')->references('id')->on('establecimientos')->onDelete('cascade');
             $table->timestamps();
         });
     }

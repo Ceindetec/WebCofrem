@@ -15,14 +15,18 @@ class CreateTerminalesTable extends Migration
     {
         Schema::create('terminales', function (Blueprint $table) {
             $table->bigIncrements('id')->nocache();
-            $table->string('codigo');
+            $table->bigInteger('sucursal_id')->unsigned();
+            $table->string('codigo',15)->unique();
             $table->string('uid')->nullable();
             $table->string('mac')->nullable();
             $table->string('imei')->nullable();
+            $table->string('celular',10);
+            $table->string('numero_activo')->unique();
             $table->string('password');
-            $table->bigInteger('sucursal_id')->unsigned();
-            $table->foreign('sucursal_id')->references('id')->on('sucursales')->onDelete('cascade');
+            $table->enum('estado',['A','I'])->default('A');
             $table->timestamps();
+
+            $table->foreign('sucursal_id')->references('id')->on('sucursales')->onDelete('cascade');
         });
     }
 

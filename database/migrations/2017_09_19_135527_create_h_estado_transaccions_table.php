@@ -19,6 +19,8 @@ class CreateHEstadoTransaccionsTable extends Migration
             $table->enum("estado", ["A","I"]); // A -> Activo , Inactivo
             $table->date("fecha");
             $table->timestamps();
+
+            $table->foreign('transaccion_id')->references('id')->on('transacciones')->onDelete('cascade');
         });
     }
 

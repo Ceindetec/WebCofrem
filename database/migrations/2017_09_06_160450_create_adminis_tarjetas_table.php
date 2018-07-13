@@ -17,9 +17,10 @@ class CreateAdminisTarjetasTable extends Migration
             $table->increments('id')->nocache();
             $table->integer('porcentaje');
             $table->enum('estado',['A','I'])->default('A');
-            $table->string('tarjeta_codigo')->index();
-            $table->foreign('tarjeta_codigo')->references('codigo')->on('tipo_tarjetas')->onDelete('cascade');
+            $table->string('servicio_codigo')->index();
             $table->timestamps();
+
+            $table->foreign('servicio_codigo')->references('codigo')->on('servicios')->onDelete('cascade');
         });
     }
 

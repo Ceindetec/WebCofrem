@@ -84,9 +84,9 @@ class ParametrizacionTarjetasController extends Controller
                     }
                 }
             }
-            if($codigo == Tarjetas::$CODIGO_SERVICIO_REGALO){
+            if ($codigo == Tarjetas::$CODIGO_SERVICIO_REGALO) {
                 $existePararegalo = AdminisTarjetas::where('estado', 'A')->where('servicio_codigo', $codigo)->first();
-                if($existePararegalo != NULL){
+                if ($existePararegalo != NULL) {
                     $result['estado'] = false;
                     $result['mensaje'] = 'Existe una parametrizacion activa para este producto';
                     return $result;
@@ -110,10 +110,10 @@ class ParametrizacionTarjetasController extends Controller
      */
     public function gridAdministracionTarjetas($codigo)
     {
-        $administraciones = AdminisTarjetas::where('estado', 'A')->where('servicio_codigo', $codigo)->get();
-        foreach ($administraciones as $administracione) {
-            $administracione->getTipoTarjeta;
-        }
+        $administraciones = AdminisTarjetas::with("getTipoTarjeta")
+            ->where('estado', 'A')
+            ->where('servicio_codigo', $codigo)
+            ->orderBy("porcentaje", "asc");
 
         return Datatables::of($administraciones)
             ->addColumn('action', function ($rangos) {
@@ -179,7 +179,8 @@ class ParametrizacionTarjetasController extends Controller
         DB::beginTransaction();
         try {
             $existePaga = PagaPlastico::where('estado', 'A')->where('servicio_codigo', $codigo)->first();
-            if (count($existePaga) > 0) {
+
+            if ($existePaga != null) {
                 $existePaga->estado = 'I';
                 $existePaga->save();
             }
